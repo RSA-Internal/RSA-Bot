@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
+mainClassName = 'org.rsa.Bot'
+version '1.0'
+sourceCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'net.dv8tion:JDA:5.0.0-beta.13'
+    implementation 'ch.qos.logback:logback-classic:1.2.8'
+}
+
+compileJava.options.encoding = 'UTF-8'
