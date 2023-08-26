@@ -5,7 +5,15 @@
     {
       "dnsSearchDomains": null,
       "environmentFiles": null,
-      "logConfiguration": null,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "rsa-bot-container",
+          "awslogs-region": "us-west-2",
+          "awslogs-create-group": "true",
+          "awslogs-stream-prefix": "rsa-bot"
+        }
+      },
       "entryPoint": null,
       "portMappings": [
         {
@@ -51,7 +59,7 @@
   ],
   "placementConstraints": [],
   "memory": "2GB",
-  "taskRoleArn": null,
+  "taskRoleArn": "arn:aws:iam::792720642917:role/ecsTaskExecutionRole",
   "compatibilities": [
     "FARGATE"
   ],
