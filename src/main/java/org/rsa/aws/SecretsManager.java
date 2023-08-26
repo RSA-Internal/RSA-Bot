@@ -16,7 +16,7 @@ public class SecretsManager {
 
     private static SecretsManagerClient instance;
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final TypeReference<HashMap<String, String>> SECRET_TYPE_REFERENCE = new TypeReference<HashMap<String, String>>() {};
+    private static final TypeReference<HashMap<String, String>> SECRET_TYPE_REFERENCE = new TypeReference<>() {};
 
     public static final String BOT_TOKEN = "prod/RSABot/token";
 
@@ -24,7 +24,6 @@ public class SecretsManager {
         if (null == instance) {
             instance = SecretsManagerClient.builder()
                     .region(Region.US_WEST_2)
-                    .credentialsProvider(ProfileCredentialsProvider.create())
                     .build();
         }
         return instance;
