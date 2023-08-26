@@ -3,11 +3,19 @@ package org.rsa;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.rsa.aws.SecretsManager;
 import org.rsa.listeners.MessageListener;
+
+import static org.rsa.aws.SecretsManager.getSecretManager;
+import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
     public static void main(String[] args) {
-        final String BOT_TOKEN = System.getenv("BOT_TOKEN");
+        String BOT_TOKEN = System.getenv("BOT_TOKEN");
+
+        if (null == BOT_TOKEN) {
+            BOT_TOKEN = getValue(getSecretManager(), SecretsManager.BOT_TOKEN);
+        }
 
         JDA api = JDABuilder
                 .createDefault(BOT_TOKEN)
