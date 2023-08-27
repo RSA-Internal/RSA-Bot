@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.spotbugs' version '6.0.0-beta.3'
 }
 
 mainClassName = 'org.rsa.Bot'
@@ -21,7 +22,7 @@ dependencies {
 
     implementation 'software.amazon.awssdk:secretsmanager'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.0.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
 
     implementation 'net.dv8tion:JDA:5.0.0-beta.13'
     implementation 'ch.qos.logback:logback-classic:1.2.9'

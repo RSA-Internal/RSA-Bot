@@ -13,7 +13,6 @@ public class MessageListener extends ListenerAdapter {
         String content = message.getContentRaw();
 
         if (content.equals("tg!ping")) {
-            MessageChannel channel = event.getChannel();
             message.reply("Pong!").queue();
         }
     }

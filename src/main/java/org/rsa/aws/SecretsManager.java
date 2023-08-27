@@ -13,24 +13,20 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class SecretsManager {
-
-    private static SecretsManagerClient instance;
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final TypeReference<HashMap<String, String>> SECRET_TYPE_REFERENCE = new TypeReference<>() {};
 
-    public static final String BOT_TOKEN = "prod/RSABot/token";
+    public static final String BOT_TOKEN_KEY = "prod/RSABot/token";
 
-    public static SecretsManagerClient getSecretManager() {
-        if (null == instance) {
-            instance = SecretsManagerClient.builder()
-                    .region(Region.US_WEST_2)
-                    .build();
-        }
-        return instance;
+    private static SecretsManagerClient getSecretManager() {
+        return SecretsManagerClient.builder()
+            .region(Region.US_WEST_2)
+            .build();
     }
 
-    public static String getValue(SecretsManagerClient secretsClient, String secretName) {
+    public static String getValue(String secretName) {
         try {
+            SecretsManagerClient secretsClient = getSecretManager();
             GetSecretValueRequest valueRequest = GetSecretValueRequest.builder()
                     .secretId(secretName)
                     .build();
@@ -43,6 +39,7 @@ public class SecretsManager {
             String secretValue = secret.values().stream().findFirst().orElse(null);
 
             System.out.println("Secret: " + secretValue);
+            secretsClient.close();
             return secretValue;
         } catch (SecretsManagerException e) {
             System.err.println(e.awsErrorDetails().errorMessage());
