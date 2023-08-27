@@ -2,7 +2,6 @@ package org.rsa.aws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
@@ -33,12 +32,9 @@ public class SecretsManager {
 
             GetSecretValueResponse valueResponse = secretsClient.getSecretValue(valueRequest);
             String secretResponse = valueResponse.secretString();
-            System.out.println(secretResponse);
             HashMap<String, String> secret = objectMapper.readValue(secretResponse, SECRET_TYPE_REFERENCE);
-            System.out.println(secret);
             String secretValue = secret.values().stream().findFirst().orElse(null);
 
-            System.out.println("Secret: " + secretValue);
             secretsClient.close();
             return secretValue;
         } catch (SecretsManagerException e) {
