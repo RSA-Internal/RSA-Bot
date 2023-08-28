@@ -19,10 +19,10 @@ import java.util.List;
 
 public class WandboxAPI {
 
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final TypeReference<List<CompilerInfo>> COMPILER_INFO_LIST_TYPE = new TypeReference<>() {};
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private static final TypeReference<List<CompilerInfo>> COMPILER_INFO_LIST_TYPE = new TypeReference<>() {};
 
-    private String httpRequest(String endpoint, String method, String body) {
+    private static String httpRequest(String endpoint, String method, String body) {
         String BASE_URL = "https://wandbox.org";
         String targetURL = BASE_URL + "/" + endpoint;
 
@@ -61,7 +61,7 @@ public class WandboxAPI {
         }
     }
 
-    public List<CompilerInfo> getList() {
+    public static List<CompilerInfo> getList() {
         try {
             String jsonResult = httpRequest("/api/list.json", "GET", null);
             return mapper.readValue(jsonResult, COMPILER_INFO_LIST_TYPE);
@@ -71,7 +71,7 @@ public class WandboxAPI {
         }
     }
 
-    public CompileResult compileJson(CompileParameter compileParameter) {
+    public static CompileResult compileJson(CompileParameter compileParameter) {
         try {
             String jsonResult = httpRequest("/api/compile.json", "POST", compileParameter.toJson());
             return mapper.readValue(jsonResult, CompileResult.class);

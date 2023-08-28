@@ -17,4 +17,14 @@ public class CompileResult {
     String program_output;
     String program_error;
     String program_message;
+
+    public String getStatus() {
+        if (status.equals("0")) {
+            return "Success";
+        } else if (status.equals("1")) {
+            return "Failed";
+        } else {
+            return "Unknown";
+        }
+    }
 }
