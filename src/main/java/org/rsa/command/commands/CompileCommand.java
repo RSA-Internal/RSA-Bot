@@ -73,35 +73,12 @@ public class CompileCommand extends CommandObject {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        // TODO: Ship to wandbox.
-        OptionMapping languageMapping = event.getOption("language");
-        OptionMapping versionMapping = event.getOption("version");
-        OptionMapping codeMapping = event.getOption("code");
+        String language = event.getOption("language", "Lua", OptionMapping::getAsString);
+        String version = event.getOption("version", "5.4.3", OptionMapping::getAsString);
+        String code = event.getOption("code", OptionMapping::getAsString);
 
-        String language;
-        String version;
-        String code;
-
-        if (languageMapping != null) {
-            language = languageMapping.getAsString();
-        } else {
-            language = null;
-        }
-
-        if (versionMapping != null) {
-            version = versionMapping.getAsString();
-        } else {
-            version = null;
-        }
-
-        if (codeMapping != null) {
-            code = codeMapping.getAsString();
-        } else {
-            code = null;
-        }
-
-        if (null == language || null == version || null == code) {
-            event.reply("One or more required parameters were `null`.").setEphemeral(true).queue();
+        if (null == code) {
+            event.reply("There was no code provided, or it was not properly received.").setEphemeral(true).queue();
             return;
         }
 
