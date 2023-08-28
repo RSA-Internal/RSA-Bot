@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class CompileCommand extends CommandObject {
 
     List<CompilerInfo> compilers = WandboxAPI.getList();
-    List<String> languageList = compilers.stream().map(CompilerInfo::getLanguage).distinct().toList();
+    Set<String> languageList = compilers.stream().map(CompilerInfo::getLanguage).collect(Collectors.toSet());
     Map<String, Set<String>> languageVersions = compilers.stream()
             .collect(Collectors.groupingBy(
                     CompilerInfo::getLanguage,
@@ -40,51 +40,33 @@ public class CompileCommand extends CommandObject {
         addOptionData(new OptionData(OptionType.BOOLEAN, "display",
                 "Display the result to the channel.", false));
         setIsAutocomplete();
-
-        int max = 0;
-
-        for (Map.Entry<String, Set<String>> entry : languageVersions.entrySet()) {
-            if (entry.getValue().size() >= max) {
-                max = entry.getValue().size();
-            }
-        }
-
-        System.out.println("Largest version set: " + max);
     }
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        List<Command.Choice> options = Collections.emptyList();
         String focusedOption = event.getFocusedOption().getName();
+        Set<String> setToFilter = Collections.emptySet();
 
         if (focusedOption.equals("language")) {
-            options = getFilteredLanguages(event);
+            setToFilter = languageList;
         } else if(focusedOption.equals("version")) {
-            options = getFilteredVersions(event);
+            OptionMapping languageOption = event.getOption("language");
+
+            if (languageOption != null && languageVersions.containsKey(languageOption.getAsString())) {
+                setToFilter = languageVersions.get(languageOption.getAsString());
+            }
         }
+
+        List<Command.Choice> options = getFilteredOptions(event, setToFilter);
 
         event.replyChoices(options).queue();
     }
 
-    private @NotNull List<Command.Choice> getFilteredLanguages(@NotNull CommandAutoCompleteInteractionEvent event) {
-        return languageList.stream()
-                .filter(lang -> lang.startsWith(event.getFocusedOption().getValue()))
-                .map(lang -> new Command.Choice(lang, lang))
-                .limit(25)
-                .toList();
-    }
-
-    private @NotNull List<Command.Choice> getFilteredVersions(@NotNull CommandAutoCompleteInteractionEvent event) {
-        OptionMapping languageOption = event.getOption("language");
-        Set<String> validVersions = Collections.emptySet();
-
-        if (languageOption != null && languageVersions.containsKey(languageOption.getAsString())) {
-            validVersions = languageVersions.get(languageOption.getAsString());
-        }
-
-        return validVersions.stream()
-                .filter(ver -> ver.contains(event.getFocusedOption().getValue()))
-                .map(ver -> new Command.Choice(ver, ver))
+    private @NotNull List<Command.Choice> getFilteredOptions(@NotNull CommandAutoCompleteInteractionEvent event,
+                                                             Set<String> setToFilter) {
+        return setToFilter.stream()
+                .filter(e -> e.startsWith(event.getFocusedOption().getValue()))
+                .map(e -> new Command.Choice(e, e))
                 .limit(25)
                 .toList();
     }
