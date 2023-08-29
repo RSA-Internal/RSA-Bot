@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
+
+    private static boolean isDev = true;
+
     public static void main(String[] args) throws InterruptedException {
         JDABuilder builder = JDABuilder.createDefault(getBotToken());
 
@@ -58,6 +61,7 @@ public class Bot {
         String botToken = System.getenv("BOT_TOKEN");
 
         if (null == botToken) {
+            isDev = false;
             botToken = getValue(SecretsManager.BOT_TOKEN_KEY);
         }
 
@@ -89,7 +93,7 @@ public class Bot {
                 // bandwidth if chunking is disabled.
                 .setLargeThreshold(50)
                 // Set Activity to display the version.
-                .setActivity(Activity.playing("v0.1.1"));
+                .setActivity(Activity.playing("v0.2" + (isDev ? "_development" : "")));
     }
 
     private static void setupGuild(Guild guild) {
