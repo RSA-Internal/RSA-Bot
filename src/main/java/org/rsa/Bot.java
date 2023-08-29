@@ -89,7 +89,7 @@ public class Bot {
                 // bandwidth if chunking is disabled.
                 .setLargeThreshold(50)
                 // Set Activity to display the version.
-                .setActivity(Activity.playing("v0.1"));
+                .setActivity(Activity.playing("v0.1.1"));
     }
 
     private static void setupGuild(Guild guild) {

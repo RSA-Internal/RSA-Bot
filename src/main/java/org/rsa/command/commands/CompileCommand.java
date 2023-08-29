@@ -50,16 +50,15 @@ public class CompileCommand extends CommandObject {
 
         if (focusedOption.getName().equals("language")) {
             setToFilter = languageList;
-        } else if(focusedOption.getValue().equals("version")) {
-            OptionMapping languageOption = event.getOption("language");
+        } else if(focusedOption.getName().equals("version")) {
+            String language = event.getOption("language", OptionMapping::getAsString);
 
-            if (languageOption != null && languageVersions.containsKey(languageOption.getAsString())) {
-                setToFilter = languageVersions.get(languageOption.getAsString());
+            if (language != null && languageVersions.containsKey(language)) {
+                setToFilter = languageVersions.get(language);
             }
         }
 
         List<Command.Choice> options = getFilteredOptions(focusedOption.getValue(), setToFilter);
-
         event.replyChoices(options).queue();
     }
 
