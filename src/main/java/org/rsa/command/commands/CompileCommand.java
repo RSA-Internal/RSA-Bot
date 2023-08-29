@@ -3,6 +3,7 @@ package org.rsa.command.commands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -44,12 +45,12 @@ public class CompileCommand extends CommandObject {
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        String focusedOption = event.getFocusedOption().getName();
+        AutoCompleteQuery focusedOption = event.getFocusedOption();
         Set<String> setToFilter = Collections.emptySet();
 
-        if (focusedOption.equals("language")) {
+        if (focusedOption.getName().equals("language")) {
             setToFilter = languageList;
-        } else if(focusedOption.equals("version")) {
+        } else if(focusedOption.getValue().equals("version")) {
             OptionMapping languageOption = event.getOption("language");
 
             if (languageOption != null && languageVersions.containsKey(languageOption.getAsString())) {
@@ -57,15 +58,15 @@ public class CompileCommand extends CommandObject {
             }
         }
 
-        List<Command.Choice> options = getFilteredOptions(event, setToFilter);
+        List<Command.Choice> options = getFilteredOptions(focusedOption.getValue(), setToFilter);
 
         event.replyChoices(options).queue();
     }
 
-    private @NotNull List<Command.Choice> getFilteredOptions(@NotNull CommandAutoCompleteInteractionEvent event,
+    private @NotNull List<Command.Choice> getFilteredOptions(String query,
                                                              Set<String> setToFilter) {
         return setToFilter.stream()
-                .filter(e -> e.startsWith(event.getFocusedOption().getValue()))
+                .filter(e -> e.startsWith(query))
                 .map(e -> new Command.Choice(e, e))
                 .limit(25)
                 .toList();
