@@ -3,10 +3,7 @@ package org.rsa.aws;
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
-import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
+import software.amazon.awssdk.services.dynamodb.model.*;
 
 public class DynamoDB {
 
@@ -33,5 +30,10 @@ public class DynamoDB {
             System.err.println(e.getMessage());
             return new PutItemResponseWithStatus(null, true, e.getMessage());
         }
+    }
+
+    public static QueryResponse query(QueryRequest queryRequest) {
+        DynamoDbClient dynamoDbClient = getDynamoDbClient();
+        return dynamoDbClient.query(queryRequest);
     }
 }

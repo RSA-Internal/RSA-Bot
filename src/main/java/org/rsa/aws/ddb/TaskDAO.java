@@ -3,8 +3,11 @@ package org.rsa.aws.ddb;
 import org.rsa.aws.DynamoDB;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class TaskDAO {
 
@@ -26,5 +29,22 @@ public class TaskDAO {
                 .build();
 
         return DynamoDB.handleRequest(request);
+    }
+
+    public static int getGuildTaskCount(String guildId) {
+        Map<String, String> attrNames = new HashMap<>();
+        attrNames.put("#guildid", "guildid");
+        Map<String, AttributeValue> attrValue = new HashMap<>();
+        attrValue.put(":guildid", AttributeValue.builder().s(guildId).build());
+
+        QueryRequest request = QueryRequest.builder()
+                .tableName(TABLE_NAME)
+                .keyConditionExpression("#guildid = :guildid")
+                .expressionAttributeNames(attrNames)
+                .expressionAttributeValues(attrValue)
+                .build();
+
+        QueryResponse response = DynamoDB.query(request);
+        return response.count();
     }
 }

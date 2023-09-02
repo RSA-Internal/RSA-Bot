@@ -7,12 +7,23 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.AttachmentProxy;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
 import org.rsa.aws.ddb.TaskDAO;
 import org.rsa.command.CommandObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
 public class TaskCreateCommand extends CommandObject {
+
+    private static final int MAX_TASKS_PER_GUILD = 1;
 
     public TaskCreateCommand() {
         super("task-create", "Create a user task.");
@@ -26,6 +37,19 @@ public class TaskCreateCommand extends CommandObject {
                 "The lua file containing test cases. Use `/tests-example` to view expected format.", true));
     }
 
+    private String getAttachmentContent(Message.Attachment attachment) {
+        try {
+            AttachmentProxy attachmentProxy = attachment.getProxy();
+            CompletableFuture<InputStream> futureStream = attachmentProxy.download();
+            InputStream attachmentStream = futureStream.get();
+            return new BufferedReader(new InputStreamReader(attachmentStream, StandardCharsets.UTF_8))
+                    .lines()
+                    .collect(Collectors.joining("\n"));
+        } catch (InterruptedException | ExecutionException e) {
+            return null;
+        }
+    }
+
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
@@ -36,6 +60,15 @@ public class TaskCreateCommand extends CommandObject {
 
         if (null == guild) {
             event.reply("Guild object is invalid. Please report this as a bug.").setEphemeral(true).queue();
+            return;
+        }
+
+        int taskCount = TaskDAO.getGuildTaskCount(guild.getId());
+        if (taskCount >= MAX_TASKS_PER_GUILD) {
+            event
+                    .reply("Guild currently has " + taskCount + " task, max allowed is " + MAX_TASKS_PER_GUILD + ". Your task was not created.")
+                    .setEphemeral(true)
+                    .queue();
             return;
         }
 
@@ -64,7 +97,27 @@ public class TaskCreateCommand extends CommandObject {
             return;
         }
 
-        PutItemResponseWithStatus response = TaskDAO.writeTask(guild.getId(), taskName, roleReward.getId(), "task-prompt-holder", "test-file-holder");
+        String taskPromptContents = getAttachmentContent(taskPrompt);
+
+        if (null == taskPromptContents) {
+            event
+                .reply("Failed to parse task prompt contents, please try again later.")
+                .setEphemeral(true)
+                .queue();
+            return;
+        }
+
+        String testFileContents = getAttachmentContent(testsFile);
+
+        if (null == testFileContents) {
+            event
+                    .reply("Failed to parse test file contents, please try again later.")
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        PutItemResponseWithStatus response = TaskDAO.writeTask(guild.getId(), taskName, roleReward.getId(), taskPromptContents, testFileContents);
         if (response.failed()) {
             event.reply("Failed to write data to DB.\n" + response.message()).setEphemeral(true).queue();
             return;
