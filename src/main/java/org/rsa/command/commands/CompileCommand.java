@@ -72,7 +72,7 @@ public class CompileCommand extends CommandObject {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void handleSlashCommand(@NotNull SlashCommandInteractionEvent event) {
         String language = event.getOption("language", "Lua", OptionMapping::getAsString);
         String version = event.getOption("version", "5.4.3", OptionMapping::getAsString);
         String code = event.getOption("code", OptionMapping::getAsString);

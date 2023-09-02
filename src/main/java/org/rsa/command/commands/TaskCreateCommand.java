@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
 import org.rsa.aws.ddb.TaskDAO;
 import org.rsa.command.CommandObject;
+import org.rsa.exception.ValidationException;
+import org.rsa.util.ValidationUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 
 public class TaskCreateCommand extends CommandObject {
 
-    private static final int MAX_TASKS_PER_GUILD = 1;
+    private static final int MAX_TASKS_PER_GUILD = 5;
 
     public TaskCreateCommand() {
         super("task-create", "Create a user task.");
@@ -51,71 +53,30 @@ public class TaskCreateCommand extends CommandObject {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void handleSlashCommand(@NotNull SlashCommandInteractionEvent event) throws ValidationException {
         Guild guild = event.getGuild();
         String taskName = event.getOption("task-name", OptionMapping::getAsString);
         Role roleReward = event.getOption("role-reward", OptionMapping::getAsRole);
         Message.Attachment taskPrompt = event.getOption("task-prompt", OptionMapping::getAsAttachment);
         Message.Attachment testsFile = event.getOption("tests-file", OptionMapping::getAsAttachment);
 
-        if (null == guild) {
-            event.reply("Guild object is invalid. Please report this as a bug.").setEphemeral(true).queue();
-            return;
-        }
+        ValidationUtil.notNull("Guild", guild);
+        ValidationUtil.notNull("Role reward", roleReward);
+        ValidationUtil.notNull("Task prompt", taskPrompt);
+        ValidationUtil.notNull("Tests file", testsFile);
+        ValidationUtil.areEqual("Task prompt file type", taskPrompt.getFileExtension(), "md");
+        ValidationUtil.areEqual("Tests file file type", testsFile.getFileExtension(), "lua");
 
         int taskCount = TaskDAO.getGuildTaskCount(guild.getId());
         if (taskCount >= MAX_TASKS_PER_GUILD) {
-            event
-                    .reply("Guild currently has " + taskCount + " task, max allowed is " + MAX_TASKS_PER_GUILD + ". Your task was not created.")
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
-
-        if (null == roleReward) {
-            event.reply("The supplied role is invalid.").setEphemeral(true).queue();
-            return;
-        }
-
-        if (null == taskPrompt) {
-            event.reply("Task prompt file is missing or invalid.").setEphemeral(true).queue();
-            return;
-        }
-
-        if (!"md".equals(taskPrompt.getFileExtension())) {
-            event.reply("Please provide a valid `.md` file for the task prompt.").setEphemeral(true).queue();
-            return;
-        }
-
-        if (null == testsFile) {
-            event.reply("Tests file is missing or invalid.").setEphemeral(true).queue();
-            return;
-        }
-
-        if (!"lua".equals(testsFile.getFileExtension())) {
-            event.reply("Please provide a valid `.lua` file for the tests file.").setEphemeral(true).queue();
-            return;
+            throw new ValidationException(String.format("Guild has %s tasks, max allowed is %s", taskCount, MAX_TASKS_PER_GUILD));
         }
 
         String taskPromptContents = getAttachmentContent(taskPrompt);
-
-        if (null == taskPromptContents) {
-            event
-                .reply("Failed to parse task prompt contents, please try again later.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-
         String testFileContents = getAttachmentContent(testsFile);
 
-        if (null == testFileContents) {
-            event
-                    .reply("Failed to parse test file contents, please try again later.")
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
+        ValidationUtil.notNull("Task prompt contents", taskPromptContents);
+        ValidationUtil.notNull("Test file contents", testFileContents);
 
         PutItemResponseWithStatus response = TaskDAO.writeTask(guild.getId(), taskName, roleReward.getId(), taskPromptContents, testFileContents);
         if (response.failed()) {
