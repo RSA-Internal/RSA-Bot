@@ -1,7 +1,8 @@
 package org.rsa.command;
 
 import org.rsa.command.commands.CompileCommand;
-import org.rsa.command.commands.TaskCreateCommand;
+import org.rsa.command.commands.tasks.TaskCreateCommand;
+import org.rsa.command.commands.tasks.TaskStartCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ public class Commands {
 
         addCommandObject(new CompileCommand());
         addCommandObject(new TaskCreateCommand());
+        addCommandObject(new TaskStartCommand());
     }
 
     private static void addCommandObject(CommandObject commandObject) {

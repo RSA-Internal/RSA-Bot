@@ -1,4 +1,4 @@
-package org.rsa.command.commands;
+package org.rsa.command.commands.tasks;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import static org.rsa.cache.TaskCache.guildTaskListCache;
 
 public class TaskCreateCommand extends CommandObject {
 
@@ -84,6 +86,7 @@ public class TaskCreateCommand extends CommandObject {
             return;
         }
 
+        guildTaskListCache.refresh(guild.getId());
         event.reply("Successfully created a new task: `" + taskName + "`.").setEphemeral(true).queue();
     }
 }
