@@ -2,12 +2,15 @@
 The repo for the Discord bot used in the Roblox Scripting Assistance server.
 
 ## Features
-- None at this time.
+- Compile code from Discord directly using Wandbox.
 
 ## Required Tools
 - IntelliJ (auto imports project)
 - JDK17
 - Test Application ([Discord Developers](https://discord.com/developers/applications))
+  - Required Scopes: `application.commands` and `bot`
+  - Permissions: `administrator`
+- [Test Server](https://discord.gg/invite/w3BmYhkKUP)
 
 ### Setup
 1. Install JDK17+.
@@ -22,6 +25,7 @@ It might be useful to test the bot. This can be done one of two ways:
 
 1. `./gradlew run` from terminal _or_ Gradle -> Tasks -> application -> run.
 2. `./gradlew shadowjar` and `java -jar build/libs/RSA-Bot-1.0-all.jar`.
+3. Alternatively opening the `Bot.java` class and clicking "Run 'Bot.main()'"
 
 ## Development
 
@@ -30,7 +34,7 @@ It might be useful to test the bot. This can be done one of two ways:
 - All changes should be made on a branch other than `main`.
 - `git checkout -b [branch name]`
 - If adding / removing a feature, update the **Features** section of the readme.
-- Run `./gradlew spotbugsmain` before committing changes.s
+- Run `./gradlew spotbugsmain` before committing changes.
 
 ### Submitting Changes
 
