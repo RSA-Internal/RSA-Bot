@@ -33,8 +33,8 @@ on:
 env:
   AWS_REGION: us-west-2                       # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: rsabot                      # set this to your Amazon ECR repository name
-  ECS_SERVICE: rsa-bot-cluster-fg             # set this to your Amazon ECS service name
-  ECS_CLUSTER: rsa-bot-cluster-fg             # set this to your Amazon ECS cluster name
+  ECS_CLUSTER: rsa-bot-cluster                # set this to your Amazon ECS cluster name
+  ECS_SERVICE: rsa-panda-bot                  # set this to your Amazon ECS service name
   ECS_TASK_DEFINITION: task-definition.json   # set this to the path to your Amazon ECS task definition
                                               # file, e.g. .aws/task-definition.json
   CONTAINER_NAME: rsa-bot-container           # set this to the name of the container in the
