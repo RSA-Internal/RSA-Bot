@@ -63,7 +63,7 @@
   "compatibilities": [
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-west-2:792720642917:task-definition/rsa-bot:9",
+  "taskDefinitionArn": "arn:aws:ecs:us-west-2:792720642917:task-definition/rsa-bot:latest",
   "family": "rsa-bot",
   "requiresAttributes": [
     {
