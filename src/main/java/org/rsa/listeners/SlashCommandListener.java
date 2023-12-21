@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.Commands;
+import org.rsa.exception.ValidationException;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -14,6 +15,10 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        Commands.getCommand(event.getName()).onSlashCommandInteraction(event);
+        try {
+            Commands.getCommand(event.getName()).handleSlashCommand(event);
+        } catch (ValidationException e) {
+            event.reply(e.toEventResponse()).setEphemeral(true).queue();
+        }
     }
 }

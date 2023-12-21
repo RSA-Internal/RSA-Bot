@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.exception.ValidationException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,5 +47,5 @@ public abstract class CommandObject extends ListenerAdapter {
         return Commands.slash(name, description).addOptions(optionDataList);
     }
 
-    public abstract void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event);
+    public abstract void handleSlashCommand(@NotNull SlashCommandInteractionEvent event) throws ValidationException;
 }
