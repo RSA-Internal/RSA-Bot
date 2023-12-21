@@ -1,5 +1,6 @@
 package org.rsa.aws;
 
+import org.rsa.aws.ddb.DeleteItemResponseWithStatus;
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -29,6 +30,25 @@ public class DynamoDB {
         } catch (DynamoDbException e) {
             System.err.println(e.getMessage());
             return new PutItemResponseWithStatus(null, true, e.getMessage());
+        }
+    }
+
+    public static DeleteItemResponseWithStatus deleteItem(DeleteItemRequest deleteRequest) {
+        DynamoDbClient dynamoDbClient = getDynamoDbClient();
+        String tableName = deleteRequest.tableName();
+
+        try {
+            DeleteItemResponse response = dynamoDbClient.deleteItem(deleteRequest);
+            System.out.println(tableName +" was successfully updated. The request id is "+response.responseMetadata().requestId());
+            return new DeleteItemResponseWithStatus(response, false, "");
+        } catch (ResourceNotFoundException e) {
+            String errorMessage = String.format("Error: The Amazon DynamoDB table \"%s\" can't be found.\n", tableName);
+            System.err.format(errorMessage);
+            System.err.println("Be sure that it exists and that you've typed its name correctly!");
+            return new DeleteItemResponseWithStatus(null, true, errorMessage);
+        } catch (DynamoDbException e) {
+            System.err.println(e.getMessage());
+            return new DeleteItemResponseWithStatus(null, true, e.getMessage());
         }
     }
 
