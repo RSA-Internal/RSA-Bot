@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.events.guild.scheduledevent.*;
 import net.dv8tion.jda.api.events.guild.scheduledevent.update.ScheduledEventUpdateStatusEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.aws.ddb.PutItemResponseWithStatus;
 import org.rsa.aws.ddb.dao.ScheduledEventDao;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ScheduledEventListener extends ListenerAdapter {
@@ -29,24 +29,23 @@ public class ScheduledEventListener extends ListenerAdapter {
         ScheduledEvent scheduledEvent = event.getScheduledEvent();
         User creatorAsUser = scheduledEvent.getCreator();
 
-        guild.createRole()
+        Role eventRole = guild.createRole()
                 .setName(scheduledEvent.getId() + "_event_role")
                 .setMentionable(false)
                 .setPermissions(Collections.emptyList())
-                .queue(eventRole -> {
-                    PutItemResponseWithStatus response = ScheduledEventDao.writeEventRole(guild.getId(), scheduledEvent.getId(), eventRole.getId());
-                    if (creatorAsUser != null) {
-                        guild.addRoleToMember(creatorAsUser, eventRole).queue();
-                    }
-                    sendMessageForEvent(event, ScheduledEvent.Status.SCHEDULED);
-                });
+                .complete();
+        ScheduledEventDao.writeEventRole(guild.getId(), scheduledEvent.getId(), eventRole.getId());
+        if (creatorAsUser != null) {
+            guild.addRoleToMember(creatorAsUser, eventRole).queue();
+        }
+        sendMessageForEvent(event, ScheduledEvent.Status.SCHEDULED);
     }
 
     @Override
     public void onScheduledEventDelete(@NotNull ScheduledEventDeleteEvent event) {
         super.onScheduledEventDelete(event);
-        cleanupEvent(event);
         sendMessageForEvent(event, ScheduledEvent.Status.CANCELED);
+        cleanupEvent(event);
     }
 
     @Override
@@ -86,7 +85,7 @@ public class ScheduledEventListener extends ListenerAdapter {
     private Role getRoleForEvent(@NotNull GenericScheduledEventGatewayEvent event) {
         Guild guild = event.getGuild();
         ScheduledEvent scheduledEvent = event.getScheduledEvent();
-        String roleId = ScheduledEventDao.read(guild.getId(), scheduledEvent.getId());
+        String roleId = ScheduledEventDao.read(guild.getId(), scheduledEvent.getId(), "roleid");
         if (roleId == null) {
             return null;
         }
@@ -99,11 +98,28 @@ public class ScheduledEventListener extends ListenerAdapter {
             role.delete().queue();
         }
 
-        ScheduledEventDao.delete(event.getGuild().getId(), event.getScheduledEvent().getId());
+        String guildId = event.getGuild().getId();
+        String eventId = event.getScheduledEvent().getId();
+        List<String> messageIdL = ScheduledEventDao.getMessageListForEvent(guildId, eventId);
+        TextChannel channel = getTextChannel(event.getGuild());
+        if (channel == null) {
+            return;
+        }
+        if (messageIdL.isEmpty()) {
+            return;
+        }
+
+        if (messageIdL.size() < 2) {
+            channel.deleteMessageById(messageIdL.get(0)).queue();
+        } else {
+            channel.deleteMessagesByIds(messageIdL).queue();
+        }
+
+        ScheduledEventDao.delete(guildId, eventId);
     }
 
     private TextChannel getTextChannel(Guild guild) {
-        String channelId = ScheduledEventDao.read(guild.getId(), "null");
+        String channelId = ScheduledEventDao.read(guild.getId(), "null", "channelid");
         if (channelId == null) {
             return null;
         }
@@ -117,6 +133,13 @@ public class ScheduledEventListener extends ListenerAdapter {
         if (channel == null || role == null) {
             return;
         }
-        channel.sendMessage(String.format(eventMessage, role.getAsMention(), event.getScheduledEvent().getName())).queue();
+
+        Message message = channel
+                .sendMessage(String.format(eventMessage, role.getAsMention(), event.getScheduledEvent().getName()))
+                .complete();
+        ScheduledEventDao.updateMessageListForEvent(
+                event.getGuild().getId(),
+                event.getScheduledEvent().getId(),
+                message.getId());
     }
 }

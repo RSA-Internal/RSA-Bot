@@ -3,6 +3,7 @@ package org.rsa.aws.ddb.dao;
 import org.rsa.aws.DynamoDB;
 import org.rsa.aws.ddb.DeleteItemResponseWithStatus;
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
+import org.rsa.aws.ddb.UpdateItemResponseWithStatus;
 import software.amazon.awssdk.services.dynamodb.model.*;
 
 import java.util.*;
@@ -39,10 +40,7 @@ public class ScheduledEventDao {
         return DynamoDB.handleRequest(request);
     }
 
-    public static String read(String guildId, String eventId) {
-        Map<String, String> attrNames = new HashMap<>();
-        attrNames.put("#guildid", "guildid");
-        attrNames.put("#eventid", "eventid");
+    public static String read(String guildId, String eventId, String field) {
         Map<String, AttributeValue> attrValue = new HashMap<>();
         attrValue.put(":guildid", AttributeValue.builder().s(guildId).build());
         attrValue.put(":eventid", AttributeValue.builder().s(eventId).build());
@@ -50,7 +48,7 @@ public class ScheduledEventDao {
         QueryRequest request = QueryRequest.builder()
                 .tableName(TABLE_NAME)
                 .keyConditionExpression("#guildid = :guildid and #eventid = :eventid")
-                .expressionAttributeNames(attrNames)
+                .expressionAttributeNames(getAttributeMapForEvent(guildId, eventId))
                 .expressionAttributeValues(attrValue)
                 .build();
 
@@ -61,10 +59,10 @@ public class ScheduledEventDao {
         }
 
         Map<String, AttributeValue> firstEntry = items.get(0);
-        if (eventId.equals("null")) {
-            return firstEntry.get("channelid").s();
+        if (firstEntry.containsKey(field)) {
+            return firstEntry.get(field).s();
         }
-        return firstEntry.get("roleid").s();
+        return null;
     }
 
     public static DeleteItemResponseWithStatus delete(String guildId, String eventId) {
@@ -78,5 +76,49 @@ public class ScheduledEventDao {
                 .build();
 
         return DynamoDB.deleteItem(deleteItemRequest);
+    }
+
+    public static UpdateItemResponseWithStatus updateMessageListForEvent(
+            String guildId,
+            String eventId,
+            String messageId) {
+        HashMap<String, AttributeValue> keyToGet = new HashMap<>();
+        keyToGet.put("guildid", AttributeValue.builder().s(guildId).build());
+        keyToGet.put("eventid", AttributeValue.builder().s(eventId).build());
+
+        List<String> messageIdL = getMessageListForEvent(guildId, eventId);
+        if (messageIdL.get(0).isBlank()) {
+            messageIdL.remove(0);
+        }
+        messageIdL.add(messageId);
+
+        HashMap<String, AttributeValueUpdate> updatedValues = new HashMap<>();
+        updatedValues.put("messagelist", AttributeValueUpdate.builder()
+                .value(AttributeValue.fromS(String.join(",", messageIdL)))
+                .action(AttributeAction.PUT)
+                .build());
+
+        UpdateItemRequest request = UpdateItemRequest.builder()
+                .tableName(TABLE_NAME)
+                .key(keyToGet)
+                .attributeUpdates(updatedValues)
+                .build();
+
+        return DynamoDB.updateItem(request);
+    }
+
+    private static Map<String, String> getAttributeMapForEvent(String guildId, String eventId) {
+        Map<String, String> attrNames = new HashMap<>();
+        attrNames.put("#guildid", "guildid");
+        attrNames.put("#eventid", "eventid");
+        return attrNames;
+    }
+
+    public static List<String> getMessageListForEvent(String guildId, String eventId) {
+        String messageIdS = read(guildId, eventId, "messagelist");
+        if (messageIdS == null) {
+            messageIdS = "";
+        }
+        return new ArrayList<>(Arrays.asList(messageIdS.split(",")));
     }
 }
