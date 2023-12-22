@@ -1,6 +1,7 @@
 package org.rsa.command;
 
 import org.rsa.command.commands.CompileCommand;
+import org.rsa.command.commands.SetEventNotificationChannelCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ public class Commands {
         System.out.println("Loading commands.");
 
         addCommandObject(new CompileCommand());
+        addCommandObject(new SetEventNotificationChannelCommand());
     }
 
     private static void addCommandObject(CommandObject commandObject) {

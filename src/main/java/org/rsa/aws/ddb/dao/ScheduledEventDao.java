@@ -11,11 +11,25 @@ public class ScheduledEventDao {
 
     private static final String TABLE_NAME = "scheduled_event_data";
 
-    public static PutItemResponseWithStatus write(String guildId, String eventId, String roleId) {
+    public static PutItemResponseWithStatus writeEventRole(String guildId, String eventId, String roleId) {
         HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put("guildid", AttributeValue.builder().s(guildId).build());
         itemValues.put("eventid", AttributeValue.builder().s(eventId).build());
         itemValues.put("roleid", AttributeValue.builder().s(roleId).build());
+
+        PutItemRequest request = PutItemRequest.builder()
+                .tableName(TABLE_NAME)
+                .item(itemValues)
+                .build();
+
+        return DynamoDB.handleRequest(request);
+    }
+
+    public static PutItemResponseWithStatus writeEventChannel(String guildId, String channelId) {
+        HashMap<String, AttributeValue> itemValues = new HashMap<>();
+        itemValues.put("guildid", AttributeValue.builder().s(guildId).build());
+        itemValues.put("eventid", AttributeValue.builder().s("null").build());
+        itemValues.put("channelid", AttributeValue.builder().s(channelId).build());
 
         PutItemRequest request = PutItemRequest.builder()
                 .tableName(TABLE_NAME)
@@ -47,6 +61,9 @@ public class ScheduledEventDao {
         }
 
         Map<String, AttributeValue> firstEntry = items.get(0);
+        if (eventId.equals("null")) {
+            return firstEntry.get("channelid").s();
+        }
         return firstEntry.get("roleid").s();
     }
 
