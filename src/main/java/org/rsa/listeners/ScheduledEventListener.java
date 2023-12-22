@@ -14,7 +14,6 @@ public class ScheduledEventListener extends ListenerAdapter {
     @Override
     public void onScheduledEventCreate(@NotNull ScheduledEventCreateEvent event) {
         super.onScheduledEventCreate(event);
-        System.out.println("Received event creation for " + event.getResponseNumber());
         Guild guild = event.getGuild();
         ScheduledEvent scheduledEvent = event.getScheduledEvent();
         User creatorAsUser = scheduledEvent.getCreator();
@@ -25,7 +24,6 @@ public class ScheduledEventListener extends ListenerAdapter {
                 .setPermissions(Collections.emptyList())
                 .queue(eventRole -> {
                     PutItemResponseWithStatus response = ScheduledEventDao.write(guild.getId(), scheduledEvent.getId(), eventRole.getId());
-                    System.out.println(response.message());
                     if (creatorAsUser != null) {
                         guild.addRoleToMember(creatorAsUser, eventRole).queue();
                     }
