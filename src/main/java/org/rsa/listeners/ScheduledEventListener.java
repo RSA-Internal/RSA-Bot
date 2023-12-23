@@ -110,17 +110,14 @@ public class ScheduledEventListener extends ListenerAdapter {
             return false;
         }
 
-        User creatorAsUser = event.getCreator();
-
         Role eventRole = guild.createRole()
                 .setName(event.getId() + "_event_role")
                 .setMentionable(false)
                 .setPermissions(Collections.emptyList())
                 .complete();
         ScheduledEventDao.writeEventRole(guild.getId(), event.getId(), eventRole.getId());
-        if (creatorAsUser != null) {
-            guild.addRoleToMember(creatorAsUser, eventRole).queue();
-        }
+        event.retrieveInterestedMembers().queue(members -> members.forEach(member -> guild.addRoleToMember(member, eventRole).queue()));
+
         sendMessageForEvent(event, ScheduledEvent.Status.SCHEDULED);
         return true;
     }
