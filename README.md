@@ -4,6 +4,8 @@ The repo for the Discord bot used in the Roblox Scripting Assistance server.
 ## Features
 - Compile code from Discord directly using Wandbox.
 - Managed event role.
+  - Setup event notifications using `/set-event-channel {channelId}`
+  - Retroactively manage events using `/setup-event {eventId}`
 
 ## Required Tools
 - IntelliJ (auto imports project)
