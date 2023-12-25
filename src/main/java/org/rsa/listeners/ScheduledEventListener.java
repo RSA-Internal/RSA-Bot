@@ -2,7 +2,10 @@ package org.rsa.listeners;
 
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.guild.scheduledevent.*;
+import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventCreateEvent;
+import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventDeleteEvent;
+import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserAddEvent;
+import net.dv8tion.jda.api.events.guild.scheduledevent.ScheduledEventUserRemoveEvent;
 import net.dv8tion.jda.api.events.guild.scheduledevent.update.ScheduledEventUpdateStatusEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
