@@ -15,7 +15,10 @@ import org.rsa.wandbox.entities.CompileParameter;
 import org.rsa.wandbox.entities.CompileResult;
 import org.rsa.wandbox.entities.CompilerInfo;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CompileCommand extends CommandObject {
