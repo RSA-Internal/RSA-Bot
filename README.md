@@ -3,6 +3,7 @@ The repo for the Discord bot used in the Roblox Scripting Assistance server.
 
 ## Features
 - Compile code from Discord directly using Wandbox.
+- Track reputation of members within forums
 
 ## Required Tools
 - IntelliJ (auto imports project)
