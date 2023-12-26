@@ -1,6 +1,9 @@
 package org.rsa.aws;
 
 import org.rsa.aws.ddb.PutItemResponseWithStatus;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
+import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
@@ -11,6 +14,13 @@ public class DynamoDB {
         return DynamoDbClient.builder()
                 .region(Region.US_WEST_2)
                 .build();
+    }
+
+    public static <T> DynamoDbTable<T> GetDynamoTable(String tableName, TableSchema<T> schema)
+    {
+        DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
+                .dynamoDbClient(getDynamoDbClient()).build();
+        return enhancedClient.table(tableName, schema);
     }
 
     public static PutItemResponseWithStatus handleRequest(PutItemRequest putItemRequest) {
