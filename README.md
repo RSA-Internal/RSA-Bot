@@ -6,6 +6,7 @@ The repo for the Discord bot used in the Roblox Scripting Assistance server.
 - Managed event role.
   - Setup event notifications using `/set-event-channel {channelId}`
   - Retroactively manage events using `/setup-event {eventId}`
+- Track reputation of members within forums
 
 ## Required Tools
 - IntelliJ (auto imports project)
