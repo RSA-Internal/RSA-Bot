@@ -17,6 +17,7 @@ import org.rsa.aws.SecretsManager;
 import org.rsa.command.CommandObject;
 import org.rsa.command.Commands;
 import org.rsa.listeners.AutoCompleteListener;
+import org.rsa.listeners.ReactionAddedListener;
 import org.rsa.listeners.SlashCommandListener;
 
 import java.util.Arrays;
@@ -36,7 +37,8 @@ public class Bot {
         configureMemoryUsage(builder);
         builder.addEventListeners(
                 new AutoCompleteListener(),
-                new SlashCommandListener()
+                new SlashCommandListener(),
+                new ReactionAddedListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
