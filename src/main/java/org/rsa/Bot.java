@@ -18,6 +18,8 @@ import org.rsa.command.CommandObject;
 import org.rsa.command.Commands;
 import org.rsa.listeners.AutoCompleteListener;
 import org.rsa.listeners.ScheduledEventListener;
+import org.rsa.listeners.ReactionAddedListener;
+import org.rsa.listeners.ReactionAddedListener;
 import org.rsa.listeners.SlashCommandListener;
 
 import java.util.Arrays;
@@ -38,7 +40,9 @@ public class Bot {
         builder.addEventListeners(
                 new AutoCompleteListener(),
                 new ScheduledEventListener(),
-                new SlashCommandListener()
+                new SlashCommandListener(),
+                new SlashCommandListener(),
+                new ReactionAddedListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
