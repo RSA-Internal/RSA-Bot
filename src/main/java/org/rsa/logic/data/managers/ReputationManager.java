@@ -1,6 +1,5 @@
 package org.rsa.logic.data.managers;
 
-import org.rsa.aws.DynamoDB;
 import org.rsa.aws.RequestsManager;
 import org.rsa.logic.data.models.UserReputation;
 import software.amazon.awssdk.enhanced.dynamodb.*;
@@ -10,8 +9,7 @@ import java.util.Optional;
 
 public final class ReputationManager {
     private final static String TABLE_NAME = "reputation_data";
-    private final static DynamoDbTable<UserReputation> _table = DynamoDB.GetDynamoTable(TABLE_NAME, TableSchema.fromBean(UserReputation.class));
-    private final static RequestsManager<UserReputation> _requestsManager = new RequestsManager<>(_table);
+    private final static RequestsManager<UserReputation> _requestsManager = new RequestsManager<>(TABLE_NAME, UserReputation.class);
 
     public static UserReputation fetch(String guildId, String userId)
     {
@@ -20,15 +18,7 @@ public final class ReputationManager {
                         .partitionValue(guildId)
                         .sortValue(userId)
                         .build());
-
-        QueryEnhancedRequest request = QueryEnhancedRequest.builder()
-                .queryConditional(queryConditional)
-                .limit(1)
-                .scanIndexForward(false)
-                .build();
-
-        PageIterable<UserReputation> itemsPage = _table.query(request);
-        Optional<Page<UserReputation>> optionalUserReputationPage = itemsPage.stream().findFirst();
+        Optional<Page<UserReputation>> optionalUserReputationPage = _requestsManager.fetchSingleItem(queryConditional);
 
         if (optionalUserReputationPage.isEmpty() || optionalUserReputationPage.get().items().isEmpty()) return new UserReputation(guildId, userId);
         return optionalUserReputationPage.get().items().get(0);
@@ -36,9 +26,6 @@ public final class ReputationManager {
 
     public static void update(UserReputation userReputation)
     {
-        UpdateItemEnhancedRequest<UserReputation> updateRequest = UpdateItemEnhancedRequest.builder(UserReputation.class)
-            .item(userReputation)
-            .build();
-        _requestsManager.enqueue(updateRequest);
+        _requestsManager.enqueueItemUpdate(userReputation);
     }
 }
