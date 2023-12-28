@@ -3,37 +3,17 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.logic.constants.ReputationChanges;
+import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
+import org.rsa.logic.data.models.GuildConfiguration;
 import org.rsa.logic.data.models.UserReputation;
 
 public class ReactionAddedListener extends ListenerAdapter {
-    private static final String UPVOTE_EMOJI_CODE = "";
-    private static final String UPVOTE_EMOJI_ID = "1188852146272211034";
-    private static final String DOWNVOTE_EMOJI_CODE = "U+1F480";
-    private static final String DOWNVOTE_EMOJI_ID = "";
-
-    private static boolean isUpvoteReaction(EmojiUnion emoji)
-    {
-        if (emoji.getType().equals(Emoji.Type.UNICODE))
-            return emoji.asUnicode().getAsCodepoints().equals(UPVOTE_EMOJI_CODE);
-        else
-            return emoji.asCustom().getId().equals(UPVOTE_EMOJI_ID);
-    }
-
-    private static boolean isDownvoteReaction(EmojiUnion emoji)
-    {
-        if (emoji.getType().equals(Emoji.Type.UNICODE))
-            return emoji.asUnicode().getAsCodepoints().equals(DOWNVOTE_EMOJI_CODE);
-        else
-            return emoji.asCustom().getId().equals(DOWNVOTE_EMOJI_ID);
-    }
-
     private static void giveUpvote(MessageReactionAddEvent event)
     {
         String guildId = event.getGuild().getId();
@@ -74,13 +54,15 @@ public class ReactionAddedListener extends ListenerAdapter {
         MessageChannelUnion channel = event.getChannel();
         ChannelType channelType = event.getChannelType();
         EmojiUnion reactionEmoji = event.getEmoji();
+        GuildConfiguration configuration = GuildConfigurationManager.fetch(event.getGuild().getId());
 
         if (channelType.equals(ChannelType.GUILD_PUBLIC_THREAD)
-                && channel.asThreadChannel().getParentChannel().getType().equals(ChannelType.FORUM))
+                && channel.asThreadChannel().getParentChannel().getType().equals(ChannelType.FORUM)
+                && !event.getUserId().equals(event.getMessageAuthorId()))
         {
-            if ( isUpvoteReaction(reactionEmoji) )
+            if (reactionEmoji.getFormatted().equals(configuration.getUpvote_emoji()))
                 giveUpvote(event);
-            else if ( isDownvoteReaction(reactionEmoji) )
+            else if (reactionEmoji.getFormatted().equals(configuration.getDownvote_emoji()))
                 giveDownvote(event);
         }
     }
