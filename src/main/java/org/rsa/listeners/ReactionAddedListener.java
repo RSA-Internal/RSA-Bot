@@ -30,13 +30,14 @@ public class ReactionAddedListener extends ListenerAdapter {
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.getMessageAuthorId());
         UserReputation giverUserReputation = ReputationManager.fetch(guildId, event.getUserId());
 
-        receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
+        receiverUserReputation.setReceived_post_downvotes(receiverUserReputation.getReceived_post_downvotes() + 1);
         receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_RECEIVED);
 
         giverUserReputation.setGiven_post_downvotes(receiverUserReputation.getGiven_post_downvotes() + 1);
         giverUserReputation.setReputation(giverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_GIVEN);
 
         ReputationManager.update(receiverUserReputation);
+        ReputationManager.update(giverUserReputation);
     }
 
     @Override
