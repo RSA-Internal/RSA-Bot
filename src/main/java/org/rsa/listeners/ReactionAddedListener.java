@@ -18,15 +18,11 @@ public class ReactionAddedListener extends ListenerAdapter {
     {
         String guildId = event.getGuild().getId();
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.getMessageAuthorId());
-        ThreadChannel threadChannel = event.getChannel().asThreadChannel();
 
-        if (threadChannel.retrieveStartMessage().complete().getId().equals(event.getMessageId()))
-        { // Is original post
-            receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
-            receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_UPVOTE_RECEIVED);
+        receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_UPVOTE_RECEIVED);
 
-            ReputationManager.update(receiverUserReputation);
-        }
+        ReputationManager.update(receiverUserReputation);
     }
 
     private static void giveDownvote(MessageReactionAddEvent event)
@@ -34,18 +30,14 @@ public class ReactionAddedListener extends ListenerAdapter {
         String guildId = event.getGuild().getId();
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.getMessageAuthorId());
         UserReputation giverUserReputation = ReputationManager.fetch(guildId, event.getUserId());
-        ThreadChannel threadChannel = event.getChannel().asThreadChannel();
 
-        if (threadChannel.retrieveStartMessage().complete().getId().equals(event.getMessageId()))
-        { // Is original post
-            receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
-            receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_RECEIVED);
+        receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_RECEIVED);
 
-            giverUserReputation.setGiven_post_downvotes(receiverUserReputation.getGiven_post_downvotes() + 1);
-            giverUserReputation.setReputation(giverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_GIVEN);
+        giverUserReputation.setGiven_post_downvotes(receiverUserReputation.getGiven_post_downvotes() + 1);
+        giverUserReputation.setReputation(giverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_GIVEN);
 
-            ReputationManager.update(receiverUserReputation);
-        }
+        ReputationManager.update(receiverUserReputation);
     }
 
     @Override
@@ -54,12 +46,14 @@ public class ReactionAddedListener extends ListenerAdapter {
         MessageChannelUnion channel = event.getChannel();
         ChannelType channelType = event.getChannelType();
         EmojiUnion reactionEmoji = event.getEmoji();
-        GuildConfiguration configuration = GuildConfigurationManager.fetch(event.getGuild().getId());
 
-        if (channelType.equals(ChannelType.GUILD_PUBLIC_THREAD)
-                && channel.asThreadChannel().getParentChannel().getType().equals(ChannelType.FORUM)
-                && !event.getUserId().equals(event.getMessageAuthorId()))
-        {
+        if (channelType.equals(ChannelType.GUILD_PUBLIC_THREAD) // channel is a thread
+                && channel.asThreadChannel().getParentChannel().getType().equals(ChannelType.FORUM) // channel is a forum post
+                && !event.getUserId().equals(event.getMessageAuthorId()) // reactor's id is not equal to the message author's id
+                && channel.asThreadChannel().retrieveStartMessage().complete().getId().equals(event.getMessageId())) // is the first message
+        { // Is original post in forum channel & reaction was not made by forum author
+            GuildConfiguration configuration = GuildConfigurationManager.fetch(event.getGuild().getId());
+
             if (reactionEmoji.getFormatted().equals(configuration.getUpvote_emoji()))
                 giveUpvote(event);
             else if (reactionEmoji.getFormatted().equals(configuration.getDownvote_emoji()))
