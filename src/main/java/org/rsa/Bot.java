@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -14,13 +15,9 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.SecretsManager;
-import org.rsa.command.CommandObject;
-import org.rsa.command.Commands;
-import org.rsa.listeners.AutoCompleteListener;
-import org.rsa.listeners.ScheduledEventListener;
+import org.rsa.command.*;
+import org.rsa.listeners.*;
 import org.rsa.listeners.ReactionAddedListener;
-import org.rsa.listeners.ReactionAddedListener;
-import org.rsa.listeners.SlashCommandListener;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +38,9 @@ public class Bot {
                 new AutoCompleteListener(),
                 new ScheduledEventListener(),
                 new SlashCommandListener(),
-                new ReactionAddedListener()
+                new ReactionAddedListener(),
+                new ReactionRemovedListener(),
+                new ContextInteractionListeners()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
@@ -110,7 +109,15 @@ public class Bot {
         List<SlashCommandData> slashCommandData = commandObjectList.stream()
                 .map(CommandObject::slashCommandImplementation)
                 .collect(Collectors.toList());
+        List<CommandData> messageContextCommandData = ContextItems.getLoadedMessageItems()
+                        .values().stream().map(MessageContextObject::getCommandData)
+                        .toList();
+        List<CommandData> userContextCommandData = ContextItems.getLoadedUserItems()
+                        .values().stream().map(UserContextObject::getCommandData)
+                        .toList();
 
         commands.addCommands(slashCommandData).queue();
+        commands.addCommands(messageContextCommandData).queue();
+        commands.addCommands(userContextCommandData).queue();
     }
 }
