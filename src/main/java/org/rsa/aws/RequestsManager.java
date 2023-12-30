@@ -10,32 +10,32 @@ import java.util.Queue;
 
 
 public class RequestsManager<T> {
-    private final Queue<UpdateItemEnhancedRequest<T>> _updateRequestsQueue = new LinkedList<>();
-    private final DynamoDbTable<T> _table;
-    private final Class<T> _classType;
-    private boolean _processingUpdateRequests = false;
+    private final Queue<UpdateItemEnhancedRequest<T>> updateRequestsQueue = new LinkedList<>();
+    private final DynamoDbTable<T> table;
+    private final Class<T> classType;
+    private boolean processingUpdateRequests = false;
 
     public RequestsManager(String tableName, Class<T> type)
     {
-        this._table = DynamoDB.GetDynamoTable(tableName, TableSchema.fromBean(type));
-        this._classType = type;
+        this.table = DynamoDB.GetDynamoTable(tableName, TableSchema.fromBean(type));
+        this.classType = type;
     }
 
     private void processUpdateRequests()
     {
-        if (_updateRequestsQueue.isEmpty()) return;
+        if (updateRequestsQueue.isEmpty()) return;
 
-        _processingUpdateRequests = true;
-        UpdateItemEnhancedRequest<T> request = _updateRequestsQueue.remove();
-        _table.updateItem(request);
+        processingUpdateRequests = true;
+        UpdateItemEnhancedRequest<T> request = updateRequestsQueue.remove();
+        table.updateItem(request);
 
-        _processingUpdateRequests = false;
+        processingUpdateRequests = false;
         processUpdateRequests();
     }
 
     public void enqueueItemUpdate(T item)
     {
-        UpdateItemEnhancedRequest<T> request = UpdateItemEnhancedRequest.builder(_classType)
+        UpdateItemEnhancedRequest<T> request = UpdateItemEnhancedRequest.builder(classType)
                 .item(item)
                 .build();
         enqueueUpdateRequest(request);
@@ -43,8 +43,8 @@ public class RequestsManager<T> {
 
     public void enqueueUpdateRequest(UpdateItemEnhancedRequest<T> request)
     {
-        _updateRequestsQueue.add(request);
-        if (_processingUpdateRequests) return;
+        updateRequestsQueue.add(request);
+        if (processingUpdateRequests) return;
         processUpdateRequests();
     }
 
@@ -55,7 +55,7 @@ public class RequestsManager<T> {
             .limit(1)
             .scanIndexForward(false)
             .build();
-        PageIterable<T> pages = _table.query(request);
+        PageIterable<T> pages = table.query(request);
         return pages.stream().findFirst();
     }
 }
