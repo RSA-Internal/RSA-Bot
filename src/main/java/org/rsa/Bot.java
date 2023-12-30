@@ -30,7 +30,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v0.3.2";
+    private static final String VERSION = "v1.0";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -40,7 +40,6 @@ public class Bot {
         builder.addEventListeners(
                 new AutoCompleteListener(),
                 new ScheduledEventListener(),
-                new SlashCommandListener(),
                 new SlashCommandListener(),
                 new ReactionAddedListener()
         );
