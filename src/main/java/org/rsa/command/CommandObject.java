@@ -49,7 +49,9 @@ public abstract class CommandObject extends ListenerAdapter {
         isAutocomplete = true;
     }
 
-    public void setIsGuildOnly() { isGuildOnly = true; }
+    public void setIsGuildOnly() {
+        isGuildOnly = true;
+    }
 
     public List<OptionData> getOptionDataList() {
         return new ArrayList<>(optionDataList);
