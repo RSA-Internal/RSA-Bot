@@ -15,8 +15,9 @@ public class ReactionsSubcommand extends SubcommandObject {
         super("reactions", "Change reaction emojis");
         this.addOptions(
                 new OptionData(OptionType.STRING, "reaction_type", "Specify the reaction emoji to change.", true)
-                    .addChoice("upvote", "upvote")
-                    .addChoice("downvote", "downvote"),
+                        .addChoice("upvote", "upvote")
+                        .addChoice("downvote", "downvote")
+                        .addChoice("moderate", "moderate"),
                 new OptionData(OptionType.STRING, "emoji", "New emoji to assign to reaction emoji", true));
     }
 
@@ -26,10 +27,11 @@ public class ReactionsSubcommand extends SubcommandObject {
         String reactionType = Objects.requireNonNull(event.getOption("reaction_type")).getAsString();
         String emojiValue = Objects.requireNonNull(event.getOption("emoji")).getAsString();
 
-        if (reactionType.equals("upvote"))
-            config.setUpvote_emoji(emojiValue);
-        else if (reactionType.equals("downvote"))
-            config.setDownvote_emoji(emojiValue);
+        switch (reactionType) {
+            case "upvote" -> config.setUpvote_emoji(emojiValue);
+            case "downvote" -> config.setDownvote_emoji(emojiValue);
+            case "moderate" -> config.setModerate_emoji(emojiValue);
+        }
 
         try {
             GuildConfigurationManager.update(config);
