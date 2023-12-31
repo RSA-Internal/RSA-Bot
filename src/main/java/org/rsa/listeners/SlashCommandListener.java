@@ -11,7 +11,7 @@ public class SlashCommandListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
-        if (event.getGuild() == null) {
+        if (event.getGuild() == null || event.isAcknowledged()) {
             return;
         }
 
