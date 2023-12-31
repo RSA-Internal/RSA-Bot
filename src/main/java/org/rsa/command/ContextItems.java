@@ -2,6 +2,7 @@ package org.rsa.command;
 
 import lombok.Getter;
 import org.rsa.command.contextitems.message.AcceptAnswerContextItem;
+import org.rsa.command.contextitems.message.ClosePostAsSpamContextItem;
 
 import java.util.HashMap;
 
@@ -15,6 +16,7 @@ public class ContextItems {
         System.out.println("Loading context menu items.");
 
         addMessageItem(new AcceptAnswerContextItem());
+        addMessageItem(new ClosePostAsSpamContextItem());
     }
 
     private static void addMessageItem(MessageContextObject item)
