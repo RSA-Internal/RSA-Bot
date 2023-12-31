@@ -6,13 +6,17 @@ import org.jetbrains.annotations.Nullable;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
 import org.rsa.command.subcommands.configure.ReactionsSubcommand;
+import org.rsa.command.subcommands.configure.RolesSubcommand;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 public class ConfigureCommand extends CommandObject {
-    private static final SubcommandObject[] subcommands = { new ReactionsSubcommand() };
+    private static final SubcommandObject[] subcommands = {
+            new ReactionsSubcommand() ,
+            new RolesSubcommand()
+    };
 
     public ConfigureCommand()
     {
