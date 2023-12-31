@@ -14,6 +14,9 @@ public class GuildConfiguration {
 
     String upvote_emoji = "";
     String downvote_emoji = "";
+    String moderate_emoji = "";
+
+    String moderator_role_id = "";
 
     public GuildConfiguration() { }
     public GuildConfiguration(String guildId) { guildid = guildId; }
