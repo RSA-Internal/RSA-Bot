@@ -26,10 +26,10 @@ public class AcceptAnswerContextItem extends MessageContextObject {
         UserReputation receiverReputation = ReputationManager.fetch(guildId, event.getTarget().getAuthor().getId());
         UserReputation acceptorReputation = ReputationManager.fetch(guildId, event.getUser().getId());
 
-        receiverReputation.setAccepted_answers(receiverReputation.getAccepted_answers() + 1);
+        receiverReputation.setReceived_accepted_answers(receiverReputation.getReceived_accepted_answers() + 1);
         receiverReputation.setReputation(receiverReputation.getReputation() + ReputationChanges.ANSWER_ACCEPT_RECEIVED);
 
-        acceptorReputation.setOther_answers_accepted(acceptorReputation.getOther_answers_accepted() + 1);
+        acceptorReputation.setGiven_accepted_answers(acceptorReputation.getGiven_accepted_answers() + 1);
         acceptorReputation.setReputation(acceptorReputation.getReputation() + ReputationChanges.ANSWER_ACCEPT_GIVEN);
 
         ReputationManager.update(receiverReputation);
