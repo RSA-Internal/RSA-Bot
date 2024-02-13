@@ -19,14 +19,14 @@ public class UserReputation
     Integer given_post_downvotes = 0;
     Integer given_moderations = 0;
     Integer given_spam_flags = 0;
+    Integer given_accepted_answers = 0;
 
     Integer received_post_upvotes = 0;
     Integer received_post_downvotes = 0;
     Integer received_moderations = 0;
     Integer received_spam_flags = 0;
+    Integer received_accepted_answers = 0;
 
-    Integer accepted_answers = 0;
-    Integer other_answers_accepted = 0;
     Integer reputation = 0;
 
     public UserReputation() {}
