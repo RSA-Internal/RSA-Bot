@@ -1,7 +1,6 @@
 package org.rsa.command.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -11,15 +10,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.rsa.command.CommandObject;
-import org.rsa.command.SubcommandObject;
-import org.rsa.exception.ValidationException;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.UserReputation;
 
 import java.awt.*;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class ProfileCommand extends CommandObject {
     public ProfileCommand()
