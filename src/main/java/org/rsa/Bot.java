@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.0";
+    private static final String VERSION = "v1.1";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -36,7 +36,6 @@ public class Bot {
         configureMemoryUsage(builder);
         builder.addEventListeners(
                 new AutoCompleteListener(),
-                new ScheduledEventListener(),
                 new SlashCommandListener(),
                 new ReactionAddedListener(),
                 new ReactionRemovedListener(),
@@ -80,7 +79,7 @@ public class Bot {
                 // Disable All CacheFlags.
                 .disableCache(Arrays.asList(CacheFlag.values()))
                 // Enable specific CacheFlags
-                .enableCache(CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.SCHEDULED_EVENTS)
+                .enableCache(CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS)
                 // Only cache members who are online or owner of the guild.
                 .setMemberCachePolicy(MemberCachePolicy.ONLINE.or(MemberCachePolicy.OWNER))
                 // Disable member chunking on startup.
@@ -91,7 +90,7 @@ public class Bot {
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.GUILD_PRESENCES, GatewayIntent.SCHEDULED_EVENTS
+                        GatewayIntent.GUILD_PRESENCES
                 )
                 // Consider guilds with more than 50 members as "large".
                 // Large guilds will only provide online members in the setup and thus reduce
