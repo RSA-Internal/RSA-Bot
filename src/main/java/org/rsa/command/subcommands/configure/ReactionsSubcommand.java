@@ -15,9 +15,9 @@ public class ReactionsSubcommand extends SubcommandObject {
         super("reactions", "Change reaction emojis");
         this.addOptions(
                 new OptionData(OptionType.STRING, "reaction_type", "Specify the reaction emoji to change.", true)
-                        .addChoice("upvote", "upvote")
-                        .addChoice("downvote", "downvote")
-                        .addChoice("moderate", "moderate"),
+                    .addChoice("upvote", "upvote")
+                    .addChoice("downvote", "downvote")
+                    .addChoice("moderate", "moderate"),
                 new OptionData(OptionType.STRING, "emoji", "New emoji to assign to reaction emoji", true));
     }
 

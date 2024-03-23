@@ -17,7 +17,8 @@ public class RolesSubcommand extends SubcommandObject {
         addOptions(
                 new OptionData(OptionType.STRING, "role_name", "Specify role to configure", true)
                     .addChoice("moderator", "moderator")
-                    .addChoice("helper", "helper"),
+                    .addChoice("helper", "helper")
+                    .addChoice("resolver_override", "resolver"),
                 new OptionData(OptionType.ROLE, "role", "Specify new role", true));
     }
 
@@ -32,6 +33,8 @@ public class RolesSubcommand extends SubcommandObject {
             guildConfig.setModerator_role_id(newRole.getId());
         } else if(roleName.equals("helper")) {
             guildConfig.setHelper_role_id(newRole.getId());
+        } else if(roleName.equals("resolver")) {
+            guildConfig.setResolver_role_id(newRole.getId());
         }
 
         GuildConfigurationManager.update(guildConfig);

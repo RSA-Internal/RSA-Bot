@@ -11,10 +11,10 @@ import org.rsa.logic.data.models.GuildConfiguration;
 
 import static org.rsa.util.CheckInToggleUtil.toggleUserCheckInState;
 
-public class CheckInCommand extends CommandObject {
+public class CheckOutCommand extends CommandObject {
 
-    public CheckInCommand() {
-        super("check-in", "Toggle check-in status for the Helper role for this server.");
+    public CheckOutCommand() {
+        super("check-out", "Toggle check-out status for the Helper role for this server.");
     }
 
     @Override
@@ -32,7 +32,7 @@ public class CheckInCommand extends CommandObject {
 
         if (helperRoleId.isEmpty() || helperRoleId.isBlank()) {
             event
-                .reply(guild.getName() + " does not have an active helper role. You were not checked-in.")
+                .reply(guild.getName() + " does not have an active helper role. You were not checked-out.")
                 .setEphemeral(true)
                 .queue();
             return;
@@ -42,7 +42,7 @@ public class CheckInCommand extends CommandObject {
 
         if (null == role) {
             event
-                .reply(guild.getName() + "'s helper role is misconfigured. You were not checked-in.")
+                .reply(guild.getName() + "'s helper role is misconfigured. You were not checked-out.")
                 .setEphemeral(true)
                 .queue();
             return;
@@ -51,7 +51,7 @@ public class CheckInCommand extends CommandObject {
         Member member = event.getMember();
         if (null == member) {
             event
-                .reply("An error occurred and you were not checked-in. Please try again later.")
+                .reply("An error occurred and you were not checked-out. Please try again later.")
                 .setEphemeral(true)
                 .queue();
             return;

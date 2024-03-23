@@ -1,9 +1,6 @@
 package org.rsa.command.commands;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.ThreadMember;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -17,8 +14,11 @@ import org.rsa.command.CommandObject;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.rsa.util.ConversionUtil.parseIntFromString;
 
@@ -26,9 +26,11 @@ public class ResolveCommand extends CommandObject {
 
     public ResolveCommand() {
         super("resolve", "Mark a question as answered.");
-        addOptionData(
-            new OptionData(OptionType.USER, "helper", "Who answered your question?", true)
-        );
+        addOptionData(new OptionData(OptionType.USER, "helper-1", "Who answered your question?", true));
+        addOptionData(new OptionData(OptionType.USER, "helper-2", "Who answered your question?", false));
+        addOptionData(new OptionData(OptionType.USER, "helper-3", "Who answered your question?", false));
+        addOptionData(new OptionData(OptionType.USER, "helper-4", "Who answered your question?", false));
+        addOptionData(new OptionData(OptionType.USER, "helper-5", "Who answered your question?", false));
     }
 
     @Override
@@ -86,7 +88,23 @@ public class ResolveCommand extends CommandObject {
             return;
         }
 
-        if (!requester.getId().equals(resolver.getId())) {
+        String resolverOverrideRoleId = guildConfig.getResolver_role_id();
+        boolean canResolve = false;
+        boolean wasOverriden = false;
+
+        if (requester.getId().equals(resolver.getId())) {
+            canResolve = true;
+        } else if (!resolverOverrideRoleId.isEmpty() && !resolverOverrideRoleId.isBlank()) {
+            Role resolveOverrideRole = guild.getRoleById(resolverOverrideRoleId);
+            if (null != resolveOverrideRole) {
+                if (resolver.getRoles().contains(resolveOverrideRole)) {
+                    canResolve = true;
+                    wasOverriden = true;
+                }
+            }
+        }
+
+        if (!canResolve) {
             event
                 .reply("You cannot resolve a question asked by someone else.")
                 .setEphemeral(true)
@@ -102,43 +120,82 @@ public class ResolveCommand extends CommandObject {
 
         String threadTitle = originalMessage.getContentStripped().substring(0, Math.min(length, titleLengthValue));
 
-        Member helper = event.getOption("helper", OptionMapping::getAsMember);
+        List<Member> helperList = getHelperList(event);
         String response = "There was a problem resolving your question. Please try again later.";
-        boolean canClose;
-        if (null != helper) {
+        boolean canClose = false;
+
+        if (helperList.isEmpty()) {
+            response = "You cannot resolve this question without giving credit.";
+        } else if (helperList.size() == 1) {
+            Member helper = helperList.get(0);
             if (helper.getId().equals(requester.getId())) {
                 response = "Congrats on answering your own question! (Hopefully you shared your findings to help others in the future.)";
-                canClose = true;
             } else {
-                Optional<ThreadMember> threadHelper = threadMemberList.stream().filter(threadMember -> threadMember.getId().equals(helper.getId())).findFirst();
-                if (threadHelper.isEmpty()) {
-                    canClose = false;
-                    response = "Marked helper was not a part of this thread. Please provide a valid helper.";
-                } else {
-                    // TODO: Notify member of reputation gain.
-                    helper.getUser().openPrivateChannel().queue(helperDm -> {
-                        helperDm
-                            .sendMessage("Thank you for helping " + requester.getAsMention() + " with their question: [" + threadTitle + "](" + threadChannel.getJumpUrl() + ").\nYou have been rewarded 0 reputation.")
-                            .queue();
-                    });
-
-                    response = "Successfully resolved your question.";
-                    canClose = true;
-                }
+                rewardHelper(helper, requester, threadTitle, threadChannel.getJumpUrl());
             }
+            canClose = true;
         } else {
-            canClose = false;
+            for (Member helper : helperList) {
+                System.out.println(helper.getEffectiveName());
+                Optional<ThreadMember> threadHelper = threadMemberList.stream().filter(threadMember -> threadMember.getId().equals(helper.getId())).findFirst();
+                if (threadHelper.isEmpty()) continue;
+                rewardHelper(helper, requester, threadTitle, threadChannel.getJumpUrl());
+                response = "Successfully resolved this question.";
+                canClose = true;
+            }
+
+            if (!canClose) {
+                response = "No valid helpers were listed. Please provide a valid helper to resolve this question.";
+            }
         }
 
-        event.reply(response).setEphemeral(true).queue(s -> {
-            if (canClose) {
-                threadChannel
-                    .getManager()
-                    .setName(String.join(" ", "[✅]", threadTitle))
-                    .setLocked(true)
-                    .setArchived(true)
-                    .queue();
-            }
-        });
+        if (wasOverriden) {
+            response = "You have overridden the resolving for this question.";
+            String helperListConcat = helperList.stream().map(Member::getUser).map(User::getId).map(id -> "<@" + id + ">").collect(Collectors.joining(","));
+            messageHelper(requester, "Your question \"[" + threadTitle + "](<" + threadChannel.getJumpUrl() + ">)\" was overridden by " + resolver.getAsMention() + ".\nHelper(s): " + helperListConcat);
+        }
+
+        event.reply(response).setEphemeral(true).complete();
+        if (canClose) {
+            threadChannel
+                .getManager()
+                .setName(String.join(" ", "[✅]", threadTitle))
+                .setLocked(true)
+                .setArchived(true)
+                .queue();
+        }
+    }
+
+    private List<Member> getHelperList(SlashCommandInteractionEvent event) {
+        List<Member> helperList = new ArrayList<>();
+        for (int i=0;i<5;i++) {
+            Member helper = event.getOption("helper-" + (i+1), OptionMapping::getAsMember);
+            helperList.add(helper);
+        }
+
+        return removeInvalidEntries(helperList);
+    }
+
+    private List<Member> removeInvalidEntries(List<Member> list) {
+        return list.stream()
+            .filter(Objects::nonNull)
+            .filter(member -> !member.getUser().isBot())
+            .filter(member -> !member.getUser().isSystem())
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
+    private void rewardHelper(Member helper, Member requester, String threadTitle, String threadUrl) {
+        System.out.println("Rewarding " + helper.getEffectiveName());
+        if (helper.getId().equals(requester.getId())) {
+            System.out.println("Skipping " + helper.getEffectiveName());
+            return;
+        }
+        String message = "Thank you for helping " + requester.getAsMention() + " with their question: [" + threadTitle + "](<" + threadUrl + ">).\nYou have been rewarded 0 reputation.";
+        messageHelper(helper, message);
+    }
+
+    private void messageHelper(Member helper, String message) {
+        helper.getUser().openPrivateChannel().queue(helperDm -> helperDm.sendMessage(message).queue());
     }
 }

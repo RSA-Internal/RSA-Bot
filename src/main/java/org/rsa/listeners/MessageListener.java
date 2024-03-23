@@ -52,7 +52,7 @@ public class MessageListener extends ListenerAdapter {
 
             if (length >= requiredCharsValue) {
                 message.createThreadChannel(
-                    String.join(" ", "[❌]", message.getContentStripped().substring(0, Math.min(length, titleLengthValue)))
+                    String.join(" ", "[❔]", message.getContentStripped().substring(0, Math.min(length, titleLengthValue)))
                 ).queue(c -> c.sendMessage("A new question has been asked. " + helperRole.getAsMention()).queue());
             }
         }

@@ -20,6 +20,7 @@ public class GuildConfiguration {
     // Role IDs
     String moderator_role_id = "";
     String helper_role_id = "";
+    String resolver_role_id = "";
 
     // Channel IDs
     String help_channel_id = "";
