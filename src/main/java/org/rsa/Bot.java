@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.1";
+    private static final String VERSION = "v1.2";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -39,6 +39,7 @@ public class Bot {
                 new SlashCommandListener(),
                 new ReactionAddedListener(),
                 new ReactionRemovedListener(),
+                new MessageListener(),
                 new ContextInteractionListeners()
         );
         builder.addEventListeners(new ListenerAdapter() {
@@ -90,7 +91,7 @@ public class Bot {
                 .enableIntents(
                         GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_MEMBERS,
                         GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                        GatewayIntent.GUILD_PRESENCES
+                        GatewayIntent.GUILD_PRESENCES, GatewayIntent.MESSAGE_CONTENT
                 )
                 // Consider guilds with more than 50 members as "large".
                 // Large guilds will only provide online members in the setup and thus reduce

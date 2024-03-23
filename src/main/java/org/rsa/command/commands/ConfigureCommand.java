@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
+import org.rsa.command.subcommands.configure.ChannelsSubcommand;
+import org.rsa.command.subcommands.configure.OptionsSubcommand;
 import org.rsa.command.subcommands.configure.ReactionsSubcommand;
 import org.rsa.command.subcommands.configure.RolesSubcommand;
 
@@ -14,8 +16,10 @@ import java.util.Optional;
 
 public class ConfigureCommand extends CommandObject {
     private static final SubcommandObject[] subcommands = {
-            new ReactionsSubcommand() ,
-            new RolesSubcommand()
+        new ReactionsSubcommand(),
+        new RolesSubcommand(),
+        new ChannelsSubcommand(),
+        new OptionsSubcommand()
     };
 
     public ConfigureCommand()

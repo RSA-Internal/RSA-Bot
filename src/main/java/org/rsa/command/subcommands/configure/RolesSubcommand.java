@@ -16,7 +16,8 @@ public class RolesSubcommand extends SubcommandObject {
         super("roles", "Configure server roles.");
         addOptions(
                 new OptionData(OptionType.STRING, "role_name", "Specify role to configure", true)
-                    .addChoice("moderator", "moderator"),
+                    .addChoice("moderator", "moderator")
+                    .addChoice("helper", "helper"),
                 new OptionData(OptionType.ROLE, "role", "Specify new role", true));
     }
 
@@ -29,6 +30,8 @@ public class RolesSubcommand extends SubcommandObject {
 
         if (roleName.equals("moderator")) {
             guildConfig.setModerator_role_id(newRole.getId());
+        } else if(roleName.equals("helper")) {
+            guildConfig.setHelper_role_id(newRole.getId());
         }
 
         GuildConfigurationManager.update(guildConfig);
