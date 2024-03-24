@@ -9,9 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.exception.ValidationException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Getter
 public abstract class CommandObject extends ListenerAdapter {
@@ -62,4 +60,11 @@ public abstract class CommandObject extends ListenerAdapter {
     }
 
     public abstract void handleSlashCommand(@NotNull SlashCommandInteractionEvent event) throws ValidationException;
+
+    protected void processSubcommand(SlashCommandInteractionEvent event, SubcommandObject[] subcommandObjects, String subCommandName) {
+        if (subCommandName != null) {
+            Optional<SubcommandObject> optionalSubcommand = Arrays.stream(subcommandObjects).filter(s -> s.getName().equals(subCommandName)).findFirst();
+            optionalSubcommand.ifPresent(subcommandObject -> subcommandObject.handleSubcommand(event));
+        }
+    }
 }

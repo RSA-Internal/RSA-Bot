@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.SubcommandObject;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
+
+import static org.rsa.logic.constants.GuildConfigurationConstants.HELP_CHANNEL_KEY;
 
 public class ChannelsSubcommand extends SubcommandObject {
 
@@ -17,7 +18,7 @@ public class ChannelsSubcommand extends SubcommandObject {
         super("channels", "Configure server channels.");
         addOptions(
             new OptionData(OptionType.STRING, "channel_type", "Specify a channel type to configure.", true)
-                .addChoice("help_channel", "help_channel"),
+                .addChoice("help_channel", HELP_CHANNEL_KEY),
             new OptionData(OptionType.CHANNEL, "channel", "Specify the channel", true)
         );
     }
@@ -33,8 +34,8 @@ public class ChannelsSubcommand extends SubcommandObject {
             return;
         }
 
-        String channelType = event.getOption("channel_type", OptionMapping::getAsString);
-        if (channelType == null) {
+        String option = event.getOption("channel_type", OptionMapping::getAsString);
+        if (option == null) {
             event
                 .reply("An invalid channel type was provided. Please try again later.")
                 .setEphemeral(true)
@@ -50,16 +51,12 @@ public class ChannelsSubcommand extends SubcommandObject {
                 .queue();
             return;
         }
+        String value = channel.getId();
 
-        GuildConfiguration guildConfig = GuildConfigurationManager.fetch(guild.getId());
+        String response = GuildConfigurationManager.processUpdate(guild, option, value);
 
-        if (channelType.equals("help_channel")) {
-            guildConfig.setHelp_channel_id(channel.getId());
-        }
-
-        GuildConfigurationManager.update(guildConfig);
         event
-            .reply("✅ **" + channelType + "** channel changed to " + channel.getAsMention())
+            .reply(response)
             .setEphemeral(true)
             .queue();
     }

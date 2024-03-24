@@ -1,5 +1,6 @@
 package org.rsa.logic.data.managers;
 
+import net.dv8tion.jda.api.entities.Guild;
 import org.rsa.aws.RequestsManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
@@ -27,5 +28,20 @@ public class GuildConfigurationManager {
     public static void update(GuildConfiguration item)
     {
         _requestsManager.enqueueItemUpdate(item);
+    }
+
+    public static String processUpdate(Guild guild, String option, String value) {
+        GuildConfiguration guildConfig = GuildConfigurationManager.fetch(guild.getId());
+        boolean result = guildConfig.updateField(option, value);
+
+        String response = "✅ **" + option + "** option changed to " + value + ".";
+
+        if (result) {
+            GuildConfigurationManager.update(guildConfig);
+        } else {
+            response = "❌ **" + option + "** option was not changed to " + value + ".";
+        }
+
+        return response;
     }
 }

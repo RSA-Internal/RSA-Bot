@@ -12,7 +12,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.CommandObject;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
+import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.logic.data.models.UserReputation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.rsa.logic.constants.GuildConfigurationConstants.REPUTATION_FOR_HELPING_KEY;
+import static org.rsa.logic.constants.GuildConfigurationConstants.REPUTATION_FOR_RESOLVE_KEY;
 import static org.rsa.util.ConversionUtil.parseIntFromString;
 
 public class ResolveCommand extends CommandObject {
@@ -90,7 +94,7 @@ public class ResolveCommand extends CommandObject {
 
         String resolverOverrideRoleId = guildConfig.getResolver_role_id();
         boolean canResolve = false;
-        boolean wasOverriden = false;
+        boolean wasOverridden = false;
 
         if (requester.getId().equals(resolver.getId())) {
             canResolve = true;
@@ -99,7 +103,7 @@ public class ResolveCommand extends CommandObject {
             if (null != resolveOverrideRole) {
                 if (resolver.getRoles().contains(resolveOverrideRole)) {
                     canResolve = true;
-                    wasOverriden = true;
+                    wasOverridden = true;
                 }
             }
         }
@@ -123,6 +127,10 @@ public class ResolveCommand extends CommandObject {
         List<Member> helperList = getHelperList(event);
         String response = "There was a problem resolving your question. Please try again later.";
         boolean canClose = false;
+        int resolveReputation = parseIntFromString(guildConfig.getValue(REPUTATION_FOR_RESOLVE_KEY), 1);
+        int helpingReputation = parseIntFromString(guildConfig.getValue(REPUTATION_FOR_HELPING_KEY), 10);
+        System.out.println("Resolver reputation: " + resolveReputation);
+        System.out.println("Helper reputation: " + helpingReputation);
 
         if (helperList.isEmpty()) {
             response = "You cannot resolve this question without giving credit.";
@@ -131,7 +139,7 @@ public class ResolveCommand extends CommandObject {
             if (helper.getId().equals(requester.getId())) {
                 response = "Congrats on answering your own question! (Hopefully you shared your findings to help others in the future.)";
             } else {
-                rewardHelper(helper, requester, threadTitle, threadChannel.getJumpUrl());
+                rewardHelper(guild, helper, requester, threadTitle, threadChannel.getJumpUrl(), helpingReputation);
             }
             canClose = true;
         } else {
@@ -139,7 +147,7 @@ public class ResolveCommand extends CommandObject {
                 System.out.println(helper.getEffectiveName());
                 Optional<ThreadMember> threadHelper = threadMemberList.stream().filter(threadMember -> threadMember.getId().equals(helper.getId())).findFirst();
                 if (threadHelper.isEmpty()) continue;
-                rewardHelper(helper, requester, threadTitle, threadChannel.getJumpUrl());
+                rewardHelper(guild, helper, requester, threadTitle, threadChannel.getJumpUrl(), helpingReputation);
                 response = "Successfully resolved this question.";
                 canClose = true;
             }
@@ -149,7 +157,7 @@ public class ResolveCommand extends CommandObject {
             }
         }
 
-        if (wasOverriden) {
+        if (wasOverridden) {
             response = "You have overridden the resolving for this question.";
             String helperListConcat = helperList.stream().map(Member::getUser).map(User::getId).map(id -> "<@" + id + ">").collect(Collectors.joining(","));
             messageHelper(requester, "Your question \"[" + threadTitle + "](<" + threadChannel.getJumpUrl() + ">)\" was overridden by " + resolver.getAsMention() + ".\nHelper(s): " + helperListConcat);
@@ -157,6 +165,9 @@ public class ResolveCommand extends CommandObject {
 
         event.reply(response).setEphemeral(true).complete();
         if (canClose) {
+            if (!wasOverridden) {
+                awardReputation(guild, requester, resolveReputation);
+            }
             threadChannel
                 .getManager()
                 .setName(String.join(" ", "[✅]", threadTitle))
@@ -185,7 +196,7 @@ public class ResolveCommand extends CommandObject {
             .collect(Collectors.toList());
     }
 
-    private void rewardHelper(Member helper, Member requester, String threadTitle, String threadUrl) {
+    private void rewardHelper(Guild guild, Member helper, Member requester, String threadTitle, String threadUrl, int reputation) {
         System.out.println("Rewarding " + helper.getEffectiveName());
         if (helper.getId().equals(requester.getId())) {
             System.out.println("Skipping " + helper.getEffectiveName());
@@ -193,6 +204,18 @@ public class ResolveCommand extends CommandObject {
         }
         String message = "Thank you for helping " + requester.getAsMention() + " with their question: [" + threadTitle + "](<" + threadUrl + ">).\nYou have been rewarded 0 reputation.";
         messageHelper(helper, message);
+        awardReputation(guild, helper, reputation);
+    }
+
+    private void awardReputation(Guild guild, Member helper, int reputation) {
+        UserReputation helperReputation = ReputationManager.fetch(guild.getId(), helper.getId());
+        int currentReputation = helperReputation.getReputation();
+        helperReputation.setReputation(currentReputation + reputation);
+
+        int timesHelped = helperReputation.getTimes_helped();
+        helperReputation.setTimes_helped(timesHelped + 1);
+
+        ReputationManager.update(helperReputation);
     }
 
     private void messageHelper(Member helper, String message) {

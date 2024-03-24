@@ -11,7 +11,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 @Setter
 public class UserReputation
 {
-    Integer schema_version = 1;
+    Integer schema_version = 2;
     String guildid;
     String userid;
 
@@ -28,6 +28,8 @@ public class UserReputation
     Integer accepted_answers = 0;
     Integer other_answers_accepted = 0;
     Integer reputation = 0;
+
+    Integer times_helped = 0;
 
     public UserReputation() {}
     public UserReputation(String guildId, String userId) {

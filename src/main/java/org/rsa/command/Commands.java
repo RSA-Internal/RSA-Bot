@@ -16,6 +16,7 @@ public class Commands {
         addCommandObject(new CheckOutCommand());
         addCommandObject(new CompileCommand());
         addCommandObject(new ConfigureCommand());
+        addCommandObject(new ReputationCommand());
         addCommandObject(new ResolveCommand());
     }
 

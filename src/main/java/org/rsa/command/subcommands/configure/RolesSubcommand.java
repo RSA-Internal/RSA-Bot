@@ -1,14 +1,16 @@
 package org.rsa.command.subcommands.configure;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.rsa.command.SubcommandObject;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
 
 import java.util.Objects;
+
+import static org.rsa.logic.constants.GuildConfigurationConstants.*;
 
 public class RolesSubcommand extends SubcommandObject {
     public RolesSubcommand()
@@ -16,28 +18,31 @@ public class RolesSubcommand extends SubcommandObject {
         super("roles", "Configure server roles.");
         addOptions(
                 new OptionData(OptionType.STRING, "role_name", "Specify role to configure", true)
-                    .addChoice("moderator", "moderator")
-                    .addChoice("helper", "helper")
-                    .addChoice("resolver_override", "resolver"),
+                    .addChoice("moderator", MODERATOR_ROLE_KEY)
+                    .addChoice("helper", HELPER_ROLE_KEY)
+                    .addChoice("resolver_override", RESOLVER_ROLE_KEY),
                 new OptionData(OptionType.ROLE, "role", "Specify new role", true));
     }
 
     @Override
     public void handleSubcommand(SlashCommandInteractionEvent event)
     {
-        String roleName = Objects.requireNonNull(event.getOption("role_name")).getAsString();
-        Role newRole = Objects.requireNonNull(event.getOption("role")).getAsRole();
-        GuildConfiguration guildConfig = GuildConfigurationManager.fetch(Objects.requireNonNull(event.getGuild()).getId());
-
-        if (roleName.equals("moderator")) {
-            guildConfig.setModerator_role_id(newRole.getId());
-        } else if(roleName.equals("helper")) {
-            guildConfig.setHelper_role_id(newRole.getId());
-        } else if(roleName.equals("resolver")) {
-            guildConfig.setResolver_role_id(newRole.getId());
+        Guild guild = event.getGuild();
+        if (guild == null) {
+            event
+                .reply("This command can only be used in a Server.")
+                .setEphemeral(true)
+                .queue();
+            return;
         }
+        String option = Objects.requireNonNull(event.getOption("role_name")).getAsString();
+        Role newRole = Objects.requireNonNull(event.getOption("role")).getAsRole();
+        String value = newRole.getId();
+        String response = GuildConfigurationManager.processUpdate(guild, option, value);
 
-        GuildConfigurationManager.update(guildConfig);
-        event.reply("✅ **" + roleName + "** role changed to " + newRole.getAsMention()).queue();
+        event
+            .reply(response)
+            .setEphemeral(true)
+            .queue();
     }
 }
