@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.exception.ValidationException;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
@@ -22,39 +21,28 @@ public abstract class CommandObject extends ListenerAdapter {
     private final String description;
     private final List<OptionData> optionDataList;
     private final List<SubcommandPassthroughObject> subcommandList;
-    private final List<SubcommandData> subcommandDataList;
     protected final Map<String, Consumer<SlashCommandInteractionEvent>> subcommandHandlers = new HashMap<>();
     private boolean isAutocomplete = false;
     private boolean isGuildOnly = false;
 
     public CommandObject(String name, String description) {
-        this(name, description, Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+        this(name, description, Collections.emptyList(), Collections.emptyList());
     }
 
     public CommandObject(String name, String description, List<OptionData> optionDataList)
     {
-        this(name, description, optionDataList, Collections.emptyList(), Collections.emptyList());
+        this(name, description, optionDataList, Collections.emptyList());
     }
 
     public CommandObject(String name, String description, List<OptionData> optionDataList, List<SubcommandPassthroughObject> subcommandList) {
-        this(name, description, optionDataList, Collections.emptyList(), subcommandList);
-    }
-
-    public CommandObject(String name, String description, List<OptionData> optionDataList, List<SubcommandData> subcommandDataList, List<SubcommandPassthroughObject> subcommandList) {
         this.name = name;
         this.description = description;
         this.optionDataList = new ArrayList<>(optionDataList);
-        this.subcommandDataList = new ArrayList<>(subcommandDataList);
         this.subcommandList = new ArrayList<>(subcommandList);
     }
 
     public void addOptionData(OptionData optionData) {
         optionDataList.add(optionData);
-    }
-
-    public void addSubcommand(SubcommandData subcommandData, Consumer<SlashCommandInteractionEvent> handler) {
-        subcommandDataList.add(subcommandData);
-        subcommandHandlers.put(subcommandData.getName(), handler);
     }
 
     public void setIsAutocomplete() {
@@ -64,11 +52,6 @@ public abstract class CommandObject extends ListenerAdapter {
     public void setIsGuildOnly() {
         isGuildOnly = true;
     }
-
-    public List<OptionData> getOptionDataList() {
-        return new ArrayList<>(optionDataList);
-    }
-    public List<SubcommandData> getSubcommandList() { return new ArrayList<>(subcommandDataList); }
 
     public SlashCommandData slashCommandImplementation() {
         return Commands.slash(name, description).addOptions(optionDataList).addSubcommands(subcommandList).setGuildOnly(isGuildOnly);
