@@ -1,46 +1,23 @@
 package org.rsa.command.subcommands.configure;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.rsa.command.SubcommandObject;
+import org.rsa.command.SubcommandPassthroughObject;
 import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
 
-import java.util.Objects;
-
-public class ReactionsSubcommand extends SubcommandObject {
+public class ReactionsSubcommand extends SubcommandPassthroughObject {
     public ReactionsSubcommand()
     {
-        super("reactions", "Change reaction emojis");
+        super("reactions", "Change reaction emojis",
+            event -> event.getOption("option", OptionMapping::getAsString),
+            event -> event.getOption("value", OptionMapping::getAsString));
         this.addOptions(
-                new OptionData(OptionType.STRING, "reaction_type", "Specify the reaction emoji to change.", true)
+                new OptionData(OptionType.STRING, "option", "Specify the reaction emoji to change.", true)
                     .addChoice(GuildConfigurationConstant.UPVOTE_EMOJI.getLocalization(), GuildConfigurationConstant.UPVOTE_EMOJI.getKey())
                     .addChoice(GuildConfigurationConstant.DOWNVOTE_EMOJI.getLocalization(), GuildConfigurationConstant.DOWNVOTE_EMOJI.getKey())
                     .addChoice(GuildConfigurationConstant.MODERATE_EMOJI.getLocalization(), GuildConfigurationConstant.MODERATE_EMOJI.getKey())
                     .addChoice(GuildConfigurationConstant.ACCEPT_EMOJI.getLocalization(), GuildConfigurationConstant.ACCEPT_EMOJI.getKey()),
-                new OptionData(OptionType.STRING, "emoji", "New emoji to assign to reaction emoji", true));
-    }
-
-    @Override
-    public void handleSubcommand(SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            event
-                .reply("This command can only be used in a Server.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-
-        String option = Objects.requireNonNull(event.getOption("reaction_type")).getAsString();
-        String value = Objects.requireNonNull(event.getOption("emoji")).getAsString();
-        String response = GuildConfigurationManager.processUpdate(guild, option, value);
-
-        event
-            .reply(response)
-            .setEphemeral(true)
-            .queue();
+                new OptionData(OptionType.STRING, "value", "New emoji to assign to reaction emoji", true));
     }
 }

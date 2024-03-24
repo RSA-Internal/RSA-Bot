@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
 import org.rsa.command.SubcommandObject;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.UserReputation;
@@ -18,16 +19,7 @@ public class ViewSubcommand extends SubcommandObject {
     }
 
     @Override
-    public void handleSubcommand(SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            event
-                .reply("This command can only be used in a Server.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-
+    public void handleSubcommand(@NotNull SlashCommandInteractionEvent event, @NotNull Guild guild) {
         Member requester = event.getMember();
         if (null == requester) {
             event

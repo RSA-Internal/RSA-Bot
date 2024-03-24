@@ -1,62 +1,23 @@
 package org.rsa.command.subcommands.configure;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.Channel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
-import org.rsa.command.SubcommandObject;
+import org.rsa.command.SubcommandPassthroughObject;
 import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
 
-public class ChannelsSubcommand extends SubcommandObject {
+import java.util.Objects;
+
+public class ChannelsSubcommand extends SubcommandPassthroughObject {
 
     public ChannelsSubcommand() {
-        super("channels", "Configure server channels.");
+        super("channels", "Configure server channels.",
+            event -> event.getOption("option", OptionMapping::getAsString),
+            event -> Objects.requireNonNull(event.getOption("value", OptionMapping::getAsChannel)).getId());
         addOptions(
-            new OptionData(OptionType.STRING, "channel_type", "Specify a channel type to configure.", true)
+            new OptionData(OptionType.STRING, "option", "Specify a channel type to configure.", true)
                 .addChoice(GuildConfigurationConstant.HELP_CHANNEL.getLocalization(), GuildConfigurationConstant.HELP_CHANNEL.getKey()),
-            new OptionData(OptionType.CHANNEL, "channel", "Specify the channel", true)
+            new OptionData(OptionType.CHANNEL, "value", "Specify the channel", true)
         );
-    }
-
-    @Override
-    public void handleSubcommand(@NotNull SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        if (guild == null) {
-            event
-                .reply("This command can only be used in a Server.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-
-        String option = event.getOption("channel_type", OptionMapping::getAsString);
-        if (option == null) {
-            event
-                .reply("An invalid channel type was provided. Please try again later.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-
-        Channel channel = event.getOption("channel", OptionMapping::getAsChannel);
-        if (channel == null) {
-            event
-                .reply("An invalid channel was provided. Please try again later.")
-                .setEphemeral(true)
-                .queue();
-            return;
-        }
-        String value = channel.getId();
-
-        String response = GuildConfigurationManager.processUpdate(guild, option, value);
-
-        event
-            .reply(response)
-            .setEphemeral(true)
-            .queue();
     }
 }
