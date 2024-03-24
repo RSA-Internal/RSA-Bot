@@ -8,12 +8,10 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.logic.constants.GuildConfigurationDefaults;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 
-import static org.rsa.logic.constants.GuildConfigurationConstants.MESSAGE_CHARACTERS_AS_TITLE_KEY;
-import static org.rsa.logic.constants.GuildConfigurationConstants.REQUIRED_CHARACTERS_KEY;
 import static org.rsa.util.ConversionUtil.parseIntFromString;
 
 public class MessageListener extends ListenerAdapter {
@@ -39,8 +37,8 @@ public class MessageListener extends ListenerAdapter {
         String helpRoleId = guildConfig.getHelper_role_id();
         String requiredChars = guildConfig.getReq_chars_for_help_thread();
         String titleLength = guildConfig.getHelp_thread_title_length();
-        int requiredCharsValue = parseIntFromString(requiredChars, parseIntFromString(GuildConfigurationDefaults.DEFAULTS.get(REQUIRED_CHARACTERS_KEY), 50));
-        int titleLengthValue = parseIntFromString(titleLength, parseIntFromString(GuildConfigurationDefaults.DEFAULTS.get(MESSAGE_CHARACTERS_AS_TITLE_KEY), 80));
+        int requiredCharsValue = parseIntFromString(requiredChars, parseIntFromString(guildConfig.getValue(GuildConfigurationConstant.REQUIRED_CHARACTERS.getKey())));
+        int titleLengthValue = parseIntFromString(titleLength, parseIntFromString(guildConfig.getValue(GuildConfigurationConstant.HELP_TITLE_LENGTH.getKey())));
 
         boolean isHelpActive = isHelperActive(guild, helpChannelId, helpRoleId);
         boolean isInHelpChannel = channel.getId().equals(helpChannelId);

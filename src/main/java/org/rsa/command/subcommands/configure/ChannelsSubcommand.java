@@ -8,9 +8,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.SubcommandObject;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
-
-import static org.rsa.logic.constants.GuildConfigurationConstants.HELP_CHANNEL_KEY;
 
 public class ChannelsSubcommand extends SubcommandObject {
 
@@ -18,7 +17,7 @@ public class ChannelsSubcommand extends SubcommandObject {
         super("channels", "Configure server channels.");
         addOptions(
             new OptionData(OptionType.STRING, "channel_type", "Specify a channel type to configure.", true)
-                .addChoice("help_channel", HELP_CHANNEL_KEY),
+                .addChoice(GuildConfigurationConstant.HELP_CHANNEL.getLocalization(), GuildConfigurationConstant.HELP_CHANNEL.getKey()),
             new OptionData(OptionType.CHANNEL, "channel", "Specify the channel", true)
         );
     }

@@ -5,11 +5,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.rsa.command.SubcommandObject;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 
 import java.util.Objects;
-
-import static org.rsa.logic.constants.GuildConfigurationConstants.*;
 
 public class ReactionsSubcommand extends SubcommandObject {
     public ReactionsSubcommand()
@@ -17,9 +16,10 @@ public class ReactionsSubcommand extends SubcommandObject {
         super("reactions", "Change reaction emojis");
         this.addOptions(
                 new OptionData(OptionType.STRING, "reaction_type", "Specify the reaction emoji to change.", true)
-                    .addChoice("upvote", UPVOTE_EMOJI_KEY)
-                    .addChoice("downvote", DOWNVOTE_EMOJI_KEY)
-                    .addChoice("moderate", MODERATE_EMOJI_KEY),
+                    .addChoice(GuildConfigurationConstant.UPVOTE_EMOJI.getLocalization(), GuildConfigurationConstant.UPVOTE_EMOJI.getKey())
+                    .addChoice(GuildConfigurationConstant.DOWNVOTE_EMOJI.getLocalization(), GuildConfigurationConstant.DOWNVOTE_EMOJI.getKey())
+                    .addChoice(GuildConfigurationConstant.MODERATE_EMOJI.getLocalization(), GuildConfigurationConstant.MODERATE_EMOJI.getKey())
+                    .addChoice(GuildConfigurationConstant.ACCEPT_EMOJI.getLocalization(), GuildConfigurationConstant.ACCEPT_EMOJI.getKey()),
                 new OptionData(OptionType.STRING, "emoji", "New emoji to assign to reaction emoji", true));
     }
 

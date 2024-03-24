@@ -6,11 +6,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.rsa.command.SubcommandObject;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 
 import java.util.Objects;
-
-import static org.rsa.logic.constants.GuildConfigurationConstants.*;
 
 public class RolesSubcommand extends SubcommandObject {
     public RolesSubcommand()
@@ -18,9 +17,9 @@ public class RolesSubcommand extends SubcommandObject {
         super("roles", "Configure server roles.");
         addOptions(
                 new OptionData(OptionType.STRING, "role_name", "Specify role to configure", true)
-                    .addChoice("moderator", MODERATOR_ROLE_KEY)
-                    .addChoice("helper", HELPER_ROLE_KEY)
-                    .addChoice("resolver_override", RESOLVER_ROLE_KEY),
+                    .addChoice(GuildConfigurationConstant.MODERATOR_ROLE.getLocalization(), GuildConfigurationConstant.MODERATOR_ROLE.getKey())
+                    .addChoice(GuildConfigurationConstant.HELPER_ROLE.getLocalization(), GuildConfigurationConstant.HELPER_ROLE.getKey())
+                    .addChoice(GuildConfigurationConstant.RESOLVER_ROLE.getLocalization(), GuildConfigurationConstant.RESOLVER_ROLE.getKey()),
                 new OptionData(OptionType.ROLE, "role", "Specify new role", true));
     }
 
@@ -46,3 +45,4 @@ public class RolesSubcommand extends SubcommandObject {
             .queue();
     }
 }
+

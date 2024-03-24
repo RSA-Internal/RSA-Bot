@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.logic.constants.ReputationChanges;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
@@ -17,6 +17,8 @@ import org.rsa.logic.data.models.UserReputation;
 import java.util.List;
 import java.util.Objects;
 
+import static org.rsa.util.ConversionUtil.parseIntFromString;
+
 public class ReactionAddedListener extends ListenerAdapter {
     private static final int REQUIRED_REACTIONS_FOR_MODERATION = 2;
     private static final int REQUIRED_REPUTATION_FOR_MODERATION = 200;
@@ -24,10 +26,11 @@ public class ReactionAddedListener extends ListenerAdapter {
     private static void giveUpvote(MessageReactionAddEvent event)
     {
         String guildId = event.getGuild().getId();
+        GuildConfiguration guildConfiguration = GuildConfigurationManager.fetch(guildId);
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.getMessageAuthorId());
 
         receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() + 1);
-        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_UPVOTE_RECEIVED);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.UPVOTE_RECEIVED.getKey())));
 
         ReputationManager.update(receiverUserReputation);
     }
@@ -35,14 +38,15 @@ public class ReactionAddedListener extends ListenerAdapter {
     private static void giveDownvote(MessageReactionAddEvent event)
     {
         String guildId = event.getGuild().getId();
+        GuildConfiguration guildConfiguration = GuildConfigurationManager.fetch(guildId);
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.getMessageAuthorId());
         UserReputation giverUserReputation = ReputationManager.fetch(guildId, event.getUserId());
 
         receiverUserReputation.setReceived_post_downvotes(receiverUserReputation.getReceived_post_downvotes() + 1);
-        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_RECEIVED);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() + parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.DOWNVOTE_RECEIVED.getKey())));
 
         giverUserReputation.setGiven_post_downvotes(receiverUserReputation.getGiven_post_downvotes() + 1);
-        giverUserReputation.setReputation(giverUserReputation.getReputation() + ReputationChanges.POST_DOWNVOTE_GIVEN);
+        giverUserReputation.setReputation(giverUserReputation.getReputation() + parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.DOWNVOTE_GIVEN.getKey())));
 
         ReputationManager.update(receiverUserReputation);
         ReputationManager.update(giverUserReputation);
@@ -85,7 +89,7 @@ public class ReactionAddedListener extends ListenerAdapter {
         // Handling reputation of spam flag recipient
         String authorId = event.getMessageAuthorId();
         UserReputation reputation = ReputationManager.fetch(event.getGuild().getId(), authorId);
-        reputation.setReputation(reputation.getReputation() + ReputationChanges.POST_CLOSED_FOR_SPAM);
+        reputation.setReputation(reputation.getReputation() + parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.QUESTION_MODERATED.getKey())));
         reputation.setReceived_spam_flags(reputation.getReceived_spam_flags() + 1);
         ReputationManager.update(reputation);
 

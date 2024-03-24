@@ -7,9 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.SubcommandObject;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
-
-import static org.rsa.logic.constants.GuildConfigurationConstants.*;
 
 public class OptionsSubcommand extends SubcommandObject {
 
@@ -17,17 +16,17 @@ public class OptionsSubcommand extends SubcommandObject {
         super("options", "Various options for a server.");
         addOptions(
             new OptionData(OptionType.STRING, "option", "Specify the setting to change.", true)
-                .addChoice("Required characters for a help thread", REQUIRED_CHARACTERS_KEY)
-                .addChoice("Length of help thread title", MESSAGE_CHARACTERS_AS_TITLE_KEY)
-                .addChoice("Reputation for Resolve", REPUTATION_FOR_RESOLVE_KEY)
-                .addChoice("Reputation for Helping", REPUTATION_FOR_HELPING_KEY)
-                .addChoice("Reputation change for receiving an upvote", UPVOTE_RECEIVED_KEY)
-                .addChoice("Reputation change for receiving a downvote", DOWNVOTE_RECEIVED_KEY)
-                .addChoice("Reputation change for giving a downvote", DOWNVOTE_GIVEN_KEY)
-                .addChoice("Reputation change for accepting an answer", ANSWER_ACCEPTED_KEY)
-                .addChoice("Reputation change for an answer being accepted", ACCEPTED_ANSWER_KEY)
-                .addChoice("Reputation change for a question being moderated", QUESTION_MODERATED_KEY)
-                .addChoice("Reputation change for a question being flagged as spam", FLAGGED_SPAM_KEY),
+                .addChoice(GuildConfigurationConstant.REQUIRED_CHARACTERS.getLocalization(), GuildConfigurationConstant.REQUIRED_CHARACTERS.getKey())
+                .addChoice(GuildConfigurationConstant.HELP_TITLE_LENGTH.getLocalization(), GuildConfigurationConstant.HELP_TITLE_LENGTH.getKey())
+                .addChoice(GuildConfigurationConstant.RESOLVER_REPUTATION.getLocalization(), GuildConfigurationConstant.RESOLVER_REPUTATION.getKey())
+                .addChoice(GuildConfigurationConstant.HELPER_REPUTATION.getLocalization(), GuildConfigurationConstant.HELPER_REPUTATION.getKey())
+                .addChoice(GuildConfigurationConstant.UPVOTE_RECEIVED.getLocalization(), GuildConfigurationConstant.UPVOTE_RECEIVED.getKey())
+                .addChoice(GuildConfigurationConstant.DOWNVOTE_RECEIVED.getLocalization(), GuildConfigurationConstant.DOWNVOTE_RECEIVED.getKey())
+                .addChoice(GuildConfigurationConstant.DOWNVOTE_GIVEN.getLocalization(), GuildConfigurationConstant.DOWNVOTE_GIVEN.getKey())
+                .addChoice(GuildConfigurationConstant.ANSWER_ACCEPTED.getLocalization(), GuildConfigurationConstant.ANSWER_ACCEPTED.getKey())
+                .addChoice(GuildConfigurationConstant.ACCEPTED_ANSWER.getLocalization(), GuildConfigurationConstant.ACCEPTED_ANSWER.getKey())
+                .addChoice(GuildConfigurationConstant.QUESTION_MODERATED.getLocalization(), GuildConfigurationConstant.QUESTION_MODERATED.getKey())
+                .addChoice(GuildConfigurationConstant.FLAGGED_SPAM.getLocalization(), GuildConfigurationConstant.FLAGGED_SPAM.getKey()),
             new OptionData(OptionType.STRING, "value", "The value for the option.", true)
         );
     }

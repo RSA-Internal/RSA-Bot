@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.CommandObject;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
@@ -22,8 +23,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.rsa.logic.constants.GuildConfigurationConstants.REPUTATION_FOR_HELPING_KEY;
-import static org.rsa.logic.constants.GuildConfigurationConstants.REPUTATION_FOR_RESOLVE_KEY;
 import static org.rsa.util.ConversionUtil.parseIntFromString;
 
 public class ResolveCommand extends CommandObject {
@@ -127,8 +126,8 @@ public class ResolveCommand extends CommandObject {
         List<Member> helperList = getHelperList(event);
         String response = "There was a problem resolving your question. Please try again later.";
         boolean canClose = false;
-        int resolveReputation = parseIntFromString(guildConfig.getValue(REPUTATION_FOR_RESOLVE_KEY), 1);
-        int helpingReputation = parseIntFromString(guildConfig.getValue(REPUTATION_FOR_HELPING_KEY), 10);
+        int resolveReputation = parseIntFromString(guildConfig.getValue(GuildConfigurationConstant.RESOLVER_REPUTATION.getKey()));
+        int helpingReputation = parseIntFromString(guildConfig.getValue(GuildConfigurationConstant.HELPER_REPUTATION.getKey()));
         System.out.println("Resolver reputation: " + resolveReputation);
         System.out.println("Helper reputation: " + helpingReputation);
 

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import org.rsa.command.MessageContextObject;
-import org.rsa.logic.constants.ReputationChanges;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
@@ -16,6 +16,8 @@ import org.rsa.logic.data.models.UserReputation;
 
 import java.util.List;
 import java.util.Objects;
+
+import static org.rsa.util.ConversionUtil.parseIntFromString;
 
 public class ClosePostAsSpamContextItem extends MessageContextObject {
 
@@ -41,10 +43,11 @@ public class ClosePostAsSpamContextItem extends MessageContextObject {
         Message message = event.getTarget();
         User poster = message.getAuthor();
         String guildId = Objects.requireNonNull(event.getGuild()).getId();
+        GuildConfiguration guildConfiguration = GuildConfigurationManager.fetch(guildId);
 
         UserReputation posterReputation = ReputationManager.fetch(guildId, poster.getId());
         posterReputation.setReceived_spam_flags(posterReputation.getReceived_spam_flags() + 1);
-        posterReputation.setReputation(posterReputation.getReputation() + ReputationChanges.POST_CLOSED_FOR_SPAM);
+        posterReputation.setReputation(posterReputation.getReputation() + parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.FLAGGED_SPAM.getKey())));
 
         ReputationManager.update(posterReputation);
     }

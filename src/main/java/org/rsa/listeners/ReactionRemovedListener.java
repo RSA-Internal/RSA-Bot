@@ -6,21 +6,24 @@ import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.logic.constants.ReputationChanges;
+import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 import org.rsa.logic.data.models.UserReputation;
+
+import static org.rsa.util.ConversionUtil.parseIntFromString;
 
 public class ReactionRemovedListener extends ListenerAdapter {
 
     private void removeUpvote(MessageReactionRemoveEvent event)
     {
         String guildId = event.getGuild().getId();
+        GuildConfiguration guildConfiguration = GuildConfigurationManager.fetch(guildId);
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.retrieveMessage().complete().getAuthor().getId());
 
         receiverUserReputation.setReceived_post_upvotes(receiverUserReputation.getReceived_post_upvotes() - 1);
-        receiverUserReputation.setReputation(receiverUserReputation.getReputation() - ReputationChanges.POST_UPVOTE_RECEIVED);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() - parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.UPVOTE_RECEIVED.getKey())));
 
         ReputationManager.update(receiverUserReputation);
     }
@@ -28,14 +31,15 @@ public class ReactionRemovedListener extends ListenerAdapter {
     private void removeDownvote(MessageReactionRemoveEvent event)
     {
         String guildId = event.getGuild().getId();
+        GuildConfiguration guildConfiguration = GuildConfigurationManager.fetch(guildId);
         UserReputation receiverUserReputation = ReputationManager.fetch(guildId, event.retrieveMessage().complete().getAuthor().getId());
         UserReputation giverUserReputation = ReputationManager.fetch(guildId, event.getUserId());
 
         receiverUserReputation.setReceived_post_downvotes(receiverUserReputation.getReceived_post_downvotes() - 1);
-        receiverUserReputation.setReputation(receiverUserReputation.getReputation() - ReputationChanges.POST_DOWNVOTE_RECEIVED);
+        receiverUserReputation.setReputation(receiverUserReputation.getReputation() - parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.DOWNVOTE_RECEIVED.getKey())));
 
         giverUserReputation.setGiven_post_downvotes(receiverUserReputation.getGiven_post_downvotes() - 1);
-        giverUserReputation.setReputation(giverUserReputation.getReputation() - ReputationChanges.POST_DOWNVOTE_GIVEN);
+        giverUserReputation.setReputation(giverUserReputation.getReputation() - parseIntFromString(guildConfiguration.getValue(GuildConfigurationConstant.DOWNVOTE_GIVEN.getKey())));
 
         ReputationManager.update(receiverUserReputation);
         ReputationManager.update(giverUserReputation);
