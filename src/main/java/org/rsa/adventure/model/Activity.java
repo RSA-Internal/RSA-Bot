@@ -17,24 +17,28 @@ public enum Activity {
     HUNT(1, "Hunt Animals", 2, 5,
         Map.of(Skill.HUNTING, 0), List.of(Item.BASIC_KNIFE),
         2, Map.of(
+            Item.NOTHING, new ItemDrop(1, 40),
             Item.BONE, new ItemDrop(2, 4),
             Item.ANIMAL_PELT, new ItemDrop(1, 1),
-            Item.RAW_MEAT, new ItemDrop(1, 95)
+            Item.RAW_MEAT, new ItemDrop(1, 55)
         )),
     FORAGE(2, "Forage", 2, 3,
         Map.of(Skill.FORAGING, 0), List.of(),
         3, Map.of(
-            Item.BERRY, new ItemDrop(3, 25),
-            Item.STICK, new ItemDrop(2, 25),
-            Item.PLANT_FIBER, new ItemDrop(4, 50)
+            Item.NOTHING, new ItemDrop(1, 40),
+            Item.BERRY, new ItemDrop(3, 13),
+            Item.STICK, new ItemDrop(2, 17),
+            Item.PLANT_FIBER, new ItemDrop(4, 20),
+            Item.ROCK, new ItemDrop(1, 10)
         )),
     FISH(3, "Fish", 2, 2,
         Map.of(Skill.FISHING, 0), List.of(),
         1, Map.of(
+            Item.NOTHING, new ItemDrop(1, 40),
             Item.STICK, new ItemDrop(1, 10),
             Item.BONE, new ItemDrop(1, 1),
-            Item.KELP, new ItemDrop(2, 45),
-            Item.RAW_FISH, new ItemDrop(1, 44)
+            Item.KELP, new ItemDrop(2, 30),
+            Item.RAW_FISH, new ItemDrop(1, 19)
         )),
     RELAX(4, "Relax", 0, 0,
         Map.of(Skill.NO_SKILL, 0), Collections.emptyList(), 0, Collections.emptyMap()),
@@ -46,10 +50,12 @@ public enum Activity {
     FARM(6, "Farm", 3, 3,
         Map.of(Skill.FORAGING, 2), List.of(Item.BASIC_HOE),
         3, Map.of(
-            Item.BERRY, new ItemDrop(2, 30),
-            Item.CARROT, new ItemDrop(4, 40),
-            Item.POTATO, new ItemDrop(3, 20),
-            Item.PLANT_FIBER, new ItemDrop(2, 10)
+            Item.NOTHING, new ItemDrop(1, 30),
+            Item.BERRY, new ItemDrop(2, 15),
+            Item.CARROT, new ItemDrop(4, 25),
+            Item.POTATO, new ItemDrop(3, 15),
+            Item.PLANT_FIBER, new ItemDrop(2, 6),
+            Item.ROCK, new ItemDrop(2, 9)
         )),
     CHOP(7, "Chop Tree", 4, 4,
         Map.of(Skill.FORAGING, 1), List.of(Item.BASIC_AXE),
@@ -132,11 +138,16 @@ public enum Activity {
 
         for (int i=0;i<rolls;i++) {
             Item randomReward = items[random.nextInt(items.length)];
-            ItemDrop itemDropForReward = possibleItems.get(randomReward);
-            int rewardCount = random.nextInt(1, itemDropForReward.dropMax());
-            travelSummary.addItemReceived(randomReward, rewardCount);
-            response.addItemReceived(randomReward, rewardCount);
-            profile.updateBackpack(randomReward.getId(), rewardCount);
+            int rewardCount = 1;
+            if (!Item.NOTHING.equals(randomReward)) {
+                ItemDrop itemDropForReward = possibleItems.get(randomReward);
+                if (itemDropForReward.dropMax() > 1) {
+                    rewardCount = random.nextInt(1, itemDropForReward.dropMax());
+                }
+                travelSummary.addItemReceived(randomReward, rewardCount);
+                response.addItemReceived(randomReward, rewardCount);
+                profile.updateBackpack(randomReward.getId(), rewardCount);
+            }
         }
 
         // Quests?

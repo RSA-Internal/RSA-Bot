@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 @Getter
 @AllArgsConstructor
 public enum Item {
+    NOTHING(-1, "Nothing", Rarity.ALPHA, 0, 0, false, false),
     TEST(0, "Test Item", Rarity.COMMON, 0, 0, false, false),
     BASIC_AXE(1, "Basic Axe", Rarity.COMMON, 0, 0, false, false),
     BASIC_FISHING_ROD(2, "Basic Fishing Rod", Rarity.UNCOMMON, 0, 0, false, false),

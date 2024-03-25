@@ -10,11 +10,13 @@ public class TravelSummaryManager {
     private static final Map<String, ActivityPerformResponse> travelSummaryMap = new HashMap<>();
 
     public static ActivityPerformResponse getUserSummary(String userId) {
-        return travelSummaryMap.getOrDefault(userId, new ActivityPerformResponse());
+        return travelSummaryMap.getOrDefault(userId, createNewTravelSummary(userId));
     }
 
-    public static void createNewTravelSummary(String userId) {
-        travelSummaryMap.put(userId, new ActivityPerformResponse());
+    public static ActivityPerformResponse createNewTravelSummary(String userId) {
+        ActivityPerformResponse response = new ActivityPerformResponse();
+        travelSummaryMap.put(userId, response);
+        return response;
     }
 
     public static void updateTravelSummary(String userId, ActivityPerformResponse summary) {
