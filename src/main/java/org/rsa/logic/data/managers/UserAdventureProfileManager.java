@@ -24,7 +24,12 @@ public class UserAdventureProfileManager {
             update(newProfile);
             return newProfile;
         }
-        return optionalUserAdventureProfile.get().items().get(0);
+
+        UserAdventureProfile adventureProfile = optionalUserAdventureProfile.get().items().get(0);
+        if (adventureProfile.validateProfile()) {
+            update(adventureProfile);
+        }
+        return adventureProfile;
     }
 
     public static void update(UserAdventureProfile userAdventureProfile) {

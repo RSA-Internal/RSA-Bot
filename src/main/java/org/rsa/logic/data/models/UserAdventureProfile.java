@@ -1,8 +1,10 @@
 package org.rsa.logic.data.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.rsa.adventure.model.Activity;
 import org.rsa.adventure.model.Item;
 import org.rsa.adventure.model.Skill;
 import org.rsa.adventure.model.Zone;
@@ -20,6 +22,7 @@ import java.util.Map;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserAdventureProfile {
     Integer schema_version = 1;
 
@@ -40,6 +43,7 @@ public class UserAdventureProfile {
 
     Map<Integer, Integer> skillSetLevel;
     Map<Integer, Integer> skillSetExperience;
+    Map<Integer, BigInteger> activitiesPerformed;
 
     public UserAdventureProfile(String guildId, String userId) {
         this.guildid = guildId;
@@ -61,6 +65,51 @@ public class UserAdventureProfile {
             skillSetLevel.put(skill.getId(), 0);
             skillSetExperience.put(skill.getId(), 0);
         }
+
+        activitiesPerformed = new HashMap<>();
+
+        for (Activity activity : Activity.values()) {
+            activitiesPerformed.put(activity.getId(), BigInteger.ZERO);
+        }
+    }
+
+    public boolean validateProfile() {
+        boolean validated = false;
+
+        if (wallet == null) {
+            wallet = new HashMap<>();
+            validated = true;
+        }
+        if (backpack == null) {
+            backpack = new HashMap<>();
+            validated = true;
+        }
+        if (equipment == null) {
+            equipment = new HashMap<>();
+            validated = true;
+        }
+        if (unlockedAchievements == null) {
+            unlockedAchievements = new ArrayList<>();
+            validated = true;
+        }
+        if (unlockedZones == null) {
+            unlockedZones = new ArrayList<>();
+            validated = true;
+        }
+        if (skillSetLevel == null) {
+            skillSetLevel = new HashMap<>();
+            validated = true;
+        }
+        if (skillSetExperience == null) {
+            skillSetExperience = new HashMap<>();
+            validated = true;
+        }
+        if (activitiesPerformed == null) {
+            activitiesPerformed = new HashMap<>();
+            validated = true;
+        }
+
+        return validated;
     }
 
     @DynamoDbSortKey
@@ -117,6 +166,32 @@ public class UserAdventureProfile {
         return updateContainer(backpack, itemId, newValue);
     }
 
+    /**
+     * Increment the times an activity has been performed by 1.
+     * @param activity The activity performed.
+     */
+    public void performActivity(Activity activity) {
+        BigInteger newValue = getNewValue(activitiesPerformed, activity.getId(), 1);
+        updateContainer(activitiesPerformed, activity.getId(), newValue);
+    }
+
+    public boolean updateSkillSet(Skill skill, int experience) {
+        int currentLevel = skillSetLevel.get(skill.getId());
+        int currentExperience = skillSetExperience.get(skill.getId());
+        int requiredExperience = Skill.getRequiredExperienceForLevelUp(skill, currentLevel);
+        boolean leveledUp = false;
+        currentExperience += experience;
+        if (currentExperience >= requiredExperience) {
+            currentLevel += 1;
+            currentExperience -= requiredExperience;
+            leveledUp = true;
+        }
+        skillSetLevel.put(skill.getId(), currentLevel);
+        skillSetExperience.put(skill.getId(), currentExperience);
+
+        return leveledUp;
+    }
+
     public String getWalletAsString() {
         return "Wallet is empty.";
     }
@@ -126,7 +201,7 @@ public class UserAdventureProfile {
 
         for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
             Item item = Item.getById(itemEntry.getKey());
-            String rarityDisplay = "[" + item.getRarity().getPrefix() + "]";
+            String rarityDisplay = "[" + item.getRarity().getPrefix() + "] ";
             builder.append(rarityDisplay);
             builder.append(item.getName());
             builder.append(": ");
@@ -157,7 +232,7 @@ public class UserAdventureProfile {
         for (Skill skill : Skill.values()) {
             if (Skill.NO_SKILL.getId().equals(skill.getId())) continue;
             int level = skillSetLevel.getOrDefault(skill.getId(), 0);
-            int exp = skillSetLevel.getOrDefault(skill.getId(), 0);
+            int exp = skillSetExperience.getOrDefault(skill.getId(), 0);
             int reqExp = Skill.getRequiredExperienceForLevelUp(skill, level + 1);
 
             builder.append(skill.getName());

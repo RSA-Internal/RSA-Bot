@@ -35,18 +35,19 @@ public class Bot {
 
         configureMemoryUsage(builder);
         builder.addEventListeners(
-                new AutoCompleteListener(),
-                new SlashCommandListener(),
-                new ReactionAddedListener(),
-                new ReactionRemovedListener(),
-                new MessageListener(),
-                new ContextInteractionListeners()
+            new AutoCompleteListener(),
+            new SlashCommandListener(),
+            new ReactionAddedListener(),
+            new ReactionRemovedListener(),
+            new MessageListener(),
+            new ContextInteractionListeners(),
+            new ButtonListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
             public void onGuildJoin(@NotNull GuildJoinEvent event) {
-                super.onGuildJoin(event);
-                setupGuild(event.getGuild());
+            super.onGuildJoin(event);
+            setupGuild(event.getGuild());
             }
         });
 

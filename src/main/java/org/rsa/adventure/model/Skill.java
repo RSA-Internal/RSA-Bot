@@ -21,6 +21,11 @@ public enum Skill {
     private final Integer baseExp;
     private final Double curveFactor;
 
+    /**
+     * @param skill The skill to check.
+     * @param level The users current level.
+     * @return The required experience to level up.
+     */
     public static int getRequiredExperienceForLevelUp(Skill skill, int level) {
         return (int) Math.floor(skill.baseExp * (Math.pow(level + 1, skill.getCurveFactor())));
     }

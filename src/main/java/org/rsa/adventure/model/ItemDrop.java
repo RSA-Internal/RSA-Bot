@@ -1,3 +1,3 @@
 package org.rsa.adventure.model;
 
-public record ItemDrop(int dropMax, double dropChance) { }
+public record ItemDrop(int dropMax, int dropChance) { }
