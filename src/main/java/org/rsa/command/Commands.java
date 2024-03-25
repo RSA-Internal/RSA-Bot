@@ -12,6 +12,7 @@ public class Commands {
     static {
         System.out.println("Loading commands.");
 
+        addCommandObject(new AdventureCommand());
         addCommandObject(new CheckInCommand());
         addCommandObject(new CheckOutCommand());
         addCommandObject(new CompileCommand());
