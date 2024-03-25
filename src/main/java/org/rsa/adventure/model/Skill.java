@@ -36,11 +36,15 @@ public enum Skill {
     public List<Zone> unlockZonesOnLevelUp(UserAdventureProfile profile) {
         int userSkillLevel = profile.getSkillSetLevel().get(this.getId());
         List<Integer> unlockedZones = profile.getUnlockedZones();
+        System.out.println("Checking for zones " + name + " - level: " + userSkillLevel);
 
         return Zone.zoneStream()
+            // Filter out unlocked zones
             .filter(zone -> !unlockedZones.contains(zone.getId()))
+            // Filter out zones that don't have this skill
             .filter(zone -> zone.getRequiredSkills().containsKey(this))
-            .filter(zone -> zone.getRequiredSkills().get(this) >= userSkillLevel)
+            // Filter out zones where the skill is higher than the users skill level
+            .filter(zone -> zone.getRequiredSkills().get(this) <= userSkillLevel)
             .toList();
     }
 

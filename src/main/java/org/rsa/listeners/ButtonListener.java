@@ -99,6 +99,7 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, Zone zone) {
+        TravelSummaryManager.createNewTravelSummary(requester.getId());
         EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
         List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
         event

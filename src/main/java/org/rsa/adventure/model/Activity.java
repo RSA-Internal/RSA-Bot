@@ -14,21 +14,21 @@ import java.util.stream.Stream;
 public enum Activity {
     LEAVE(0, "Leave", 0, 0,
         Collections.emptyMap(), Collections.emptyList(), 0, Collections.emptyMap()),
-    HUNT(1, "Hunt Animals", 2, 1,
+    HUNT(1, "Hunt Animals", 2, 5,
         Map.of(Skill.HUNTING, 0), List.of(Item.BASIC_KNIFE),
         2, Map.of(
             Item.BONE, new ItemDrop(2, 4),
             Item.ANIMAL_PELT, new ItemDrop(1, 1),
             Item.RAW_MEAT, new ItemDrop(1, 95)
         )),
-    FORAGE(2, "Forage", 2, 1,
+    FORAGE(2, "Forage", 2, 3,
         Map.of(Skill.FORAGING, 0), List.of(),
         3, Map.of(
             Item.BERRY, new ItemDrop(3, 25),
             Item.STICK, new ItemDrop(2, 25),
             Item.PLANT_FIBER, new ItemDrop(4, 50)
         )),
-    FISH(3, "Fish", 2, 1,
+    FISH(3, "Fish", 2, 2,
         Map.of(Skill.FISHING, 0), List.of(),
         1, Map.of(
             Item.STICK, new ItemDrop(1, 10),
@@ -38,12 +38,12 @@ public enum Activity {
         )),
     RELAX(4, "Relax", 0, 0,
         Map.of(Skill.NO_SKILL, 0), Collections.emptyList(), 0, Collections.emptyMap()),
-    MINE(5, "Mine", 4, 1,
+    MINE(5, "Mine", 4, 5,
         Map.of(Skill.MINING, 0), List.of(Item.BASIC_PICKAXE),
         2, Map.of(
             Item.ROCK, new ItemDrop(4, 100)
         )),
-    FARM(6, "Farm", 3, 1,
+    FARM(6, "Farm", 3, 3,
         Map.of(Skill.FORAGING, 2), List.of(Item.BASIC_HOE),
         3, Map.of(
             Item.BERRY, new ItemDrop(2, 30),
@@ -51,7 +51,7 @@ public enum Activity {
             Item.POTATO, new ItemDrop(3, 20),
             Item.PLANT_FIBER, new ItemDrop(2, 10)
         )),
-    CHOP(7, "Chop Tree", 4, 1,
+    CHOP(7, "Chop Tree", 4, 4,
         Map.of(Skill.FORAGING, 1), List.of(Item.BASIC_AXE),
         1, Map.of(
             Item.LOG, new ItemDrop(4, 100)
@@ -115,8 +115,11 @@ public enum Activity {
             if (skillLeveledUp) {
                 travelSummary.addSkillLeveledUp(skill);
                 response.addSkillLeveledUp(skill);
+                System.out.println("Skill " + skill.getName() + " leveled up. Checking for new zones.");
                 List<Zone> unlockedZones = skill.unlockZonesOnLevelUp(profile);
+                System.out.println("Unlocked new zones: " + unlockedZones.size());
                 for (Zone zone : unlockedZones) {
+                    System.out.println("Unlocked zone: " + zone.getName());
                     travelSummary.addUnlockedZone(zone);
                     response.addUnlockedZone(zone);
                 }
