@@ -15,13 +15,13 @@ public enum Zone {
 
     START_TOWN(0, "Starter Town", Collections.emptyList(), Collections.emptyMap()),
     FOREST(1, "Forest",
-        List.of(Activity.HUNT, Activity.FORAGE, Activity.LEAVE),
+        List.of(Activity.HUNT, Activity.FORAGE, Activity.CHOP, Activity.LEAVE),
         Map.of(Skill.HUNTING, 0, Skill.FORAGING, 0)),
     RIVER(2, "River",
         List.of(Activity.FISH, Activity.RELAX, Activity.LEAVE),
         Map.of(Skill.FISHING, 0)),
     CAVE(3, "Cave",
-        List.of(Activity.MINE, Activity.FORAGE, Activity.LEAVE),
+        List.of(Activity.MINE, Activity.LEAVE),
         Map.of(Skill.MINING, 0)),
     FARM(4, "Farm",
         List.of(Activity.FORAGE, Activity.LEAVE),
@@ -33,7 +33,7 @@ public enum Zone {
     private final List<Activity> activities;
     private final Map<Skill, Integer> requiredSkills;
 
-    private static Stream<Zone> zoneStream() {
+    public static Stream<Zone> zoneStream() {
         return Arrays.stream(Zone.values());
     }
 

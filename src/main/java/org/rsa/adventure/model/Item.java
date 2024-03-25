@@ -26,6 +26,9 @@ public enum Item {
     WHEAT(13, "Wheat", Rarity.COMMON, 0, 0, false, false),
     LOG(14, "Log", Rarity.COMMON, 0, 0, false, false),
     BASIC_KNIFE(15, "Basic Knife", Rarity.COMMON, 0, 0, false, false),
+    RAW_MEAT(16, "Raw Meat", Rarity.COMMON, 0, 0, false, false),
+    KELP(17, "Kelp", Rarity.COMMON, 0, 0, false, false),
+    RAW_FISH(18, "Raw Fish", Rarity.COMMON, 0, 0, false, false),
     ;
 
     private final Integer id;
