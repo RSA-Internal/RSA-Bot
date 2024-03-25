@@ -62,6 +62,7 @@ public class AdventureTravelTranslator {
                 StringBuilder requiredDisplay = getTravelStringBuilder(requiredLevels, requiredItems, experienceBound, possibleItems);
 
                 builder.addField(activity.getName(), requiredDisplay.toString(), true);
+                builder.setFooter(requester.getId());
             }
         }
 

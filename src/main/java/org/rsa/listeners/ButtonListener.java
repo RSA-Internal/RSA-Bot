@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.adventure.TravelSummaryManager;
@@ -33,7 +34,8 @@ public class ButtonListener extends ListenerAdapter {
             .setTitle(title)
             .setAuthor(requester.getEffectiveName())
             .setColor(HelperUtil.getRandomColor())
-            .setThumbnail(requester.getEffectiveAvatarUrl());
+            .setThumbnail(requester.getEffectiveAvatarUrl())
+            .setFooter(requester.getId());
 
         Map<Item, Integer> itemsReceived = performResponse.getItemsReceived();
         String itemReceivedDisplay = itemsReceived.keySet().stream()
@@ -100,10 +102,11 @@ public class ButtonListener extends ListenerAdapter {
 
     private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, Zone zone) {
         TravelSummaryManager.createNewTravelSummary(requester.getId());
+        UserZoneManager.userTravelToZone(requester.getId(), zone.getId());
         EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
         List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
         event
-            .editMessage(MessageEditData.fromEmbeds(builder.build()))
+            .reply(MessageCreateData.fromEmbeds(builder.build()))
             .setComponents(ActionRow.of(components))
             .queue();
     }
@@ -170,14 +173,29 @@ public class ButtonListener extends ListenerAdapter {
                     EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
                     UserAdventureProfileManager.update(adventureProfile);
 
-                    event
-                        .editMessage(MessageEditData.fromEmbeds(builder.build()))
-                        .setComponents(ActionRow.of(
-                            Button.success("travel_" + activity.getId(), activity.getName() + " again"),
-                            Button.success("return_" + activity.getId(), "Go back"),
-                            Button.primary("travel_" + Activity.LEAVE.getId(), "Leave")
-                        ))
-                        .queue();
+                    MessageEmbed existingEmbed = event.getMessage().getEmbeds().get(0);
+                    if (existingEmbed != null) {
+                        String ownerId = Objects.requireNonNull(existingEmbed.getFooter()).getText();
+                        if (requester.getId().equals(ownerId)) {
+                            event
+                                .editMessage(MessageEditData.fromEmbeds(builder.build()))
+                                .setComponents(ActionRow.of(
+                                    Button.success("travel_" + activity.getId(), activity.getName() + " again"),
+                                    Button.success("return_" + activity.getId(), "Go back"),
+                                    Button.primary("travel_" + Activity.LEAVE.getId(), "Leave")
+                                ))
+                                .queue();
+                        } else {
+                            event
+                                .reply(MessageCreateData.fromEmbeds(builder.build()))
+                                .setComponents(ActionRow.of(
+                                    Button.success("travel_" + activity.getId(), activity.getName() + " again"),
+                                    Button.success("return_" + activity.getId(), "Go back"),
+                                    Button.primary("travel_" + Activity.LEAVE.getId(), "Leave")
+                                ))
+                                .queue();
+                        }
+                    }
                 } else if (componentId.contains("return")) {
                     int currentZoneId = UserZoneManager.getUserCurrentZone(requester.getId());
                     if (currentZoneId == Zone.START_TOWN.getId()) {
