@@ -115,6 +115,11 @@ public enum Activity {
             if (skillLeveledUp) {
                 travelSummary.addSkillLeveledUp(skill);
                 response.addSkillLeveledUp(skill);
+                List<Zone> unlockedZones = skill.unlockZonesOnLevelUp(profile);
+                for (Zone zone : unlockedZones) {
+                    travelSummary.addUnlockedZone(zone);
+                    response.addUnlockedZone(zone);
+                }
             }
         }
 

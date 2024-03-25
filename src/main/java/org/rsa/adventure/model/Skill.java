@@ -2,6 +2,9 @@ package org.rsa.adventure.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.rsa.logic.data.models.UserAdventureProfile;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -28,6 +31,17 @@ public enum Skill {
      */
     public static int getRequiredExperienceForLevelUp(Skill skill, int level) {
         return (int) Math.floor(skill.baseExp * (Math.pow(level + 1, skill.getCurveFactor())));
+    }
+
+    public List<Zone> unlockZonesOnLevelUp(UserAdventureProfile profile) {
+        int userSkillLevel = profile.getSkillSetLevel().get(this.getId());
+        List<Integer> unlockedZones = profile.getUnlockedZones();
+
+        return Zone.zoneStream()
+            .filter(zone -> !unlockedZones.contains(zone.getId()))
+            .filter(zone -> zone.getRequiredSkills().containsKey(this))
+            .filter(zone -> zone.getRequiredSkills().get(this) >= userSkillLevel)
+            .toList();
     }
 
     public static void main(String[] args) {

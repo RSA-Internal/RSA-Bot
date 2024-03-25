@@ -70,6 +70,15 @@ public class ButtonListener extends ListenerAdapter {
             }
             builder.addField("Skills Leveled Up", skillBuilder.toString(), false);
         }
+
+        Set<Zone> unlockedZones = performResponse.getUnlockedZones();
+        if (!unlockedZones.isEmpty()) {
+            String unlockedZoneDisplay = unlockedZones.stream()
+                .map(zone -> "- " + zone.getName())
+                .collect(Collectors.joining("\n"));
+            builder.addField("Zones Unlocked", unlockedZoneDisplay, false);
+        }
+
         return builder;
     }
 
