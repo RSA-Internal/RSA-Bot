@@ -3,6 +3,7 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -20,6 +21,7 @@ import org.rsa.util.HelperUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.rsa.translator.AdventureProfileTranslator.getAdventureProfileAsEmbed;
 import static org.rsa.translator.AdventureTravelTranslator.getTravelComponents;
 import static org.rsa.translator.AdventureTravelTranslator.getTravelEmbedBuilder;
 
@@ -78,10 +80,22 @@ public class ButtonListener extends ListenerAdapter {
 
         event
             .editMessage(MessageEditData.fromEmbeds(builder.build()))
-            .setComponents(Collections.emptyList())
+            .setComponents(ActionRow.of(
+                Button.success("travel_select", "Travel"),
+                Button.primary("view_profile", "Profile")
+            ))
             .queue();
 
         TravelSummaryManager.clearTravelSummary(requester.getId());
+    }
+
+    private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, Zone zone) {
+        EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
+        List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
+        event
+            .editMessage(MessageEditData.fromEmbeds(builder.build()))
+            .setComponents(ActionRow.of(components))
+            .queue();
     }
 
     @Override
@@ -96,14 +110,52 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
+        UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), requester.getId());
+
         if (componentId.equals("travel_0")) {
             travelToTown(event, guild, requester);
+        } else if(componentId.equals("view_profile")) {
+            MessageEmbed profileEmbed = getAdventureProfileAsEmbed(guild, adventureProfile, requester, requester);
+            event
+                .editMessage(MessageEditData.fromEmbeds(profileEmbed))
+                .setComponents(ActionRow.of(Button.success("travel_select", "Travel")))
+                .queue();
+        } else if (componentId.equals("travel_select")) {
+            List<ActionRow> actionRows = new ArrayList<>();
+            List<Integer> unlockedZonesId = adventureProfile.getUnlockedZones();
+
+            List<ItemComponent> components = new ArrayList<>();
+            for (Integer zoneId : unlockedZonesId) {
+                if (Zone.START_TOWN.getId().equals(zoneId)) continue;
+                components.add(Button.success("zone_" + zoneId, Zone.getById(zoneId).getName()));
+
+                if (components.size()==5) {
+                    actionRows.add(ActionRow.of(new ArrayList<>(components)));
+                    components = new ArrayList<>();
+                }
+            }
+            actionRows.add(ActionRow.of(new ArrayList<>(components)));
+
+            event
+                .editMessage(MessageEditData.fromEmbeds(
+                    new EmbedBuilder()
+                        .setTitle("Travel where")
+                        .setAuthor(requester.getEffectiveName())
+                        .setColor(HelperUtil.getRandomColor())
+                        .setThumbnail(requester.getEffectiveAvatarUrl())
+                        .build()
+                ))
+                .setComponents(actionRows)
+                .queue();
         } else {
-            UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), requester.getId());
+            int idInComponent = -1;
+            if (componentId.contains("_")) {
+                idInComponent = Integer.parseInt(componentId.substring(componentId.indexOf("_") + 1));
+            }
+
             if (componentId.contains("travel")) {
                 // Parse Activity and perform
-                int activityId = Integer.parseInt(componentId.substring(componentId.indexOf("_") + 1));
-                Activity activity = Activity.getById(activityId);
+                Activity activity = Activity.getById(idInComponent);
                 ActivityPerformResponse performResponse = activity.perform(adventureProfile);
 
                 EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
@@ -122,15 +174,12 @@ public class ButtonListener extends ListenerAdapter {
                 if (currentZoneId == Zone.START_TOWN.getId()) {
                     travelToTown(event, guild, requester);
                 } else {
-                    // Display adventure embed
                     Zone currentZone = Zone.getById(currentZoneId);
-                    EmbedBuilder builder = getTravelEmbedBuilder(requester, currentZone);
-                    List<ItemComponent> components = getTravelComponents(adventureProfile, currentZone);
-                    event
-                        .editMessage(MessageEditData.fromEmbeds(builder.build()))
-                        .setComponents(ActionRow.of(components))
-                        .queue();
+                    travelToZone(event, requester, adventureProfile, currentZone);
                 }
+            } else if(componentId.contains("zone")) {
+                Zone zone = Zone.getById(idInComponent);
+                travelToZone(event, requester, adventureProfile, zone);
             }
         }
     }

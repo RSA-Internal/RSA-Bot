@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.rsa.command.SubcommandObject;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
@@ -37,6 +39,7 @@ public class AdventureProfileSubcommand extends SubcommandObject {
         UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), profileView.getId());
         event
             .replyEmbeds(AdventureProfileTranslator.getAdventureProfileAsEmbed(guild, adventureProfile, requester, profileView))
+            .setComponents(ActionRow.of(Button.success("travel_select", "Travel")))
             .queue();
     }
 }
