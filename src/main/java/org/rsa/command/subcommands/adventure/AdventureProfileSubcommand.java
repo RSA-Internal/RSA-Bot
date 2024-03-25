@@ -11,10 +11,10 @@ import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
 import org.rsa.translator.AdventureProfileTranslator;
 
-public class AdventureInventorySubcommand extends SubcommandObject {
+public class AdventureProfileSubcommand extends SubcommandObject {
 
-    public AdventureInventorySubcommand() {
-        super("inventory", "View the inventory of a user.");
+    public AdventureProfileSubcommand() {
+        super("profile", "View the profile of a user.");
         addOptions(new OptionData(OptionType.USER, "user", "The user to view", false));
     }
 

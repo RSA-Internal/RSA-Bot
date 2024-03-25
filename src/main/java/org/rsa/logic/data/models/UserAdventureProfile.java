@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.rsa.adventure.model.Item;
+import org.rsa.adventure.model.Skill;
+import org.rsa.adventure.model.Zone;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
@@ -36,6 +38,9 @@ public class UserAdventureProfile {
     List<Integer> unlockedAchievements;
     List<Integer> unlockedZones;
 
+    Map<Integer, Integer> skillSetLevel;
+    Map<Integer, Integer> skillSetExperience;
+
     public UserAdventureProfile(String guildId, String userId) {
         this.guildid = guildId;
         this.userid = userId;
@@ -43,7 +48,19 @@ public class UserAdventureProfile {
         backpack = new HashMap<>();
         equipment = new HashMap<>();
         unlockedAchievements = new ArrayList<>();
-        unlockedZones = new ArrayList<>();
+        unlockedZones = new ArrayList<>() {{
+            add(Zone.START_TOWN.getId());
+            add(Zone.FOREST.getId());
+            add(Zone.RIVER.getId());
+            add(Zone.CAVE.getId());
+        }};
+        skillSetLevel = new HashMap<>();
+        skillSetExperience = new HashMap<>();
+
+        for (Skill skill : Skill.values()) {
+            skillSetLevel.put(skill.getId(), 0);
+            skillSetExperience.put(skill.getId(), 0);
+        }
     }
 
     @DynamoDbSortKey
@@ -118,5 +135,41 @@ public class UserAdventureProfile {
         }
 
         return builder.isEmpty() ? "Backpack is empty." : builder.toString();
+    }
+
+    public String getZonesAsString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Integer unlockedZoneId : unlockedZones) {
+            Zone unlockedZone = Zone.getById(unlockedZoneId);
+            if (unlockedZone != null) {
+                builder.append(unlockedZone.getName());
+                builder.append("\n");
+            }
+        }
+
+        return builder.isEmpty() ? "No unlocked zones." : builder.toString();
+    }
+
+    public String getSkillsAsString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (Skill skill : Skill.values()) {
+            if (Skill.NO_SKILL.getId().equals(skill.getId())) continue;
+            int level = skillSetLevel.getOrDefault(skill.getId(), 0);
+            int exp = skillSetLevel.getOrDefault(skill.getId(), 0);
+            int reqExp = Skill.getRequiredExperienceForLevelUp(skill, level + 1);
+
+            builder.append(skill.getName());
+            builder.append(": Level ");
+            builder.append(level);
+            builder.append(" (");
+            builder.append(exp);
+            builder.append(" / ");
+            builder.append(reqExp);
+            builder.append(" xp)\n");
+        }
+
+        return builder.isEmpty() ? "No skill data." : builder.toString();
     }
 }

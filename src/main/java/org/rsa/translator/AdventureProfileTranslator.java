@@ -19,8 +19,9 @@ public class AdventureProfileTranslator {
             .addBlankField(true)
             .addBlankField(true)
             .addField("Backpack", adventureProfile.getBackpackAsString(), true)
+            .addField("Zones", adventureProfile.getZonesAsString(), true)
             .addBlankField(true)
-            .addBlankField(true)
+            .addField("Skills", adventureProfile.getSkillsAsString(), true)
             .build();
     }
 

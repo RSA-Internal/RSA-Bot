@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
-import org.rsa.command.subcommands.adventure.AdventureInventorySubcommand;
+import org.rsa.command.subcommands.adventure.AdventureProfileSubcommand;
 import org.rsa.exception.ValidationException;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ import java.util.List;
 public class AdventureCommand extends CommandObject {
 
     private static final SubcommandObject[] subcommands = {
-        new AdventureInventorySubcommand(),
+        new AdventureProfileSubcommand(),
     };
 
     public AdventureCommand() {
