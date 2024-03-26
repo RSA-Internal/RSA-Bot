@@ -87,7 +87,15 @@ public class ResolveCommand extends CommandObject {
         Member requester = originalMessage.getMember();
         Member resolver = event.getMember();
 
+        if (null == requester) {
+            LoggerFactory.getLogger(Bot.class).warn("Parent message member was null.");
+            originalMessage = threadChannel.retrieveStartMessage().complete();
+            requester = originalMessage.getMember();
+        }
+
         if (null == requester || null == resolver) {
+            LoggerFactory.getLogger(Bot.class).warn("Request: {}.", requester);
+            LoggerFactory.getLogger(Bot.class).warn("Resolver: {}.", resolver);
             event
                 .reply("An error occurred. Please try again later.")
                 .setEphemeral(true)
