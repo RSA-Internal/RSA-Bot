@@ -55,7 +55,7 @@ public enum Activity {
     CHOP(7, "Chop Tree", 4, 4, 1,
         List.of(Item.BASIC_AXE),
         Map.of(Item.LOG, new ItemDrop(4, 100)),
-        Map.of(Skill.FORAGING, 1)),
+        Map.of(Skill.FORAGING, 1, Skill.LOGGING, 0)),
     ;
 
     private final Integer id;

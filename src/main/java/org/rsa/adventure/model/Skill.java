@@ -14,6 +14,7 @@ public enum Skill {
     COOKING(5, "Cooking", 15, 1.2),
     CRAFTING(6, "Crafting", 15, 1.2),
     FARMING(7, "Farming", 25, 1.4),
+    LOGGING(8, "Logging", 20, 1.3),
     ;
 
     private final Integer id;

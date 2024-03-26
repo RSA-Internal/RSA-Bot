@@ -109,6 +109,18 @@ public class UserAdventureProfile {
             skillSetExperience = new HashMap<>();
             validated = true;
         }
+
+        for (Skill skill : Skill.values()) {
+            if (!skillSetLevel.containsKey(skill.getId())) {
+                skillSetLevel.put(skill.getId(), 0);
+                validated = true;
+            }
+            if (!skillSetExperience.containsKey(skill.getId())) {
+                skillSetExperience.put(skill.getId(), 0);
+                validated = true;
+            }
+        }
+
         if (activitiesPerformed == null) {
             activitiesPerformed = new HashMap<>();
             validated = true;
