@@ -1,6 +1,7 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Rarity;
 import org.rsa.entity.BaseEntity;
 
@@ -16,6 +17,7 @@ public class RarityEntity extends BaseEntity {
     public RarityEntity(Integer id, String name, String prefix) {
         super(id, name);
         this.prefix = prefix;
+        AdventureEntities.rarityManager.addEntity(this);
     }
 
     @Override

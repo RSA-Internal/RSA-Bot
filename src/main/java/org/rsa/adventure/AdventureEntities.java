@@ -22,24 +22,16 @@ public class AdventureEntities {
         Arrays.stream(Activity.values()).iterator().forEachRemaining(ActivityEntity::fromEnum);
         logger.info("Registered activities: " + activityManager.getEntityList().size());
 
-        for (Item item : Item.values()) {
-            itemManager.addEntity(ItemEntity.fromEnum(item));
-        }
+        Arrays.stream(Item.values()).iterator().forEachRemaining(ItemEntity::fromEnum);
         logger.info("Registered items: " + itemManager.getEntityList().size());
 
-        for (Rarity rarity : Rarity.values()) {
-            rarityManager.addEntity(RarityEntity.fromEnum(rarity));
-        }
+        Arrays.stream(Rarity.values()).iterator().forEachRemaining(RarityEntity::fromEnum);
         logger.info("Registered rarities: " + rarityManager.getEntityList().size());
 
-        for (Skill skill : Skill.values()) {
-            skillManager.addEntity(SkillEntity.fromEnum(skill));
-        }
+        Arrays.stream(Skill.values()).iterator().forEachRemaining(SkillEntity::fromEnum);
         logger.info("Registered skills: " + skillManager.getEntityList().size());
 
-        for (Zone zone : Zone.values()) {
-            zoneManager.addEntity(ZoneEntity.fromEnum(zone));
-        }
+        Arrays.stream(Zone.values()).iterator().forEachRemaining(ZoneEntity::fromEnum);
         logger.info("Registered zones: " + zoneManager.getEntityList().size());
 
         logger.info("Total activities: " + activityManager.getEntityList().size());

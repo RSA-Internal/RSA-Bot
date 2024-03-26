@@ -1,6 +1,7 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Skill;
 import org.rsa.adventure.model.Zone;
 import org.rsa.entity.BaseEntity;
@@ -37,6 +38,7 @@ public class ZoneEntity extends BaseEntity {
         super(id, name);
         this.activities = activities;
         this.requiredSkillSet = requiredSkillSet;
+        AdventureEntities.zoneManager.addEntity(this);
     }
 
     @Override

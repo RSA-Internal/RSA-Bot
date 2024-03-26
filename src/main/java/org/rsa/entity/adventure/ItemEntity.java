@@ -1,6 +1,7 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Item;
 import org.rsa.adventure.model.ItemDrop;
 import org.rsa.adventure.model.Rarity;
@@ -36,6 +37,7 @@ public class ItemEntity extends BaseEntity {
         this.sellPrice = sellPrice;
         this.canTrade = canTrade;
         this.canDrop = canDrop;
+        AdventureEntities.itemManager.addEntity(this);
     }
 
     public ItemEntity setItemDrop(ItemDrop itemDrop) {

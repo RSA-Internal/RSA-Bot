@@ -35,6 +35,7 @@ public class SkillEntity extends BaseEntity {
         super(id, name);
         this.baseExp = baseExp;
         this.curveFactor = curveFactor;
+        AdventureEntities.skillManager.addEntity(this);
     }
 
     public SkillEntity setLevel(Integer level) {
