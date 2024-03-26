@@ -120,7 +120,7 @@ public class ActivityEntity extends BaseEntity {
         if (!ignoreCooldown) {
             long isCooldownReady = CooldownTracker.isCooldownReady(profile.getUserid());
             if (isCooldownReady > 0) {
-                return new ActivityResponse(false, String.join(" ", "You must wait " + (isCooldownReady / 1000) + "s before performing this action."));
+                return new ActivityResponse(false, String.join(" ", "You must wait " + (isCooldownReady / 1000.0) + "s before performing this action."));
             }
         }
 
