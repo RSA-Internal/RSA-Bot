@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.util.HelperUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class IndexManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(IndexManager.class);
 
     private static final Map<String, String> userToTypeMap = new HashMap<>();
 
@@ -37,10 +41,11 @@ public class IndexManager {
     }
 
     public static MessageEmbed getIndexEmbed(Member requester, String entityType, String selectedEntity) {
-        String selectedType = selectedEntity.substring(0, selectedEntity.indexOf("-"));
+        logger.info("getIndexEmbed - requester: {} | type: {} | entity: {}", requester.getId(), entityType, selectedEntity);
         String selectedIndex = selectedEntity.substring(selectedEntity.indexOf("-") + 1);
-        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(selectedType);
+        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(entityType.toLowerCase());
         BaseEntity baseEntity = entityManager.getEntityById(Integer.parseInt(selectedIndex));
+        logger.info("getIndexEmbed - BaseEntity: {}", baseEntity);
 
         return new EmbedBuilder()
             .setTitle("Index Viewer")

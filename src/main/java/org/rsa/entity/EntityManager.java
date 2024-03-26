@@ -69,7 +69,7 @@ public class EntityManager<T extends BaseEntity> {
             .filter(entity -> entity.getId() > 0)
             .map(entity ->
                 SelectOption
-                    .of(entity.getName(), "place-" + entity.getId())
+                    .of(entity.getName(), "entity-" + entity.getId())
                     .withDefault(entity.getId().equals(defaultIndex))
             )
             .toList();

@@ -20,6 +20,6 @@ public class RarityEntity extends BaseEntity {
 
     @Override
     public String getAsDetails() {
-        return null;
+        return "- ID: " + getId() + "\n- Name: " + getName() + "\n- Prefix: " + prefix;
     }
 }

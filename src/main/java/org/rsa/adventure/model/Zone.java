@@ -2,10 +2,7 @@ package org.rsa.adventure.model;
 
 import lombok.Getter;
 import org.rsa.entity.adventure.ActivityEntity;
-import org.rsa.entity.adventure.ItemEntity;
-import org.rsa.entity.adventure.SkillEntity;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

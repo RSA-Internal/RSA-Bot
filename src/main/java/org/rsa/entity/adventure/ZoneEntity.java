@@ -41,6 +41,30 @@ public class ZoneEntity extends BaseEntity {
 
     @Override
     public String getAsDetails() {
-        return null;
+        StringBuilder builder = new StringBuilder();
+        builder.append("\n- ID: ");
+        builder.append(getId());
+        builder.append("\n- Name: ");
+        builder.append(getName());
+        builder.append("\n- Activities");
+        for (ActivityEntity activity : activities) {
+            builder.append("\n - ");
+            builder.append(activity.getName());
+        }
+        builder.append("\n- Unlock Requirements");
+        List<SkillEntity> skillsRequiredAboveZero = requiredSkillSet.stream().filter(skill -> skill.getLevel() > 0).toList();
+        if (!skillsRequiredAboveZero.isEmpty()) {
+            for (SkillEntity skill : skillsRequiredAboveZero) {
+                builder.append("\n - ");
+                builder.append(skill.getName());
+                builder.append(" [Level ");
+                builder.append(skill.getLevel());
+                builder.append("]");
+            }
+        } else {
+            builder.append("\n - None");
+        }
+
+        return builder.toString();
     }
 }

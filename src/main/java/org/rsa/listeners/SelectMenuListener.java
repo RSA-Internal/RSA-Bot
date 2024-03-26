@@ -7,10 +7,14 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.adventure.IndexManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.rsa.adventure.IndexManager.*;
 
 public class SelectMenuListener extends ListenerAdapter {
+
+    private final Logger logger = LoggerFactory.getLogger(SelectMenuListener.class);
 
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
@@ -23,6 +27,7 @@ public class SelectMenuListener extends ListenerAdapter {
 
         if (componentId.equals("index-select-type")) {
             String newSelectedType = event.getValues().get(0);
+            logger.info("New Type: " + newSelectedType);
             String typeName = newSelectedType.substring(newSelectedType.indexOf("-") + 1);
             IndexManager.setUserTypeSelection(requester.getId(), typeName);
 
@@ -38,6 +43,7 @@ public class SelectMenuListener extends ListenerAdapter {
         } else if(componentId.equals("index-select-entity")) {
             String currentSelectedType = IndexManager.getUserTypeSelection(requester.getId());
             String newSelectedEntity = event.getValues().get(0);
+            logger.info("New Entity: " + newSelectedEntity);
 
             event
                 .editMessageEmbeds(getIndexEmbed(requester, currentSelectedType, newSelectedEntity))
