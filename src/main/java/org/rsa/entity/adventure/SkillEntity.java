@@ -62,7 +62,15 @@ public class SkillEntity extends BaseEntity {
             // Filter out zones that don't have this skill
             .filter(zone -> zone.getRequiredSkillSet().contains(this))
             // Filter out zones where the skill is higher than the users skill level
-            .filter(zone -> zone.getRequiredSkillSet().get(this.getId()).getLevel() <= userSkillLevel)
+            .filter(zone -> {
+                List<SkillEntity> requiredSkills = zone.getRequiredSkillSet();
+                for (SkillEntity skill : requiredSkills) {
+                    if (skill.getLevel() <= userSkillLevel) {
+                        return true;
+                    }
+                }
+                return false;
+            })
             .toList();
     }
 }

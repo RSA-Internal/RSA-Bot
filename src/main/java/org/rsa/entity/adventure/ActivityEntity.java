@@ -175,7 +175,10 @@ public class ActivityEntity extends BaseEntity {
 
         // Item roll
         ItemEntity[] items = generateItemArray(possibleItems);
-        int rolls = random.nextInt(1, rewardRolls);
+        int rolls = 1;
+        if (rewardRolls > 1) {
+            rolls = random.nextInt(1, rewardRolls);
+        }
 
         for (int i=0;i<rolls;i++) {
             ItemEntity randomReward = items[random.nextInt(items.length)];
