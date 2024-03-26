@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 @Getter
 public class ActivityEntity extends BaseEntity {
 
-    private final Integer requiredStamina;
     private final Integer experienceGainBound;
     private final Integer rewardRolls;
     private final List<ItemEntity> requiredItems;
@@ -39,7 +38,6 @@ public class ActivityEntity extends BaseEntity {
         return new ActivityEntity(
             activity.getId(),
             activity.getName(),
-            activity.getStaminaRequirement(),
             activity.getExperienceGainBound(),
             activity.getRewardRolls(),
             activity.getRequiredItems().stream().map(ItemEntity::fromEnum).toList(),
@@ -49,14 +47,12 @@ public class ActivityEntity extends BaseEntity {
 
     public ActivityEntity(Integer id,
                           String name,
-                          Integer requiredStamina,
                           Integer experienceGainBound,
                           Integer rewardRolls,
                           List<ItemEntity> requiredItems,
                           List<ItemEntity> possibleItems,
                           List<SkillEntity> requiredSkillSet) {
         super(id, name);
-        this.requiredStamina = requiredStamina;
         this.experienceGainBound = experienceGainBound;
         this.rewardRolls = rewardRolls;
         this.requiredItems = requiredItems;
@@ -66,13 +62,12 @@ public class ActivityEntity extends BaseEntity {
     }
 
     public ActivityEntity(String name,
-                          Integer requiredStamina,
                           Integer experienceGainBound,
                           Integer rewardRolls,
                           List<ItemEntity> requiredItems,
                           List<ItemEntity> possibleItems,
                           List<SkillEntity> requiredSkillSet) {
-        this(AdventureEntities.activityManager.getNextFreeId(), name, requiredStamina, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
+        this(AdventureEntities.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
     }
 
     @Override
@@ -82,8 +77,6 @@ public class ActivityEntity extends BaseEntity {
         builder.append(getId());
         builder.append("\n- Name: ");
         builder.append(getName());
-        builder.append("\n- Required Stamina: ");
-        builder.append(requiredStamina);
         builder.append("\n- Experience Range: ");
         builder.append("1");
         if (experienceGainBound > 1) {

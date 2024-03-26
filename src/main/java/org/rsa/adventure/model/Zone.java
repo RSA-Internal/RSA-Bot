@@ -22,7 +22,6 @@ public enum Zone {
     RIVER(2, "River",
         List.of(
             ActivityEntity.fromEnum(Activity.FISH),
-            ActivityEntity.fromEnum(Activity.RELAX),
             ActivityEntity.fromEnum(Activity.LEAVE)
         ),
         Map.of(Skill.FISHING, 0)),
