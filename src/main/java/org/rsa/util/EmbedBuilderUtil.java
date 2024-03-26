@@ -1,6 +1,7 @@
 package org.rsa.util;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Activity;
@@ -28,18 +29,18 @@ public class EmbedBuilderUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(EmbedBuilderUtil.class);
 
-    public static EmbedBuilder getEmbedBuilderTemplate(Member requester, String title) {
+    public static EmbedBuilder getEmbedBuilderTemplate(Guild guild, Member requester, String title) {
         return new EmbedBuilder()
             .setTitle(title)
             .setAuthor(requester.getEffectiveName())
-            .setColor(HelperUtil.getRandomColor())
+            .setColor(HelperUtil.getColorFromProfile(guild, requester))
             .setThumbnail(requester.getEffectiveAvatarUrl())
             .setFooter(requester.getId());
     }
 
-    public static EmbedBuilder getActivitySummaryEmbedBuilder(Member requester, UserAdventureProfile adventureProfile, String title, ActivityPerformResponse performResponse) {
+    public static EmbedBuilder getActivitySummaryEmbedBuilder(Guild guild, Member requester, UserAdventureProfile adventureProfile, String title, ActivityPerformResponse performResponse) {
         // Display results.
-        EmbedBuilder builder = getEmbedBuilderTemplate(requester, title);
+        EmbedBuilder builder = getEmbedBuilderTemplate(guild, requester, title);
 
         if (!performResponse.getMessages().isEmpty() && !title.equals("Travel Summary")) {
             String messageList = performResponse.getMessages().stream().map(msg -> "- " + msg).collect(Collectors.joining("\n"));
@@ -94,9 +95,9 @@ public class EmbedBuilderUtil {
         return builder;
     }
 
-    public static EmbedBuilder getTravelEmbedBuilder(Member requester, ZoneEntity zone) {
+    public static EmbedBuilder getTravelEmbedBuilder(Guild guild, Member requester, ZoneEntity zone) {
         long startTime = System.currentTimeMillis();
-        EmbedBuilder builder = getEmbedBuilderTemplate(requester, "Location " + zone.getName());
+        EmbedBuilder builder = getEmbedBuilderTemplate(guild, requester, "Location " + zone.getName());
 
         for (ActivityEntity activity : zone.getActivities()) {
             if (!activity.getId().equals(Activity.LEAVE.getId())) {

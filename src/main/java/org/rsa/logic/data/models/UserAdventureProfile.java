@@ -50,6 +50,8 @@ public class UserAdventureProfile {
     Map<Integer, Integer> skillSetExperience;
     Map<Integer, BigInteger> activitiesPerformed;
 
+    String colorCode;
+
     public UserAdventureProfile(String guildId, String userId) {
         this.guildid = guildId;
         this.userid = userId;
@@ -120,7 +122,7 @@ public class UserAdventureProfile {
                 validated = true;
             }
         }
-
+        
         if (activitiesPerformed == null) {
             activitiesPerformed = new HashMap<>();
             validated = true;

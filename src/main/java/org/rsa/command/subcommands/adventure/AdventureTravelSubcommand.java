@@ -49,7 +49,7 @@ public class AdventureTravelSubcommand extends SubcommandObject {
             return;
         }
 
-        EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
+        EmbedBuilder builder = getTravelEmbedBuilder(guild, requester, zone);
         List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
         event.replyEmbeds(builder.build()).addActionRow(components).queue();
     }

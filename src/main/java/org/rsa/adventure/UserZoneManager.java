@@ -36,7 +36,7 @@ public class UserZoneManager {
     public static void travelToTown(ButtonInteractionEvent event, Guild guild, Member requester) {
         ActivityPerformResponse travelSummary = TravelSummaryManager.getUserSummary(requester.getId());
         UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), requester.getId());
-        EmbedBuilder builder = getActivitySummaryEmbedBuilder(requester, adventureProfile, "Travel Summary", travelSummary);
+        EmbedBuilder builder = getActivitySummaryEmbedBuilder(guild, requester, adventureProfile, "Travel Summary", travelSummary);
 
         event
             .editMessage(MessageEditData.fromEmbeds(builder.build()))
@@ -51,7 +51,7 @@ public class UserZoneManager {
 
     public static void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, ZoneEntity zone) {
         UserZoneManager.userTravelToZone(requester.getId(), zone.getId());
-        EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
+        EmbedBuilder builder = getTravelEmbedBuilder(event.getGuild(), requester, zone);
         List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
         event
             .editMessage(MessageEditData.fromEmbeds(builder.build()))

@@ -12,6 +12,7 @@ import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
 import org.rsa.command.subcommands.adventure.AdventureIndexSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureProfileSubcommand;
+import org.rsa.command.subcommands.adventure.AdventureSettingsSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureTravelSubcommand;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.exception.ValidationException;
@@ -27,6 +28,7 @@ public class AdventureCommand extends CommandObject {
         new AdventureProfileSubcommand(),
         new AdventureTravelSubcommand(),
         new AdventureIndexSubcommand(),
+        new AdventureSettingsSubcommand()
     };
 
     public AdventureCommand() {

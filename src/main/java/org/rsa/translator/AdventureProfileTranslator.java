@@ -10,7 +10,7 @@ import static org.rsa.util.EmbedBuilderUtil.getEmbedBuilderTemplate;
 public class AdventureProfileTranslator {
 
     public static MessageEmbed getAdventureProfileAsEmbed(Guild guild, UserAdventureProfile adventureProfile, Member requester, Member profileOwner) {
-        return getEmbedBuilderTemplate(requester, "Inventory of: " + profileOwner.getEffectiveName())
+        return getEmbedBuilderTemplate(guild, requester, "Inventory of: " + profileOwner.getEffectiveName())
             .addField("Wallet", adventureProfile.getWalletAsString(), true)
             .addBlankField(true)
             .addBlankField(true)

@@ -75,7 +75,7 @@ public class ButtonListener extends ListenerAdapter {
                 actionRows.add(ActionRow.of(new ArrayList<>(components)));
                 event
                     .editMessage(MessageEditData.fromEmbeds(
-                        getEmbedBuilderTemplate(requester, "Travel where?").build()
+                        getEmbedBuilderTemplate(guild, requester, "Travel where?").build()
                     ))
                     .setComponents(actionRows)
                     .queue();
@@ -106,7 +106,7 @@ public class ButtonListener extends ListenerAdapter {
                         performResponse = activity.perform(adventureProfile);
                     }
 
-                    EmbedBuilder builder = getActivitySummaryEmbedBuilder(requester, adventureProfile, activity.getName() + " results.", performResponse);
+                    EmbedBuilder builder = getActivitySummaryEmbedBuilder(guild, requester, adventureProfile, activity.getName() + " results.", performResponse);
                     UserAdventureProfileManager.update(adventureProfile);
 
                     MessageEmbed existingEmbed = event.getMessage().getEmbeds().get(0);
