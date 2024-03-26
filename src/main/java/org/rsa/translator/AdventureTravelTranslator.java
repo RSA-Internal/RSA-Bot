@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.rsa.adventure.model.Activity.getPossibleItemsAsString;
+
 public class AdventureTravelTranslator {
 
     public static EmbedBuilder getTravelEmbedBuilder(Member requester, Zone zone) {
@@ -39,25 +41,7 @@ public class AdventureTravelTranslator {
                 String requiredItems = requiredItemsList.stream()
                     .map(item -> " - " + item.getName())
                     .collect(Collectors.joining("\n"));
-                String possibleItems = possibleItemsMap
-                    .keySet().stream()
-                    .map(item -> {
-                        ItemDrop itemDrop = possibleItemsMap.get(item);
-                        StringBuilder range = new StringBuilder();
-                        range.append("- 1");
-                        if (itemDrop.dropMax() > 1) {
-                            range.append(" - ");
-                            range.append(itemDrop.dropMax());
-                        }
-                        range.append(" ");
-                        range.append(item.getName());
-                        range.append(" (");
-                        range.append(itemDrop.dropChance());
-                        range.append("%)");
-
-                        return range.toString();
-                    })
-                    .collect(Collectors.joining("\n"));
+                String possibleItems = getPossibleItemsAsString(activity, false, false);
 
                 StringBuilder requiredDisplay = getTravelStringBuilder(requiredLevels, requiredItems, experienceBound, possibleItems);
 

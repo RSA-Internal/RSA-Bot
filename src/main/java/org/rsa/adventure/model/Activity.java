@@ -2,11 +2,13 @@ package org.rsa.adventure.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
 
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
@@ -32,7 +34,7 @@ public enum Activity {
             Item.ROCK, new ItemDrop(1, 10)
         )),
     FISH(3, "Fish", 2, 2,
-        Map.of(Skill.FISHING, 0), List.of(),
+        Map.of(Skill.FISHING, 0), List.of(Item.BASIC_FISHING_ROD),
         1, Map.of(
             Item.NOTHING, new ItemDrop(1, 40),
             Item.STICK, new ItemDrop(1, 10),
@@ -75,6 +77,51 @@ public enum Activity {
 
     public static Stream<Activity> activityStream() {
         return Arrays.stream(Activity.values());
+    }
+
+    public static List<SelectOption> getActivityOptionList() {
+        return activityStream()
+            .filter(activity -> activity.id > 0)
+            .map(activity ->
+                SelectOption
+                    .of(activity.name, "activity-" + activity.id)
+                    .withDescription("")
+                    .withDefault(activity.id == 1))
+            .toList();
+    }
+
+    public static String getPossibleItemsAsString(Activity activity, boolean depth, boolean includeNothing) {
+        return activity.possibleItems
+            .keySet().stream()
+            .filter(item -> {
+                if (Item.NOTHING.getId().equals(item.getId())) {
+                    return includeNothing;
+                }
+                return true;
+            })
+            .map(item -> {
+                ItemDrop itemDrop = activity.possibleItems.get(item);
+                StringBuilder range = new StringBuilder();
+                if (depth) {
+                    range.append(" ");
+                }
+                range.append("- ");
+                if (!Item.NOTHING.getId().equals(item.getId())) {
+                    range.append("1");
+                    if (itemDrop.dropMax() > 1) {
+                        range.append(" - ");
+                        range.append(itemDrop.dropMax());
+                    }
+                    range.append(" ");
+                }
+                range.append(item.getName());
+                range.append(" (");
+                range.append(itemDrop.dropChance());
+                range.append("%)");
+
+                return range.toString();
+            })
+            .collect(Collectors.joining("\n"));
     }
 
     public static Activity getById(int id) {
@@ -170,5 +217,61 @@ public enum Activity {
 
         Collections.shuffle(items);
         return items.toArray(Item[]::new);
+    }
+
+    public String getAsDetails() {
+        /**
+         * private final Integer id;
+         *     private final String name;
+         *     private final Integer staminaRequirement;
+         *     private final Integer experienceGainBound;
+         *     private final Map<Skill, Integer> requiredSkillSet;
+         *     private final List<Item> requiredItems;
+         *     private final Integer rewardRolls;
+         *     private final Map<Item, ItemDrop> possibleItems;
+         */
+        StringBuilder builder = new StringBuilder();
+        builder.append("- ID: ");
+        builder.append(id);
+        builder.append("\n- Name: ");
+        builder.append(name);
+        builder.append("\n- Required Stamina: ");
+        builder.append(staminaRequirement);
+        builder.append("\n- Experience Range: ");
+        builder.append("1");
+        if (experienceGainBound > 1) {
+            builder.append(" - ");
+            builder.append(experienceGainBound);
+        }
+        if (!requiredSkillSet.keySet().isEmpty()) {
+            builder.append("\n- Required Skills");
+            for (Skill skill : requiredSkillSet.keySet()) {
+                builder.append("\n - ");
+                builder.append(skill.getName());
+                int requiredLevel = requiredSkillSet.get(skill);
+                if (requiredLevel > 0) {
+                    builder.append(" [Level: ");
+                    builder.append(requiredSkillSet.get(skill));
+                    builder.append("]");
+                }
+            }
+        }
+        if (!requiredItems.isEmpty()) {
+            builder.append("\n- Required Items");
+            for (Item item : requiredItems) {
+                builder.append("\n - ");
+                builder.append(item.getName());
+            }
+        }
+        builder.append("\n- Reward rolls per action: ");
+        builder.append("1");
+        if (rewardRolls > 1) {
+            builder.append(" - ");
+            builder.append(rewardRolls);
+        }
+        builder.append("\n- Possible Rewards\n");
+        builder.append(getPossibleItemsAsString(this, true, true));
+
+        return builder.toString();
     }
 }

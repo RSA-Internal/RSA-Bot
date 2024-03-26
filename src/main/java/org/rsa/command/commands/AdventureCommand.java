@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.rsa.adventure.model.Zone;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
+import org.rsa.command.subcommands.adventure.AdventureIndexSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureProfileSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureTravelSubcommand;
 import org.rsa.exception.ValidationException;
@@ -24,6 +25,7 @@ public class AdventureCommand extends CommandObject {
     private static final SubcommandObject[] subcommands = {
         new AdventureProfileSubcommand(),
         new AdventureTravelSubcommand(),
+        new AdventureIndexSubcommand(),
     };
 
     public AdventureCommand() {
