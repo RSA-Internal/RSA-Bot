@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Rarity {
-    UNIQUE(1, "Unique", "U*"),
-    FORBIDDEN(2, "Forbidden", "F*"),
-    ALPHA(3, "Alpha", "A*"),
-    BETA(4, "Beta", "B*"),
+    UNIQUE(1, "Unique", "U\\*"),
+    FORBIDDEN(2, "Forbidden", "F\\*"),
+    ALPHA(3, "Alpha", "A\\*"),
+    BETA(4, "Beta", "B\\*"),
     COMMON(5, "Common", "C"),
     UNCOMMON(6, "Uncommon", "U"),
     RARE(7, "Rare", "R"),
