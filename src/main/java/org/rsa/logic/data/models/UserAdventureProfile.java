@@ -122,7 +122,7 @@ public class UserAdventureProfile {
                 validated = true;
             }
         }
-        
+
         if (activitiesPerformed == null) {
             activitiesPerformed = new HashMap<>();
             validated = true;
@@ -217,7 +217,6 @@ public class UserAdventureProfile {
 
     public String getBackpackAsString() {
         StringBuilder builder = new StringBuilder();
-
         EntityManager<ItemEntity> entityManager = AdventureEntities.itemManager;
 
         for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
@@ -230,7 +229,22 @@ public class UserAdventureProfile {
             builder.append("\n");
         }
 
-        return builder.isEmpty() ? "Backpack is empty." : builder.toString();
+        return builder.isEmpty() ? "Backpack is empty." : String.join("", builder);
+    }
+
+    public int getBackpackValue() {
+        EntityManager<ItemEntity> entityManager = AdventureEntities.itemManager;
+        int value = 0;
+
+        for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
+            ItemEntity item = entityManager.getEntityById(itemEntry.getKey());
+            int count = itemEntry.getValue().intValue();
+            int valuationPerItem = item.getSellPrice();
+            int totalValuation = count * valuationPerItem;
+            value += totalValuation;
+        }
+
+        return value;
     }
 
     public String getZonesAsString() {

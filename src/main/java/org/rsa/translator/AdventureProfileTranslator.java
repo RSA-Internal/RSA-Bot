@@ -3,6 +3,7 @@ package org.rsa.translator;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.rsa.adventure.model.Currency;
 import org.rsa.logic.data.models.UserAdventureProfile;
 
 import static org.rsa.util.EmbedBuilderUtil.getEmbedBuilderTemplate;
@@ -14,7 +15,7 @@ public class AdventureProfileTranslator {
             .addField("Wallet", adventureProfile.getWalletAsString(), true)
             .addBlankField(true)
             .addBlankField(true)
-            .addField("Backpack", adventureProfile.getBackpackAsString(), true)
+            .addField("Backpack [" + adventureProfile.getBackpackValue() + " " + Currency.PANDA_COIN.getEmojiId() + " ]", adventureProfile.getBackpackAsString(), true)
             .addField("Zones", adventureProfile.getZonesAsString(), true)
             .addBlankField(true)
             .addField("Skills", adventureProfile.getSkillsAsString(), true)
