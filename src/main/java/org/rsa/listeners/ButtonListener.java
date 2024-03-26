@@ -22,7 +22,6 @@ import org.rsa.entity.adventure.ActivityEntity;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
-import org.rsa.util.HelperUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +31,7 @@ import static org.rsa.adventure.UserZoneManager.travelToTown;
 import static org.rsa.adventure.UserZoneManager.travelToZone;
 import static org.rsa.translator.AdventureProfileTranslator.getAdventureProfileAsEmbed;
 import static org.rsa.util.EmbedBuilderUtil.getActivitySummaryEmbedBuilder;
+import static org.rsa.util.EmbedBuilderUtil.getEmbedBuilderTemplate;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -75,12 +75,7 @@ public class ButtonListener extends ListenerAdapter {
                 actionRows.add(ActionRow.of(new ArrayList<>(components)));
                 event
                     .editMessage(MessageEditData.fromEmbeds(
-                        new EmbedBuilder()
-                            .setTitle("Travel where")
-                            .setAuthor(requester.getEffectiveName())
-                            .setColor(HelperUtil.getRandomColor())
-                            .setThumbnail(requester.getEffectiveAvatarUrl())
-                            .build()
+                        getEmbedBuilderTemplate(requester, "Travel where?").build()
                     ))
                     .setComponents(actionRows)
                     .queue();
