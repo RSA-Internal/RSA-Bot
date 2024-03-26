@@ -4,10 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Activity;
-import org.rsa.adventure.model.Item;
 import org.rsa.adventure.model.Skill;
 import org.rsa.adventure.model.Zone;
+import org.rsa.entity.EntityManager;
+import org.rsa.entity.adventure.ActivityEntity;
+import org.rsa.entity.adventure.ItemEntity;
+import org.rsa.entity.adventure.SkillEntity;
+import org.rsa.entity.adventure.ZoneEntity;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
@@ -170,15 +175,15 @@ public class UserAdventureProfile {
      * Increment the times an activity has been performed by 1.
      * @param activity The activity performed.
      */
-    public void performActivity(Activity activity) {
+    public void performActivity(ActivityEntity activity) {
         BigInteger newValue = getNewValue(activitiesPerformed, activity.getId(), 1);
         updateContainer(activitiesPerformed, activity.getId(), newValue);
     }
 
-    public boolean updateSkillSet(Skill skill, int experience) {
+    public boolean updateSkillSet(SkillEntity skill, int experience) {
         int currentLevel = skillSetLevel.get(skill.getId());
         int currentExperience = skillSetExperience.get(skill.getId());
-        int requiredExperience = Skill.getRequiredExperienceForLevelUp(skill, currentLevel);
+        int requiredExperience = SkillEntity.getRequiredExperienceForLevelUp(skill, currentLevel);
         boolean leveledUp = false;
         currentExperience += experience;
         if (currentExperience >= requiredExperience) {
@@ -199,8 +204,10 @@ public class UserAdventureProfile {
     public String getBackpackAsString() {
         StringBuilder builder = new StringBuilder();
 
+        EntityManager<ItemEntity> entityManager = AdventureEntities.itemManager;
+
         for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
-            Item item = Item.getById(itemEntry.getKey());
+            ItemEntity item = entityManager.getEntityById(itemEntry.getKey());
             String rarityDisplay = "[" + item.getRarity().getPrefix() + "] ";
             builder.append(rarityDisplay);
             builder.append(item.getName());
@@ -215,8 +222,9 @@ public class UserAdventureProfile {
     public String getZonesAsString() {
         StringBuilder builder = new StringBuilder();
 
+        EntityManager<ZoneEntity> entityManager = AdventureEntities.zoneManager;
         for (Integer unlockedZoneId : unlockedZones) {
-            Zone unlockedZone = Zone.getById(unlockedZoneId);
+            ZoneEntity unlockedZone = entityManager.getEntityById(unlockedZoneId);
             if (unlockedZone != null) {
                 builder.append(unlockedZone.getName());
                 builder.append("\n");
@@ -229,11 +237,13 @@ public class UserAdventureProfile {
     public String getSkillsAsString() {
         StringBuilder builder = new StringBuilder();
 
-        for (Skill skill : Skill.values()) {
+        List<SkillEntity> skills = AdventureEntities.skillManager.getEntityList();
+
+        for (SkillEntity skill : skills) {
             if (Skill.NO_SKILL.getId().equals(skill.getId())) continue;
             int level = skillSetLevel.getOrDefault(skill.getId(), 0);
             int exp = skillSetExperience.getOrDefault(skill.getId(), 0);
-            int reqExp = Skill.getRequiredExperienceForLevelUp(skill, level + 1);
+            int reqExp = SkillEntity.getRequiredExperienceForLevelUp(skill, level + 1);
 
             builder.append(skill.getName());
             builder.append(": Level ");

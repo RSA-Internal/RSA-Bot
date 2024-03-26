@@ -5,20 +5,22 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.adventure.model.*;
+import org.rsa.adventure.model.Activity;
+import org.rsa.adventure.model.ActivityResponse;
+import org.rsa.entity.adventure.ActivityEntity;
+import org.rsa.entity.adventure.ItemEntity;
+import org.rsa.entity.adventure.SkillEntity;
+import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.models.UserAdventureProfile;
 import org.rsa.util.HelperUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.rsa.adventure.model.Activity.getPossibleItemsAsString;
 
 public class AdventureTravelTranslator {
 
-    public static EmbedBuilder getTravelEmbedBuilder(Member requester, Zone zone) {
+    public static EmbedBuilder getTravelEmbedBuilder(Member requester, ZoneEntity zone) {
         long startTime = System.currentTimeMillis();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Location: " + zone.getName());
@@ -26,22 +28,21 @@ public class AdventureTravelTranslator {
         builder.setColor(HelperUtil.getRandomColor());
         builder.setThumbnail(requester.getEffectiveAvatarUrl());
 
-        for (Activity activity : zone.getActivities()) {
-            if (!activity.equals(Activity.LEAVE)) {
-                Map<Skill, Integer> requiredSkillSetMap = activity.getRequiredSkillSet();
-                List<Item> requiredItemsList = activity.getRequiredItems();
+        for (ActivityEntity activity : zone.getActivities()) {
+            if (!activity.getId().equals(Activity.LEAVE.getId())) {
+                List<SkillEntity> requiredSkills = activity.getRequiredSkillSet();
+                List<ItemEntity> requiredItemsList = activity.getRequiredItems();
                 Integer experienceBound = activity.getExperienceGainBound();
-                Map<Item, ItemDrop> possibleItemsMap = activity.getPossibleItems();
+                List<ItemEntity> possibleItemsMap = activity.getPossibleItems();
 
-                String requiredLevels = requiredSkillSetMap
-                    .keySet().stream()
-                    .filter(skill -> requiredSkillSetMap.get(skill) > 0)
-                    .map(skill -> " - " + skill.getName() + ": " + requiredSkillSetMap.get(skill))
+                String requiredLevels = requiredSkills.stream()
+                    .filter(skill -> skill.getLevel() > 0)
+                    .map(skill -> " - " + skill.getName() + ": " + skill.getLevel())
                     .collect(Collectors.joining("\n"));
                 String requiredItems = requiredItemsList.stream()
                     .map(item -> " - " + item.getName())
                     .collect(Collectors.joining("\n"));
-                String possibleItems = getPossibleItemsAsString(activity, false, false);
+                String possibleItems = ActivityEntity.getPossibleItemsAsString(activity, false, false);
 
                 StringBuilder requiredDisplay = getTravelStringBuilder(requiredLevels, requiredItems, experienceBound, possibleItems);
 
@@ -55,10 +56,10 @@ public class AdventureTravelTranslator {
         return builder;
     }
 
-    public static List<ItemComponent> getTravelComponents(UserAdventureProfile adventureProfile, Zone zone) {
+    public static List<ItemComponent> getTravelComponents(UserAdventureProfile adventureProfile, ZoneEntity zone) {
         List<ItemComponent> components = new ArrayList<>();
 
-        for (Activity activity : zone.getActivities()) {
+        for (ActivityEntity activity : zone.getActivities()) {
             ActivityResponse canPerform = activity.userCanPerformActivity(adventureProfile);
             String label = activity.getName();
             if (!canPerform.isResult()) {
@@ -67,7 +68,7 @@ public class AdventureTravelTranslator {
 
             Button button;
 
-            if (activity.equals(Activity.LEAVE)) {
+            if (activity.getId().equals(Activity.LEAVE.getId())) {
                 button = Button.primary("travel_" + activity.getId(), activity.getName());
             } else {
                 button = Button

@@ -5,16 +5,14 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import org.rsa.adventure.model.*;
+import org.rsa.entity.BaseEntity;
+import org.rsa.entity.EntityManager;
 import org.rsa.util.HelperUtil;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.rsa.util.EntityStringUtil.getEntityDetails;
-import static org.rsa.util.EntityStringUtil.getEntityName;
 
 public class IndexManager {
 
@@ -28,21 +26,10 @@ public class IndexManager {
         return userToTypeMap.get(userId);
     }
 
-    public static List<SelectOption> getOptionsForUser(String userId) {
-        return getOptionsForUser(userId, 1);
-    }
-
     public static List<SelectOption> getOptionsForUser(String userId, int defaultValue) {
         String typeSelection = getUserTypeSelection(userId);
-
-        return switch(typeSelection) {
-            case "activity" -> Activity.getActivityOptionList(defaultValue);
-            case "item" -> Item.getItemOptionList(defaultValue);
-            case "rarity" -> Rarity.getRarityOptionList(defaultValue);
-            case "skill" -> Skill.getSkillOptionList(defaultValue);
-            case "zone" -> Zone.getZoneOptionList(defaultValue);
-            default -> Collections.emptyList();
-        };
+        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(typeSelection);
+        return entityManager != null ? entityManager.getOptionList(defaultValue) : Collections.emptyList();
     }
 
     private static String capitalize(String string) {
@@ -50,12 +37,17 @@ public class IndexManager {
     }
 
     public static MessageEmbed getIndexEmbed(Member requester, String entityType, String selectedEntity) {
+        String selectedType = selectedEntity.substring(0, selectedEntity.indexOf("-"));
+        String selectedIndex = selectedEntity.substring(selectedEntity.indexOf("-") + 1);
+        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(selectedType);
+        BaseEntity baseEntity = entityManager.getEntityById(Integer.parseInt(selectedIndex));
+
         return new EmbedBuilder()
             .setTitle("Index Viewer")
             .setAuthor(requester.getEffectiveName())
             .setColor(HelperUtil.getRandomColor())
             .setThumbnail("https://cdn4.iconfinder.com/data/icons/learning-31/64/dictionary_book_lexicon_work_book_thesaurus-512.png")
-            .addField("Viewing: " + capitalize(entityType) + " - " + getEntityName(selectedEntity), getEntityDetails(selectedEntity), true)
+            .addField("Viewing: " + capitalize(entityType) + " - " + baseEntity.getName(), baseEntity.getAsDetails(), true)
             .build();
     }
 

@@ -1,15 +1,18 @@
 package org.rsa.adventure.model;
 
 import lombok.Getter;
+import org.rsa.entity.adventure.ItemEntity;
+import org.rsa.entity.adventure.SkillEntity;
+import org.rsa.entity.adventure.ZoneEntity;
 
 import java.util.*;
 
 @Getter
 public class ActivityPerformResponse {
-    private final List<Skill> skillsLeveledUp;
-    private final Map<Skill, Integer> experienceGained;
-    private final Map<Item, Integer> itemsReceived;
-    private final Set<Zone> unlockedZones;
+    private final List<SkillEntity> skillsLeveledUp;
+    private final Map<SkillEntity, Integer> experienceGained;
+    private final Map<ItemEntity, Integer> itemsReceived;
+    private final Set<ZoneEntity> unlockedZones;
 
     public ActivityPerformResponse() {
         skillsLeveledUp = new ArrayList<>();
@@ -18,21 +21,21 @@ public class ActivityPerformResponse {
         unlockedZones = new HashSet<>();
     }
 
-    public void addSkillLeveledUp(Skill skill) {
+    public void addSkillLeveledUp(SkillEntity skill) {
         skillsLeveledUp.add(skill);
     }
 
-    public void addExperienceGained(Skill skill, int gain) {
+    public void addExperienceGained(SkillEntity skill, int gain) {
         int previousGain = experienceGained.getOrDefault(skill, 0);
         experienceGained.put(skill, previousGain + gain);
     }
 
-    public void addItemReceived(Item item, int count) {
+    public void addItemReceived(ItemEntity item, int count) {
         int previousCount = itemsReceived.getOrDefault(item, 0);
         itemsReceived.put(item, previousCount + count);
     }
 
-    public void addUnlockedZone(Zone zone) {
+    public void addUnlockedZone(ZoneEntity zone) {
         unlockedZones.add(zone);
     }
 }

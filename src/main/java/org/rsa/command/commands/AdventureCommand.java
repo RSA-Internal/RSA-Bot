@@ -7,12 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.adventure.model.Zone;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
 import org.rsa.command.subcommands.adventure.AdventureIndexSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureProfileSubcommand;
 import org.rsa.command.subcommands.adventure.AdventureTravelSubcommand;
+import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.exception.ValidationException;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
@@ -47,7 +48,8 @@ public class AdventureCommand extends CommandObject {
 
         UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), member.getId());
         List<Integer> unlockedZoneIds = adventureProfile.getUnlockedZones();
-        List<Zone> unlockedZones = Zone.zoneStream().filter(zone -> unlockedZoneIds.contains(zone.getId())).toList();
+        List<ZoneEntity> allZones = AdventureEntities.zoneManager.getEntityList();
+        List<ZoneEntity> unlockedZones = allZones.stream().filter(zone -> unlockedZoneIds.contains(zone.getId())).toList();
         List<Command.Choice> options = unlockedZones.stream()
             .filter(zone -> zone.getName().toLowerCase().startsWith(focusedOption.getValue().toLowerCase()))
             .map(zone -> new Command.Choice(zone.getName(), zone.getId()))

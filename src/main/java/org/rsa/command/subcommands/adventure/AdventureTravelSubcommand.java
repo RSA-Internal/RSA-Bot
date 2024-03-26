@@ -7,10 +7,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.adventure.UserZoneManager;
 import org.rsa.adventure.model.Zone;
 import org.rsa.command.SubcommandObject;
+import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
 
@@ -40,9 +42,9 @@ public class AdventureTravelSubcommand extends SubcommandObject {
         TravelSummaryManager.createNewTravelSummary(requester.getId());
         Integer zoneId = event.getOption("zone", 0, OptionMapping::getAsInt);
         UserZoneManager.userTravelToZone(requester.getId(), zoneId);
-        Zone zone = Zone.getById(zoneId);
+        ZoneEntity zone = AdventureEntities.zoneManager.getEntityById(zoneId);
 
-        if (Zone.START_TOWN.equals(zone)) {
+        if (Zone.START_TOWN.getId().equals(zone.getId())) {
             event.reply("You've returned to " + zone.getName() + ".").setEphemeral(true).queue();
             return;
         }

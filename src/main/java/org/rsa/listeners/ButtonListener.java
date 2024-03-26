@@ -12,9 +12,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.adventure.UserZoneManager;
 import org.rsa.adventure.model.*;
+import org.rsa.entity.adventure.ActivityEntity;
+import org.rsa.entity.adventure.ItemEntity;
+import org.rsa.entity.adventure.SkillEntity;
+import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
 import org.rsa.util.HelperUtil;
@@ -37,7 +42,7 @@ public class ButtonListener extends ListenerAdapter {
             .setThumbnail(requester.getEffectiveAvatarUrl())
             .setFooter(requester.getId());
 
-        Map<Item, Integer> itemsReceived = performResponse.getItemsReceived();
+        Map<ItemEntity, Integer> itemsReceived = performResponse.getItemsReceived();
         String itemReceivedDisplay = itemsReceived.keySet().stream()
             .map(item -> "- " + itemsReceived.get(item) + " " + item.getName())
             .collect(Collectors.joining("\n"));
@@ -46,7 +51,7 @@ public class ButtonListener extends ListenerAdapter {
         }
         builder.addField("Items Received", itemReceivedDisplay, false);
 
-        Map<Skill, Integer> experienceGained = performResponse.getExperienceGained();
+        Map<SkillEntity, Integer> experienceGained = performResponse.getExperienceGained();
         String experienceGainedDisplay = experienceGained.keySet().stream()
             .map(skill -> "- " + skill.getName() + " " + experienceGained.get(skill) + " xp")
             .collect(Collectors.joining("\n"));
@@ -55,11 +60,11 @@ public class ButtonListener extends ListenerAdapter {
         }
         builder.addField("Experience Gained", experienceGainedDisplay, false);
 
-        List<Skill> skillsLeveled = performResponse.getSkillsLeveledUp();
+        List<SkillEntity> skillsLeveled = performResponse.getSkillsLeveledUp();
         if (!skillsLeveled.isEmpty()) {
             StringBuilder skillBuilder = new StringBuilder();
-            Set<Skill> uniqueLevels = new HashSet<>(skillsLeveled);
-            for (Skill skill : uniqueLevels) {
+            Set<SkillEntity> uniqueLevels = new HashSet<>(skillsLeveled);
+            for (SkillEntity skill : uniqueLevels) {
                 int currentLevel = adventureProfile.getSkillSetLevel().get(skill.getId());
                 int timesLeveled = (int) skillsLeveled.stream().filter(leveledSkill -> leveledSkill.getId().equals(skill.getId())).count();
                 int previousLevel = currentLevel - timesLeveled;
@@ -73,7 +78,7 @@ public class ButtonListener extends ListenerAdapter {
             builder.addField("Skills Leveled Up", skillBuilder.toString(), false);
         }
 
-        Set<Zone> unlockedZones = performResponse.getUnlockedZones();
+        Set<ZoneEntity> unlockedZones = performResponse.getUnlockedZones();
         if (!unlockedZones.isEmpty()) {
             String unlockedZoneDisplay = unlockedZones.stream()
                 .map(zone -> "- " + zone.getName())
@@ -100,7 +105,7 @@ public class ButtonListener extends ListenerAdapter {
         TravelSummaryManager.clearTravelSummary(requester.getId());
     }
 
-    private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, Zone zone) {
+    private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, ZoneEntity zone) {
         TravelSummaryManager.createNewTravelSummary(requester.getId());
         UserZoneManager.userTravelToZone(requester.getId(), zone.getId());
         EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
@@ -140,7 +145,8 @@ public class ButtonListener extends ListenerAdapter {
                 List<ItemComponent> components = new ArrayList<>();
                 for (Integer zoneId : unlockedZonesId) {
                     if (Zone.START_TOWN.getId().equals(zoneId)) continue;
-                    components.add(Button.success("zone_" + zoneId, Zone.getById(zoneId).getName()));
+                    ZoneEntity zone = AdventureEntities.zoneManager.getEntityById(zoneId);
+                    components.add(Button.success("zone_" + zoneId, zone.getName()));
 
                     if (components.size() == 5) {
                         actionRows.add(ActionRow.of(new ArrayList<>(components)));
@@ -167,7 +173,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (componentId.contains("travel")) {
                     // Parse Activity and perform
-                    Activity activity = Activity.getById(idInComponent);
+                    ActivityEntity activity = AdventureEntities.activityManager.getEntityById(idInComponent);
                     ActivityPerformResponse performResponse = activity.perform(adventureProfile);
 
                     EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
@@ -201,11 +207,11 @@ public class ButtonListener extends ListenerAdapter {
                     if (currentZoneId == Zone.START_TOWN.getId()) {
                         travelToTown(event, guild, requester);
                     } else {
-                        Zone currentZone = Zone.getById(currentZoneId);
+                        ZoneEntity currentZone = AdventureEntities.zoneManager.getEntityById(currentZoneId);
                         travelToZone(event, requester, adventureProfile, currentZone);
                     }
                 } else if (componentId.contains("zone")) {
-                    Zone zone = Zone.getById(idInComponent);
+                    ZoneEntity zone = AdventureEntities.zoneManager.getEntityById(idInComponent) ;
                     travelToZone(event, requester, adventureProfile, zone);
                 }
             }

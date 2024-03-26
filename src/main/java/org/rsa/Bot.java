@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.aws.SecretsManager;
 import org.rsa.command.*;
 import org.rsa.listeners.*;
-import org.rsa.listeners.ReactionAddedListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,8 +31,16 @@ public class Bot {
 
     private static final String VERSION = "v1.2.7";
     private static boolean isDev = false;
+    private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
+        try {
+            AdventureEntities.registerEntities();
+        } catch (Exception e) {
+            logger.error("Adventure setup failed.", e);
+            System.exit(1);
+        }
+
         JDABuilder builder = JDABuilder.createDefault(getBotToken());
 
         configureMemoryUsage(builder);
