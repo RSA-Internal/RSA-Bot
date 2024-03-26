@@ -197,6 +197,7 @@ public class ActivityEntity extends BaseEntity {
         // Quests?
         // Achievements?
         // Special events?
+        TravelSummaryManager.updateTravelSummary(profile.getUserid(), travelSummary);
 
         return response;
     }

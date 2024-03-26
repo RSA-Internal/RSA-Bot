@@ -106,7 +106,6 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, ZoneEntity zone) {
-        TravelSummaryManager.createNewTravelSummary(requester.getId());
         UserZoneManager.userTravelToZone(requester.getId(), zone.getId());
         EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
         List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
