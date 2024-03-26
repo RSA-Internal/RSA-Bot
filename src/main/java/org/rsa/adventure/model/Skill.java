@@ -2,9 +2,12 @@ package org.rsa.adventure.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.rsa.logic.data.models.UserAdventureProfile;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
@@ -33,6 +36,29 @@ public enum Skill {
         return (int) Math.floor(skill.baseExp * (Math.pow(level + 1, skill.getCurveFactor())));
     }
 
+    public static Skill getById(int id) {
+        return skillStream().filter(skill -> skill.id.equals(id)).findFirst().orElse(null);
+    }
+
+    private static Stream<Skill> skillStream() {
+        return Arrays.stream(Skill.values());
+    }
+
+    public static List<SelectOption> getSkillOptionList() {
+        return getSkillOptionList(1);
+    }
+
+    public static List<SelectOption> getSkillOptionList(int defaultIndex) {
+        return skillStream()
+            .filter(skill -> skill.id > 0)
+            .map(skill ->
+                SelectOption
+                    .of(skill.name, "skill-" + skill.id)
+                    .withDescription("")
+                    .withDefault(skill.id == defaultIndex))
+            .toList();
+    }
+
     public List<Zone> unlockZonesOnLevelUp(UserAdventureProfile profile) {
         int userSkillLevel = profile.getSkillSetLevel().get(this.getId());
         List<Integer> unlockedZones = profile.getUnlockedZones();
@@ -48,11 +74,8 @@ public enum Skill {
             .toList();
     }
 
-    public static void main(String[] args) {
-        for (Skill skill : Skill.values()) {
-            for (int i = 0; i < 10; i++) {
-                System.out.println("Level " + (i + 1) + " " + skill.getName() + " requires " + getRequiredExperienceForLevelUp(skill, i) + " exp.");
-            }
-        }
+    public String getAsDetails() {
+        return "- ID: " + id +
+            "\n- Name: " + name;
     }
 }

@@ -2,6 +2,7 @@ package org.rsa.adventure.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,12 +45,36 @@ public enum Item {
         return Arrays.stream(Item.values());
     }
 
+    public static List<SelectOption> getItemOptionList() {
+        return getItemOptionList(1);
+    }
+
+    public static List<SelectOption> getItemOptionList(int defaultIndex) {
+        return itemStream()
+            .filter(item -> item.id > 0)
+            .map(item ->
+                SelectOption
+                    .of(item.name, "item-" + item.id)
+                    .withDescription("")
+                    .withDefault(item.id == defaultIndex))
+            .toList();
+    }
+
     public static Item getById(int id) {
         return itemStream().filter(item -> item.id.equals(id)).findFirst().orElse(null);
     }
 
     public static List<Item> getByRarity(Rarity rarity) {
         return itemStream().filter(item -> item.rarity.equals(rarity)).toList();
+    }
+
+    public String getAsDetails() {
+        return "- ID: " + id +
+            "\n- Name: " + name +
+            "\n- Rarity: " + rarity +
+            "\n- Buy: " + buyPrice + " | Sell: " + sellPrice +
+            "\n- Tradable: " + canTrade +
+            "\n- Droppable: " + canDrop;
     }
 }
 

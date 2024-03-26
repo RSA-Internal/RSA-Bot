@@ -80,13 +80,17 @@ public enum Activity {
     }
 
     public static List<SelectOption> getActivityOptionList() {
+        return getActivityOptionList(1);
+    }
+
+    public static List<SelectOption> getActivityOptionList(int defaultIndex) {
         return activityStream()
             .filter(activity -> activity.id > 0)
             .map(activity ->
                 SelectOption
                     .of(activity.name, "activity-" + activity.id)
                     .withDescription("")
-                    .withDefault(activity.id == 1))
+                    .withDefault(activity.id == defaultIndex))
             .toList();
     }
 
@@ -220,16 +224,6 @@ public enum Activity {
     }
 
     public String getAsDetails() {
-        /**
-         * private final Integer id;
-         *     private final String name;
-         *     private final Integer staminaRequirement;
-         *     private final Integer experienceGainBound;
-         *     private final Map<Skill, Integer> requiredSkillSet;
-         *     private final List<Item> requiredItems;
-         *     private final Integer rewardRolls;
-         *     private final Map<Item, ItemDrop> possibleItems;
-         */
         StringBuilder builder = new StringBuilder();
         builder.append("- ID: ");
         builder.append(id);

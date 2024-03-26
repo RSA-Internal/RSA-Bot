@@ -41,7 +41,8 @@ public class Bot {
             new ReactionRemovedListener(),
             new MessageListener(),
             new ContextInteractionListeners(),
-            new ButtonListener()
+            new ButtonListener(),
+            new SelectMenuListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
