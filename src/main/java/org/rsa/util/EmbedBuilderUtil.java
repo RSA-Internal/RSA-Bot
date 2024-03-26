@@ -30,11 +30,15 @@ public class EmbedBuilderUtil {
     private static final Logger logger = LoggerFactory.getLogger(EmbedBuilderUtil.class);
 
     public static EmbedBuilder getEmbedBuilderTemplate(Guild guild, Member requester, String title) {
+        return getEmbedBuilderTemplate(guild, requester, title, null);
+    }
+
+    public static EmbedBuilder getEmbedBuilderTemplate(Guild guild, Member requester, String title, Member profileOwner) {
         return new EmbedBuilder()
             .setTitle(title)
             .setAuthor(requester.getEffectiveName())
             .setColor(HelperUtil.getColorFromProfile(guild, requester))
-            .setThumbnail(requester.getEffectiveAvatarUrl())
+            .setThumbnail(profileOwner != null ? profileOwner.getEffectiveAvatarUrl() : requester.getEffectiveAvatarUrl())
             .setFooter(requester.getId());
     }
 
