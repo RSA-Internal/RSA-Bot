@@ -3,19 +3,23 @@ package org.rsa.command.commands;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.Bot;
 import org.rsa.command.CommandObject;
 import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 import org.rsa.logic.data.models.UserReputation;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +143,7 @@ public class ResolveCommand extends CommandObject {
                 response = "Congrats on answering your own question! (Hopefully you shared your findings to help others in the future.)";
             } else {
                 rewardHelper(guild, helper, requester, threadTitle, threadChannel.getJumpUrl(), helpingReputation);
+                response = "Successfully resolved this question.";
             }
             canClose = true;
         } else {
@@ -218,6 +223,12 @@ public class ResolveCommand extends CommandObject {
     }
 
     private void messageHelper(Member helper, String message) {
-        helper.getUser().openPrivateChannel().queue(helperDm -> helperDm.sendMessage(message).queue());
+        User user = helper.getUser();
+        PrivateChannel channel = user.openPrivateChannel().complete();
+        try {
+            channel.sendMessage(message).complete();
+        } catch (ErrorResponseException e) {
+            LoggerFactory.getLogger(Bot.class).warn("Cannot DM {}, skipping.", helper.getId());
+        }
     }
 }
