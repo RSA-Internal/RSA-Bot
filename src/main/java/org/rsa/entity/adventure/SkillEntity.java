@@ -3,7 +3,6 @@ package org.rsa.entity.adventure;
 import lombok.Getter;
 import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.model.Skill;
-import org.rsa.adventure.model.Zone;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
@@ -38,8 +37,9 @@ public class SkillEntity extends BaseEntity {
         this.curveFactor = curveFactor;
     }
 
-    public void setLevel(Integer level) {
+    public SkillEntity setLevel(Integer level) {
         this.level = level;
+        return this;
     }
 
     @Override

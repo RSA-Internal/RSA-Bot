@@ -34,12 +34,7 @@ public class Bot {
     private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
     public static void main(String[] args) throws Exception {
-        try {
-            AdventureEntities.registerEntities();
-        } catch (Exception e) {
-            logger.error("Adventure setup failed.", e);
-            System.exit(1);
-        }
+        AdventureEntities.registerEntities();
 
         JDABuilder builder = JDABuilder.createDefault(getBotToken());
 

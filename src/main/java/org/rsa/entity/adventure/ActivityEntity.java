@@ -1,6 +1,7 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
+import org.rsa.adventure.AdventureEntities;
 import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.adventure.model.*;
 import org.rsa.entity.BaseEntity;
@@ -61,6 +62,17 @@ public class ActivityEntity extends BaseEntity {
         this.requiredItems = requiredItems;
         this.possibleItems = possibleItems;
         this.requiredSkillSet = requiredSkillSet;
+        AdventureEntities.activityManager.addEntity(this);
+    }
+
+    public ActivityEntity(String name,
+                          Integer requiredStamina,
+                          Integer experienceGainBound,
+                          Integer rewardRolls,
+                          List<ItemEntity> requiredItems,
+                          List<ItemEntity> possibleItems,
+                          List<SkillEntity> requiredSkillSet) {
+        this(AdventureEntities.activityManager.getNextFreeId(), name, requiredStamina, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
     }
 
     @Override

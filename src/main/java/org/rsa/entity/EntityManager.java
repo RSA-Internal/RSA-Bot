@@ -3,12 +3,16 @@ package org.rsa.entity;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import org.rsa.adventure.model.Rarity;
 import org.rsa.entity.adventure.ItemEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class EntityManager<T extends BaseEntity> {
 
+    private final Logger logger = LoggerFactory.getLogger(EntityManager.class);
     private final Class<T> classInstance;
     private final List<T> entityList = new ArrayList<>();
 
@@ -16,16 +20,26 @@ public class EntityManager<T extends BaseEntity> {
         classInstance = clazz;
     }
 
-    public void addEntity(T entity) throws Exception {
+    public int getNextFreeId() {
+        return entityList.stream().map(BaseEntity::getId).max(Comparator.naturalOrder()).orElse(entityList.size()) + 1;
+    }
+
+    public void addEntity(T entity) {
+        logger.info("Adding entity: [" + entity.getId() + "] " + entity.getName() + ".");
         T existingEntity = getEntityById(entity.getId());
         if (existingEntity != null) {
             if (!existingEntity.equals(entity)) {
-                throw new Exception("[entity clash] Failed to add '[" + entity.getId() + "] " + entity.getName()
-                    + "' because '[" + existingEntity.getId() + "] " + existingEntity.getName()
-                    + "' already exists at ID: " + entity.getId() + "!");
+                logger.warn("Entity clash detected at ID: " + entity.getId());
+                int nextFreeId = getNextFreeId();
+                logger.warn("New id for " + entity.getName() + ": " + nextFreeId);
+                entity.setId(nextFreeId);
+            } else {
+                logger.warn("Skipping duplicate registration of [" + entity.getId() + "] " + entity.getName() + ".");
+                return;
             }
         }
         entityList.add(entity);
+        logger.info("Successfully registered [" + entity.getId() + "] " + entity.getName() + ".");
     }
 
     public List<T> getEntityList() {

@@ -1,7 +1,6 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
-import org.rsa.adventure.model.Activity;
 import org.rsa.adventure.model.Skill;
 import org.rsa.adventure.model.Zone;
 import org.rsa.entity.BaseEntity;
@@ -17,7 +16,6 @@ public class ZoneEntity extends BaseEntity {
     private final List<SkillEntity> requiredSkillSet;
 
     public static ZoneEntity fromEnum(Zone zone) {
-        List<Activity> activityList = zone.getActivities();
         Map<Skill, Integer> requiredSkillsFromZone = zone.getRequiredSkills();
 
         List<SkillEntity> requiredSkillEntityFromZone = new ArrayList<>();
@@ -31,7 +29,7 @@ public class ZoneEntity extends BaseEntity {
         return new ZoneEntity(
             zone.getId(),
             zone.getName(),
-            activityList.stream().map(ActivityEntity::fromEnum).toList(),
+            zone.getActivities(),
             requiredSkillEntityFromZone);
     }
 

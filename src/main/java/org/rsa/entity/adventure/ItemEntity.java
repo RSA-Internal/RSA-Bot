@@ -38,8 +38,9 @@ public class ItemEntity extends BaseEntity {
         this.canDrop = canDrop;
     }
 
-    public void setItemDrop(ItemDrop itemDrop) {
+    public ItemEntity setItemDrop(ItemDrop itemDrop) {
         this.itemDrop = itemDrop;
+        return this;
     }
 
     @Override
