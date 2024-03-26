@@ -19,7 +19,7 @@ import org.rsa.logic.data.models.UserAdventureProfile;
 import java.util.List;
 
 import static org.rsa.translator.AdventureTravelTranslator.getTravelComponents;
-import static org.rsa.translator.AdventureTravelTranslator.getTravelEmbedBuilder;
+import static org.rsa.util.EmbedBuilderUtil.getTravelEmbedBuilder;
 
 public class AdventureTravelSubcommand extends SubcommandObject {
 

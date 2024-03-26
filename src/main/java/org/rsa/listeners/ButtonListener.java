@@ -13,113 +13,27 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.adventure.UserZoneManager;
-import org.rsa.adventure.model.*;
+import org.rsa.adventure.model.Activity;
+import org.rsa.adventure.model.ActivityPerformResponse;
+import org.rsa.adventure.model.ActivityResponse;
+import org.rsa.adventure.model.Zone;
 import org.rsa.entity.adventure.ActivityEntity;
-import org.rsa.entity.adventure.ItemEntity;
-import org.rsa.entity.adventure.SkillEntity;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
 import org.rsa.util.HelperUtil;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
+import static org.rsa.adventure.UserZoneManager.travelToTown;
+import static org.rsa.adventure.UserZoneManager.travelToZone;
 import static org.rsa.translator.AdventureProfileTranslator.getAdventureProfileAsEmbed;
-import static org.rsa.translator.AdventureTravelTranslator.getTravelComponents;
-import static org.rsa.translator.AdventureTravelTranslator.getTravelEmbedBuilder;
+import static org.rsa.util.EmbedBuilderUtil.getActivitySummaryEmbedBuilder;
 
 public class ButtonListener extends ListenerAdapter {
-
-    private EmbedBuilder displayActivitySummary(Member requester, UserAdventureProfile adventureProfile, String title, ActivityPerformResponse performResponse) {
-        // Display results.
-        EmbedBuilder builder = new EmbedBuilder()
-            .setTitle(title)
-            .setAuthor(requester.getEffectiveName())
-            .setColor(HelperUtil.getRandomColor())
-            .setThumbnail(requester.getEffectiveAvatarUrl())
-            .setFooter(requester.getId());
-
-        if (!performResponse.getMessages().isEmpty() && !title.equals("Travel Summary")) {
-            String messageList = performResponse.getMessages().stream().map(msg -> "- " + msg).collect(Collectors.joining("\n"));
-
-            builder.addField("Messages", messageList, true);
-        } else {
-            Map<ItemEntity, Integer> itemsReceived = performResponse.getItemsReceived();
-            String itemReceivedDisplay = itemsReceived.keySet().stream()
-                .map(item -> "- " + itemsReceived.get(item) + " " + item.getName())
-                .collect(Collectors.joining("\n"));
-            if (itemReceivedDisplay.isEmpty()) {
-                itemReceivedDisplay = "- None";
-            }
-            builder.addField("Items Received", itemReceivedDisplay, false);
-
-            Map<SkillEntity, Integer> experienceGained = performResponse.getExperienceGained();
-            String experienceGainedDisplay = experienceGained.keySet().stream()
-                .map(skill -> "- " + skill.getName() + " " + experienceGained.get(skill) + " xp")
-                .collect(Collectors.joining("\n"));
-            if (experienceGainedDisplay.isEmpty()) {
-                experienceGainedDisplay = "- None";
-            }
-            builder.addField("Experience Gained", experienceGainedDisplay, false);
-
-            List<SkillEntity> skillsLeveled = performResponse.getSkillsLeveledUp();
-            if (!skillsLeveled.isEmpty()) {
-                StringBuilder skillBuilder = new StringBuilder();
-                Set<SkillEntity> uniqueLevels = new HashSet<>(skillsLeveled);
-                for (SkillEntity skill : uniqueLevels) {
-                    int currentLevel = adventureProfile.getSkillSetLevel().get(skill.getId());
-                    int timesLeveled = (int) skillsLeveled.stream().filter(leveledSkill -> leveledSkill.getId().equals(skill.getId())).count();
-                    int previousLevel = currentLevel - timesLeveled;
-                    skillBuilder.append("- ");
-                    skillBuilder.append(skill.getName());
-                    skillBuilder.append(": ");
-                    skillBuilder.append(previousLevel);
-                    skillBuilder.append(" -> ");
-                    skillBuilder.append(currentLevel);
-                }
-                builder.addField("Skills Leveled Up", skillBuilder.toString(), false);
-            }
-
-            Set<ZoneEntity> unlockedZones = performResponse.getUnlockedZones();
-            if (!unlockedZones.isEmpty()) {
-                String unlockedZoneDisplay = unlockedZones.stream()
-                    .map(zone -> "- " + zone.getName())
-                    .collect(Collectors.joining("\n"));
-                builder.addField("Zones Unlocked", unlockedZoneDisplay, false);
-            }
-        }
-
-        return builder;
-    }
-
-    private void travelToTown(ButtonInteractionEvent event, Guild guild, Member requester) {
-        ActivityPerformResponse travelSummary = TravelSummaryManager.getUserSummary(requester.getId());
-        UserAdventureProfile adventureProfile = UserAdventureProfileManager.fetch(guild.getId(), requester.getId());
-        EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, "Travel Summary", travelSummary);
-
-        event
-            .editMessage(MessageEditData.fromEmbeds(builder.build()))
-            .setComponents(ActionRow.of(
-                Button.success("travel_select", "Travel"),
-                Button.primary("view_profile", "Profile")
-            ))
-            .queue();
-
-        TravelSummaryManager.clearTravelSummary(requester.getId());
-    }
-
-    private void travelToZone(ButtonInteractionEvent event, Member requester, UserAdventureProfile adventureProfile, ZoneEntity zone) {
-        UserZoneManager.userTravelToZone(requester.getId(), zone.getId());
-        EmbedBuilder builder = getTravelEmbedBuilder(requester, zone);
-        List<ItemComponent> components = getTravelComponents(adventureProfile, zone);
-        event
-            .reply(MessageCreateData.fromEmbeds(builder.build()))
-            .setComponents(ActionRow.of(components))
-            .queue();
-    }
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -197,7 +111,7 @@ public class ButtonListener extends ListenerAdapter {
                         performResponse = activity.perform(adventureProfile);
                     }
 
-                    EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
+                    EmbedBuilder builder = getActivitySummaryEmbedBuilder(requester, adventureProfile, activity.getName() + " results.", performResponse);
                     UserAdventureProfileManager.update(adventureProfile);
 
                     MessageEmbed existingEmbed = event.getMessage().getEmbeds().get(0);

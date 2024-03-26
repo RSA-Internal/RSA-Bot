@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.rsa.adventure.IndexManager.*;
+import static org.rsa.util.EmbedBuilderUtil.getIndexEmbedBuilder;
 
 public class SelectMenuListener extends ListenerAdapter {
 
@@ -34,7 +35,7 @@ public class SelectMenuListener extends ListenerAdapter {
             // TODO: if there are more than 25 entities for a type, display a paging option.
 
             event
-                .editMessageEmbeds(getIndexEmbed(requester, typeName, typeName + "-1"))
+                .editMessageEmbeds(getIndexEmbedBuilder(requester, typeName, typeName + "-1").build())
                 .setComponents(
                     ActionRow.of(getIndexSelectType(requester)),
                     ActionRow.of(getIndexSelectEntity(requester))
@@ -46,7 +47,7 @@ public class SelectMenuListener extends ListenerAdapter {
             logger.info("New Entity: " + newSelectedEntity);
 
             event
-                .editMessageEmbeds(getIndexEmbed(requester, currentSelectedType, newSelectedEntity))
+                .editMessageEmbeds(getIndexEmbedBuilder(requester, currentSelectedType, newSelectedEntity).build())
                 .setComponents(
                     ActionRow.of(getIndexSelectType(requester)),
                     ActionRow.of(getIndexSelectEntity(requester, newSelectedEntity))

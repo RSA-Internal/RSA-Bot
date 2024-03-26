@@ -8,6 +8,7 @@ import org.rsa.adventure.model.Activity;
 import org.rsa.command.SubcommandObject;
 
 import static org.rsa.adventure.IndexManager.*;
+import static org.rsa.util.EmbedBuilderUtil.getIndexEmbedBuilder;
 
 public class AdventureIndexSubcommand extends SubcommandObject {
 
@@ -27,7 +28,7 @@ public class AdventureIndexSubcommand extends SubcommandObject {
 
         // display embed with two select menus
         event
-            .replyEmbeds(getIndexEmbed(requester, "Activity", "activity-" + Activity.HUNT.getId()))
+            .replyEmbeds(getIndexEmbedBuilder(requester, "Activity", "activity-" + Activity.HUNT.getId()).build())
             .addActionRow(getIndexSelectType(requester))
             .addActionRow(getIndexSelectEntity(requester))
             .setEphemeral(true)
