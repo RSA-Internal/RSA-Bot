@@ -174,6 +174,12 @@ public class ButtonListener extends ListenerAdapter {
                 if (componentId.contains("travel")) {
                     // Parse Activity and perform
                     ActivityEntity activity = AdventureEntities.activityManager.getEntityById(idInComponent);
+                    ActivityResponse validationResponse = activity.userCanPerformActivity(adventureProfile);
+
+                    if (!validationResponse.isResult()) {
+                        travelToTown(event, guild, requester);
+                        return;
+                    }
                     ActivityPerformResponse performResponse = activity.perform(adventureProfile);
 
                     EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
