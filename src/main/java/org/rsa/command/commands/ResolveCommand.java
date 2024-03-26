@@ -84,14 +84,8 @@ public class ResolveCommand extends CommandObject {
         }
 
         Message originalMessage = threadChannel.retrieveParentMessage().complete();
-        Member requester = originalMessage.getMember();
+        Member requester = guild.getMember(originalMessage.getAuthor());
         Member resolver = event.getMember();
-
-        if (null == requester) {
-            LoggerFactory.getLogger(Bot.class).warn("Parent message member was null.");
-            originalMessage = threadChannel.retrieveStartMessage().complete();
-            requester = originalMessage.getMember();
-        }
 
         if (null == requester || null == resolver) {
             LoggerFactory.getLogger(Bot.class).warn("Request: {}.", requester);
