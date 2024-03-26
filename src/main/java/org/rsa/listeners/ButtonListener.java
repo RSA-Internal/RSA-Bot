@@ -42,48 +42,54 @@ public class ButtonListener extends ListenerAdapter {
             .setThumbnail(requester.getEffectiveAvatarUrl())
             .setFooter(requester.getId());
 
-        Map<ItemEntity, Integer> itemsReceived = performResponse.getItemsReceived();
-        String itemReceivedDisplay = itemsReceived.keySet().stream()
-            .map(item -> "- " + itemsReceived.get(item) + " " + item.getName())
-            .collect(Collectors.joining("\n"));
-        if (itemReceivedDisplay.isEmpty()) {
-            itemReceivedDisplay = "- None";
-        }
-        builder.addField("Items Received", itemReceivedDisplay, false);
+        if (!performResponse.getMessages().isEmpty() && !title.equals("Travel Summary")) {
+            String messageList = performResponse.getMessages().stream().map(msg -> "- " + msg).collect(Collectors.joining("\n"));
 
-        Map<SkillEntity, Integer> experienceGained = performResponse.getExperienceGained();
-        String experienceGainedDisplay = experienceGained.keySet().stream()
-            .map(skill -> "- " + skill.getName() + " " + experienceGained.get(skill) + " xp")
-            .collect(Collectors.joining("\n"));
-        if (experienceGainedDisplay.isEmpty()) {
-            experienceGainedDisplay = "- None";
-        }
-        builder.addField("Experience Gained", experienceGainedDisplay, false);
-
-        List<SkillEntity> skillsLeveled = performResponse.getSkillsLeveledUp();
-        if (!skillsLeveled.isEmpty()) {
-            StringBuilder skillBuilder = new StringBuilder();
-            Set<SkillEntity> uniqueLevels = new HashSet<>(skillsLeveled);
-            for (SkillEntity skill : uniqueLevels) {
-                int currentLevel = adventureProfile.getSkillSetLevel().get(skill.getId());
-                int timesLeveled = (int) skillsLeveled.stream().filter(leveledSkill -> leveledSkill.getId().equals(skill.getId())).count();
-                int previousLevel = currentLevel - timesLeveled;
-                skillBuilder.append("- ");
-                skillBuilder.append(skill.getName());
-                skillBuilder.append(": ");
-                skillBuilder.append(previousLevel);
-                skillBuilder.append(" -> ");
-                skillBuilder.append(currentLevel);
-            }
-            builder.addField("Skills Leveled Up", skillBuilder.toString(), false);
-        }
-
-        Set<ZoneEntity> unlockedZones = performResponse.getUnlockedZones();
-        if (!unlockedZones.isEmpty()) {
-            String unlockedZoneDisplay = unlockedZones.stream()
-                .map(zone -> "- " + zone.getName())
+            builder.addField("Messages", messageList, true);
+        } else {
+            Map<ItemEntity, Integer> itemsReceived = performResponse.getItemsReceived();
+            String itemReceivedDisplay = itemsReceived.keySet().stream()
+                .map(item -> "- " + itemsReceived.get(item) + " " + item.getName())
                 .collect(Collectors.joining("\n"));
-            builder.addField("Zones Unlocked", unlockedZoneDisplay, false);
+            if (itemReceivedDisplay.isEmpty()) {
+                itemReceivedDisplay = "- None";
+            }
+            builder.addField("Items Received", itemReceivedDisplay, false);
+
+            Map<SkillEntity, Integer> experienceGained = performResponse.getExperienceGained();
+            String experienceGainedDisplay = experienceGained.keySet().stream()
+                .map(skill -> "- " + skill.getName() + " " + experienceGained.get(skill) + " xp")
+                .collect(Collectors.joining("\n"));
+            if (experienceGainedDisplay.isEmpty()) {
+                experienceGainedDisplay = "- None";
+            }
+            builder.addField("Experience Gained", experienceGainedDisplay, false);
+
+            List<SkillEntity> skillsLeveled = performResponse.getSkillsLeveledUp();
+            if (!skillsLeveled.isEmpty()) {
+                StringBuilder skillBuilder = new StringBuilder();
+                Set<SkillEntity> uniqueLevels = new HashSet<>(skillsLeveled);
+                for (SkillEntity skill : uniqueLevels) {
+                    int currentLevel = adventureProfile.getSkillSetLevel().get(skill.getId());
+                    int timesLeveled = (int) skillsLeveled.stream().filter(leveledSkill -> leveledSkill.getId().equals(skill.getId())).count();
+                    int previousLevel = currentLevel - timesLeveled;
+                    skillBuilder.append("- ");
+                    skillBuilder.append(skill.getName());
+                    skillBuilder.append(": ");
+                    skillBuilder.append(previousLevel);
+                    skillBuilder.append(" -> ");
+                    skillBuilder.append(currentLevel);
+                }
+                builder.addField("Skills Leveled Up", skillBuilder.toString(), false);
+            }
+
+            Set<ZoneEntity> unlockedZones = performResponse.getUnlockedZones();
+            if (!unlockedZones.isEmpty()) {
+                String unlockedZoneDisplay = unlockedZones.stream()
+                    .map(zone -> "- " + zone.getName())
+                    .collect(Collectors.joining("\n"));
+                builder.addField("Zones Unlocked", unlockedZoneDisplay, false);
+            }
         }
 
         return builder;
@@ -173,13 +179,23 @@ public class ButtonListener extends ListenerAdapter {
                 if (componentId.contains("travel")) {
                     // Parse Activity and perform
                     ActivityEntity activity = AdventureEntities.activityManager.getEntityById(idInComponent);
-                    ActivityResponse validationResponse = activity.userCanPerformActivity(adventureProfile);
+                    ActivityResponse validationResponse = activity.userCanPerformActivity(adventureProfile, false);
+
+                    ActivityPerformResponse performResponse = null;
 
                     if (!validationResponse.isResult()) {
-                        travelToTown(event, guild, requester);
-                        return;
+                        if (validationResponse.getResponse().contains("You must wait")) {
+                            performResponse = new ActivityPerformResponse();
+                            performResponse.addMessage(validationResponse.getResponse());
+                        } else {
+                            travelToTown(event, guild, requester);
+                            return;
+                        }
                     }
-                    ActivityPerformResponse performResponse = activity.perform(adventureProfile);
+
+                    if (performResponse == null) {
+                        performResponse = activity.perform(adventureProfile);
+                    }
 
                     EmbedBuilder builder = displayActivitySummary(requester, adventureProfile, activity.getName() + " results.", performResponse);
                     UserAdventureProfileManager.update(adventureProfile);

@@ -13,12 +13,14 @@ public class ActivityPerformResponse {
     private final Map<SkillEntity, Integer> experienceGained;
     private final Map<ItemEntity, Integer> itemsReceived;
     private final Set<ZoneEntity> unlockedZones;
+    private final List<String> messages;
 
     public ActivityPerformResponse() {
         skillsLeveledUp = new ArrayList<>();
         experienceGained = new HashMap<>();
         itemsReceived = new HashMap<>();
         unlockedZones = new HashSet<>();
+        messages = new ArrayList<>();
     }
 
     public void addSkillLeveledUp(SkillEntity skill) {
@@ -37,5 +39,9 @@ public class ActivityPerformResponse {
 
     public void addUnlockedZone(ZoneEntity zone) {
         unlockedZones.add(zone);
+    }
+
+    public void addMessage(String message) {
+        messages.add(message);
     }
 }

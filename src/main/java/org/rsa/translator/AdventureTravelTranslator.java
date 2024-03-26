@@ -60,7 +60,7 @@ public class AdventureTravelTranslator {
         List<ItemComponent> components = new ArrayList<>();
 
         for (ActivityEntity activity : zone.getActivities()) {
-            ActivityResponse canPerform = activity.userCanPerformActivity(adventureProfile);
+            ActivityResponse canPerform = activity.userCanPerformActivity(adventureProfile, true);
             String label = activity.getName();
             if (!canPerform.isResult()) {
                 label = activity.getName() + " [" + canPerform.getResponse() + "]";

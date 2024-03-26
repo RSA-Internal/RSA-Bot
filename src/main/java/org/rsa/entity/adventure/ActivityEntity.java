@@ -2,6 +2,7 @@ package org.rsa.entity.adventure;
 
 import lombok.Getter;
 import org.rsa.adventure.AdventureEntities;
+import org.rsa.adventure.CooldownTracker;
 import org.rsa.adventure.TravelSummaryManager;
 import org.rsa.adventure.model.*;
 import org.rsa.entity.BaseEntity;
@@ -115,7 +116,14 @@ public class ActivityEntity extends BaseEntity {
         return builder.toString();
     }
 
-    public ActivityResponse userCanPerformActivity(UserAdventureProfile profile) {
+    public ActivityResponse userCanPerformActivity(UserAdventureProfile profile, boolean ignoreCooldown) {
+        if (!ignoreCooldown) {
+            long isCooldownReady = CooldownTracker.isCooldownReady(profile.getUserid());
+            if (isCooldownReady > 0) {
+                return new ActivityResponse(false, String.join(" ", "You must wait " + (isCooldownReady / 1000) + "s before performing this action."));
+            }
+        }
+
         Map<Integer, Integer> skillSetLevel = profile.getSkillSetLevel();
 
         for (SkillEntity skill : requiredSkillSet) {
@@ -191,6 +199,7 @@ public class ActivityEntity extends BaseEntity {
         // Achievements?
         // Special events?
         TravelSummaryManager.updateTravelSummary(profile.getUserid(), travelSummary);
+        CooldownTracker.setUserCooldown(profile.getUserid(), System.currentTimeMillis());
 
         return response;
     }
