@@ -84,7 +84,7 @@ public class ResolveCommand extends CommandObject {
         }
 
         Message originalMessage = threadChannel.retrieveParentMessage().complete();
-        Member requester = guild.getMember(originalMessage.getAuthor());
+        Member requester = guild.retrieveMember(originalMessage.getAuthor()).complete();
         Member resolver = event.getMember();
 
         if (null == requester || null == resolver) {
