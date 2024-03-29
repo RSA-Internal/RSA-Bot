@@ -80,9 +80,6 @@ public class LootTable {
                 builder.append(" (1/");
                 builder.append((int) Math.floor(((double) 1 / getWeightPercentage(item)) * 100));
                 builder.append(")");
-//                builder.append(" (");
-//                builder.append(getWeightPercentage(item));
-//                builder.append("%)");
 
                 return builder.toString();
             })

@@ -65,15 +65,6 @@ public class ActivityEntity extends BaseEntity {
         EntityManagerRegister.activityManager.addEntity(this);
     }
 
-    public ActivityEntity(String name,
-                          Integer experienceGainBound,
-                          Integer rewardRolls,
-                          List<ItemEntity> requiredItems,
-                          List<LootTable> lootTables,
-                          List<SkillEntity> requiredSkillSet) {
-        this(EntityManagerRegister.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, lootTables, requiredSkillSet);
-    }
-
     @Override
     public String getAsDetails() {
         StringBuilder builder = new StringBuilder();
@@ -178,7 +169,6 @@ public class ActivityEntity extends BaseEntity {
         }
 
         // Item roll
-        //ItemEntity[] items = generateItemArray(possibleItems);
         for (LootTable table : getLootTables()) {
             int rolls = 1;
             if (rewardRolls > 1) {

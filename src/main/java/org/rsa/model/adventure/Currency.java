@@ -11,10 +11,6 @@ public enum Currency {
     private final String name;
     private final String emojiId;
 
-    Currency(Integer id, String name) {
-        this(id, name, "");
-    }
-
     Currency(Integer id, String name, String emojiId) {
         this.id = id;
         this.name = name;

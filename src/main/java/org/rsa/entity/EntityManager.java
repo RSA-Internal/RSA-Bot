@@ -1,8 +1,6 @@
 package org.rsa.entity;
 
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import org.rsa.model.adventure.entity.Rarity;
-import org.rsa.entity.adventure.ItemEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,21 +51,6 @@ public class EntityManager<T extends BaseEntity> {
             .filter(entity -> entity.getId().equals(id))
             .findFirst()
             .orElse(null);
-    }
-
-    public T getEntityByRarity(Rarity rarity) {
-        if (classInstance.equals(ItemEntity.class)) {
-            return entityList.stream()
-                .filter(entity -> ((ItemEntity) entity).getRarity().equals(rarity))
-                .findFirst()
-                .orElse(null);
-        }
-
-        return null;
-    }
-
-    public List<SelectOption> getOptionList(int defaultIndex) {
-        return getOptionList(defaultIndex, 1);
     }
 
     public List<SelectOption> getOptionList(int defaultIndex, int page) {

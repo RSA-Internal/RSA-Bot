@@ -1,11 +1,10 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
-import org.rsa.register.adventure.EntityManagerRegister;
-import org.rsa.model.adventure.entity.Item;
-import org.rsa.model.adventure.loot.ItemDrop;
-import org.rsa.model.adventure.entity.Rarity;
 import org.rsa.entity.BaseEntity;
+import org.rsa.model.adventure.entity.Item;
+import org.rsa.model.adventure.entity.Rarity;
+import org.rsa.register.adventure.EntityManagerRegister;
 
 @Getter
 public class ItemEntity extends BaseEntity {
@@ -15,8 +14,6 @@ public class ItemEntity extends BaseEntity {
     private final Integer sellPrice;
     private final boolean canTrade;
     private final boolean canDrop;
-
-    private ItemDrop itemDrop;
 
     public static ItemEntity fromEnum(Item item) {
         return new ItemEntity(
@@ -38,11 +35,6 @@ public class ItemEntity extends BaseEntity {
         this.canTrade = canTrade;
         this.canDrop = canDrop;
         EntityManagerRegister.itemManager.addEntity(this);
-    }
-
-    public ItemEntity setItemDrop(ItemDrop itemDrop) {
-        this.itemDrop = itemDrop;
-        return this;
     }
 
     @Override
