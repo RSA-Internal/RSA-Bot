@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.model.Activity;
-import org.rsa.adventure.model.Skill;
-import org.rsa.adventure.model.Zone;
+import org.rsa.register.adventure.EntityManagerRegister;
+import org.rsa.model.adventure.entity.Activity;
+import org.rsa.model.adventure.entity.Skill;
+import org.rsa.model.adventure.entity.Zone;
 import org.rsa.entity.EntityManager;
 import org.rsa.entity.adventure.ActivityEntity;
 import org.rsa.entity.adventure.ItemEntity;
@@ -217,7 +217,7 @@ public class UserAdventureProfile {
 
     public String getBackpackAsString() {
         StringBuilder builder = new StringBuilder();
-        EntityManager<ItemEntity> entityManager = AdventureEntities.itemManager;
+        EntityManager<ItemEntity> entityManager = EntityManagerRegister.itemManager;
 
         for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
             ItemEntity item = entityManager.getEntityById(itemEntry.getKey());
@@ -233,7 +233,7 @@ public class UserAdventureProfile {
     }
 
     public int getBackpackValue() {
-        EntityManager<ItemEntity> entityManager = AdventureEntities.itemManager;
+        EntityManager<ItemEntity> entityManager = EntityManagerRegister.itemManager;
         int value = 0;
 
         for (Map.Entry<Integer, BigInteger> itemEntry : backpack.entrySet()) {
@@ -250,7 +250,7 @@ public class UserAdventureProfile {
     public String getZonesAsString() {
         StringBuilder builder = new StringBuilder();
 
-        EntityManager<ZoneEntity> entityManager = AdventureEntities.zoneManager;
+        EntityManager<ZoneEntity> entityManager = EntityManagerRegister.zoneManager;
         for (Integer unlockedZoneId : unlockedZones) {
             ZoneEntity unlockedZone = entityManager.getEntityById(unlockedZoneId);
             if (unlockedZone != null) {
@@ -265,7 +265,7 @@ public class UserAdventureProfile {
     public String getSkillsAsString() {
         StringBuilder builder = new StringBuilder();
 
-        List<SkillEntity> skills = AdventureEntities.skillManager.getEntityList();
+        List<SkillEntity> skills = EntityManagerRegister.skillManager.getEntityList();
 
         for (SkillEntity skill : skills) {
             if (Skill.NO_SKILL.getId().equals(skill.getId())) continue;

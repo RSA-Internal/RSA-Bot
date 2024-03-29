@@ -12,12 +12,12 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.UserZoneManager;
-import org.rsa.adventure.model.Activity;
-import org.rsa.adventure.model.ActivityPerformResponse;
-import org.rsa.adventure.model.ActivityResponse;
-import org.rsa.adventure.model.Zone;
+import org.rsa.register.adventure.EntityManagerRegister;
+import org.rsa.manager.adventure.UserZoneManager;
+import org.rsa.model.adventure.entity.Activity;
+import org.rsa.model.adventure.response.ActivityPerformResponse;
+import org.rsa.model.adventure.response.ActivityResponse;
+import org.rsa.model.adventure.entity.Zone;
 import org.rsa.entity.adventure.ActivityEntity;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.rsa.adventure.UserZoneManager.travelToTown;
-import static org.rsa.adventure.UserZoneManager.travelToZone;
+import static org.rsa.manager.adventure.UserZoneManager.travelToTown;
+import static org.rsa.manager.adventure.UserZoneManager.travelToZone;
 import static org.rsa.translator.AdventureProfileTranslator.getAdventureProfileAsEmbed;
 import static org.rsa.util.EmbedBuilderUtil.getActivitySummaryEmbedBuilder;
 import static org.rsa.util.EmbedBuilderUtil.getEmbedBuilderTemplate;
@@ -64,7 +64,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<ItemComponent> components = new ArrayList<>();
                 for (Integer zoneId : unlockedZonesId) {
                     if (Zone.START_TOWN.getId().equals(zoneId)) continue;
-                    ZoneEntity zone = AdventureEntities.zoneManager.getEntityById(zoneId);
+                    ZoneEntity zone = EntityManagerRegister.zoneManager.getEntityById(zoneId);
                     components.add(Button.success("zone_" + zoneId, zone.getName()));
 
                     if (components.size() == 5) {
@@ -87,7 +87,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 if (componentId.contains("travel")) {
                     // Parse Activity and perform
-                    ActivityEntity activity = AdventureEntities.activityManager.getEntityById(idInComponent);
+                    ActivityEntity activity = EntityManagerRegister.activityManager.getEntityById(idInComponent);
                     ActivityResponse validationResponse = activity.userCanPerformActivity(adventureProfile, false);
 
                     ActivityPerformResponse performResponse = null;
@@ -137,11 +137,11 @@ public class ButtonListener extends ListenerAdapter {
                     if (currentZoneId == Zone.START_TOWN.getId()) {
                         travelToTown(event, guild, requester);
                     } else {
-                        ZoneEntity currentZone = AdventureEntities.zoneManager.getEntityById(currentZoneId);
+                        ZoneEntity currentZone = EntityManagerRegister.zoneManager.getEntityById(currentZoneId);
                         travelToZone(event, requester, adventureProfile, currentZone);
                     }
                 } else if (componentId.contains("zone")) {
-                    ZoneEntity zone = AdventureEntities.zoneManager.getEntityById(idInComponent) ;
+                    ZoneEntity zone = EntityManagerRegister.zoneManager.getEntityById(idInComponent) ;
                     travelToZone(event, requester, adventureProfile, zone);
                 }
             }

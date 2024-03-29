@@ -3,10 +3,10 @@ package org.rsa.util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.IndexManager;
-import org.rsa.adventure.model.Activity;
-import org.rsa.adventure.model.ActivityPerformResponse;
+import org.rsa.register.adventure.EntityManagerRegister;
+import org.rsa.manager.adventure.IndexManager;
+import org.rsa.model.adventure.entity.Activity;
+import org.rsa.model.adventure.response.ActivityPerformResponse;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.entity.adventure.ActivityEntity;
@@ -137,7 +137,7 @@ public class EmbedBuilderUtil {
 
     public static EmbedBuilder getIndexEmbedBuilder(Member requester, String entityType, int selectedEntityId) {
         logger.info("getIndexEmbed - requester: {} | type: {} | entity: {}", requester.getId(), entityType, selectedEntityId);
-        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(entityType.toLowerCase());
+        EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(entityType.toLowerCase());
 
         if (selectedEntityId == -1) {
             BaseEntity firstEntity = entityManager.getPaginatedEntities(IndexManager.getUserPage(requester.getId()), Comparator.comparing(BaseEntity::getName)).findFirst().orElse(null);

@@ -1,8 +1,8 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
-import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.model.Skill;
+import org.rsa.register.adventure.EntityManagerRegister;
+import org.rsa.model.adventure.entity.Skill;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.logic.data.models.UserAdventureProfile;
@@ -35,7 +35,7 @@ public class SkillEntity extends BaseEntity {
         super(id, name);
         this.baseExp = baseExp;
         this.curveFactor = curveFactor;
-        AdventureEntities.skillManager.addEntity(this);
+        EntityManagerRegister.skillManager.addEntity(this);
     }
 
     public SkillEntity setLevel(Integer level) {
@@ -54,7 +54,7 @@ public class SkillEntity extends BaseEntity {
         List<Integer> unlockedZones = profile.getUnlockedZones();
         System.out.println("Checking for zones " + getName() + " - level: " + userSkillLevel);
 
-        EntityManager<ZoneEntity> entityManager = AdventureEntities.zoneManager;
+        EntityManager<ZoneEntity> entityManager = EntityManagerRegister.zoneManager;
 
         return entityManager.getEntityList().stream()
             // Filter out unlocked zones

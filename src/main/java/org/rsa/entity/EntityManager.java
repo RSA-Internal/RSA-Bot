@@ -1,7 +1,7 @@
 package org.rsa.entity;
 
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
-import org.rsa.adventure.model.Rarity;
+import org.rsa.model.adventure.entity.Rarity;
 import org.rsa.entity.adventure.ItemEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package org.rsa.adventure;
+package org.rsa.manager.adventure;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
-import org.rsa.adventure.model.ActivityPerformResponse;
-import org.rsa.adventure.model.Zone;
+import org.rsa.model.adventure.response.ActivityPerformResponse;
+import org.rsa.model.adventure.entity.Zone;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
 import org.rsa.logic.data.models.UserAdventureProfile;

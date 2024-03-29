@@ -1,4 +1,4 @@
-package org.rsa.adventure.model;
+package org.rsa.model.adventure.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

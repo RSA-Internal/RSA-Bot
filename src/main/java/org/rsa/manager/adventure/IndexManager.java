@@ -1,8 +1,9 @@
-package org.rsa.adventure;
+package org.rsa.manager.adventure;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.rsa.register.adventure.EntityManagerRegister;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.slf4j.Logger;
@@ -62,7 +63,7 @@ public class IndexManager {
     public static List<SelectOption> getOptionsForUser(String userId, int defaultValue) {
         logger.info("getOptionsForUser - userId: {} - defaultValue: {}", userId, defaultValue);
         String typeSelection = getUserTypeSelection(userId);
-        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(typeSelection);
+        EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(typeSelection);
         int currentPage = getUserPage(userId);
 
         if (defaultValue == -1) {
@@ -79,7 +80,7 @@ public class IndexManager {
 
     public static int getPageCountForUser(String userId) {
         String typeSelection = getUserTypeSelection(userId);
-        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(typeSelection);
+        EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(typeSelection);
         int remaining = entityManager.getEntityList().size() % 25;
         int pageCount = entityManager.getEntityList().size() / 25;
         if (remaining > 0) {
@@ -119,7 +120,7 @@ public class IndexManager {
 
     public static String getLetterRangeForPage(Member requester, int page) {
         String typeSelection = getUserTypeSelection(requester.getId());
-        EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(typeSelection);
+        EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(typeSelection);
         Stream<? extends BaseEntity> entities = entityManager.getPaginatedEntities(page, Comparator.comparing(BaseEntity::getName));
         List<String> names = entities.map(BaseEntity::getName).toList();
         String firstName = names.get(0);

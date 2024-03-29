@@ -1,17 +1,17 @@
-package org.rsa.adventure;
+package org.rsa.register.adventure;
 
-import org.rsa.adventure.model.*;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.entity.adventure.*;
+import org.rsa.model.adventure.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 
-public class AdventureEntities {
+public class EntityManagerRegister {
 
-    private static final Logger logger = LoggerFactory.getLogger(AdventureEntities.class);
+    private static final Logger logger = LoggerFactory.getLogger(EntityManagerRegister.class);
     public static EntityManager<ActivityEntity> activityManager = new EntityManager<>(ActivityEntity.class);
     public static EntityManager<ItemEntity> itemManager = new EntityManager<>(ItemEntity.class);
     public static EntityManager<RarityEntity> rarityManager = new EntityManager<>(RarityEntity.class);

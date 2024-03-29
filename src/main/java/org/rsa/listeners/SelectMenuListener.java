@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionE
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.adventure.IndexManager;
+import org.rsa.manager.adventure.IndexManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

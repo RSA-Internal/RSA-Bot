@@ -1,4 +1,4 @@
-package org.rsa.adventure.model;
+package org.rsa.model.adventure;
 
 import lombok.Getter;
 

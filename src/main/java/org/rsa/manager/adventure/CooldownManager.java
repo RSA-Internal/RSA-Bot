@@ -1,4 +1,4 @@
-package org.rsa.adventure;
+package org.rsa.manager.adventure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CooldownTracker {
+public class CooldownManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(CooldownTracker.class);
+    private static final Logger logger = LoggerFactory.getLogger(CooldownManager.class);
     public static final long ACTIVITY_COOLDOWN = 3000; // 3s
     public static final Map<String, Long> USER_COOLDOWN_MAP = new HashMap<>();
 

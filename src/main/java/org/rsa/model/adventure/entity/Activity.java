@@ -1,7 +1,8 @@
-package org.rsa.adventure.model;
+package org.rsa.model.adventure.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.rsa.model.adventure.loot.ItemDrop;
 
 import java.util.Collections;
 import java.util.List;

@@ -3,7 +3,7 @@ package org.rsa.command.subcommands.adventure;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import org.rsa.adventure.IndexManager;
+import org.rsa.manager.adventure.IndexManager;
 import org.rsa.command.SubcommandObject;
 
 import static org.rsa.helper.AdventureIndexHelper.getActionRowsForResponse;

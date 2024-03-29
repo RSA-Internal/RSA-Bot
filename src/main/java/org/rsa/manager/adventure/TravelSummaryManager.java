@@ -1,6 +1,6 @@
-package org.rsa.adventure;
+package org.rsa.manager.adventure;
 
-import org.rsa.adventure.model.ActivityPerformResponse;
+import org.rsa.model.adventure.response.ActivityPerformResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

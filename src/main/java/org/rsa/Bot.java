@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.adventure.AdventureEntities;
+import org.rsa.register.adventure.EntityManagerRegister;
 import org.rsa.aws.SecretsManager;
 import org.rsa.command.*;
 import org.rsa.listeners.*;
@@ -34,7 +34,7 @@ public class Bot {
     private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
     public static void main(String[] args) throws Exception {
-        AdventureEntities.registerEntities();
+        EntityManagerRegister.registerEntities();
 
         JDABuilder builder = JDABuilder.createDefault(getBotToken());
 

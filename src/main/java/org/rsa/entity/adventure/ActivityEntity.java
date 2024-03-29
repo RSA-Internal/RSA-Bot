@@ -1,9 +1,15 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
-import org.rsa.adventure.AdventureEntities;
-import org.rsa.adventure.CooldownTracker;
-import org.rsa.adventure.TravelSummaryManager;
+import org.rsa.model.adventure.entity.Activity;
+import org.rsa.model.adventure.entity.Item;
+import org.rsa.model.adventure.loot.ItemDrop;
+import org.rsa.model.adventure.entity.Skill;
+import org.rsa.model.adventure.response.ActivityPerformResponse;
+import org.rsa.model.adventure.response.ActivityResponse;
+import org.rsa.register.adventure.EntityManagerRegister;
+import org.rsa.manager.adventure.CooldownManager;
+import org.rsa.manager.adventure.TravelSummaryManager;
 import org.rsa.adventure.model.*;
 import org.rsa.entity.BaseEntity;
 import org.rsa.logic.data.models.UserAdventureProfile;
@@ -59,7 +65,7 @@ public class ActivityEntity extends BaseEntity {
         this.requiredItems = requiredItems;
         this.possibleItems = possibleItems;
         this.requiredSkillSet = requiredSkillSet;
-        AdventureEntities.activityManager.addEntity(this);
+        EntityManagerRegister.activityManager.addEntity(this);
     }
 
     public ActivityEntity(String name,
@@ -68,7 +74,7 @@ public class ActivityEntity extends BaseEntity {
                           List<ItemEntity> requiredItems,
                           List<ItemEntity> possibleItems,
                           List<SkillEntity> requiredSkillSet) {
-        this(AdventureEntities.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
+        this(EntityManagerRegister.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
     }
 
     @Override
@@ -118,7 +124,7 @@ public class ActivityEntity extends BaseEntity {
 
     public ActivityResponse userCanPerformActivity(UserAdventureProfile profile, boolean ignoreCooldown) {
         if (!ignoreCooldown) {
-            long isCooldownReady = CooldownTracker.isCooldownReady(profile.getUserid());
+            long isCooldownReady = CooldownManager.isCooldownReady(profile.getUserid());
             if (isCooldownReady > 0) {
                 return new ActivityResponse(false, String.join(" ", "You must wait " + (isCooldownReady / 1000.0) + "s before performing this action."));
             }
@@ -199,7 +205,7 @@ public class ActivityEntity extends BaseEntity {
         // Achievements?
         // Special events?
         TravelSummaryManager.updateTravelSummary(profile.getUserid(), travelSummary);
-        CooldownTracker.setUserCooldown(profile.getUserid(), System.currentTimeMillis());
+        CooldownManager.setUserCooldown(profile.getUserid(), System.currentTimeMillis());
 
         return response;
     }

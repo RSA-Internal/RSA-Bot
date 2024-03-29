@@ -5,12 +5,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import org.rsa.adventure.IndexManager;
+import org.rsa.manager.adventure.IndexManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.rsa.adventure.IndexManager.*;
+import static org.rsa.manager.adventure.IndexManager.*;
 
 public class AdventureIndexHelper {
 
