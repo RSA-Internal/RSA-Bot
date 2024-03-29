@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Item {
     NOTHING(-1, "Nothing", Rarity.FORBIDDEN, 0, 0, false, false),
-    TEST(0, "Test Item", Rarity.COMMON, 0, 0, false, false),
+    TEST(0, "Test Item", Rarity.UNIQUE, 0, 0, false, false),
     GIOS_ROSE(1, "Gio's Rose", Rarity.ALPHA, 0, 0, false, false),
     FEMBOY(2, "Femboy", Rarity.ALPHA, 0, 0, false, false),
     SCALA_MANIFESTO(3, "Scala Manifesto", Rarity.ALPHA, 0, 0, false, false),

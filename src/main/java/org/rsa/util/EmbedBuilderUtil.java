@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import org.rsa.adventure.AdventureEntities;
+import org.rsa.adventure.IndexManager;
 import org.rsa.adventure.model.Activity;
 import org.rsa.adventure.model.ActivityPerformResponse;
 import org.rsa.entity.BaseEntity;
@@ -16,10 +17,7 @@ import org.rsa.logic.data.models.UserAdventureProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.rsa.translator.AdventureTravelTranslator.getTravelStringBuilder;
@@ -131,11 +129,25 @@ public class EmbedBuilderUtil {
         return builder;
     }
 
-    public static EmbedBuilder getIndexEmbedBuilder(Member requester, String entityType, String selectedEntity) {
-        logger.info("getIndexEmbed - requester: {} | type: {} | entity: {}", requester.getId(), entityType, selectedEntity);
-        String selectedIndex = selectedEntity.substring(selectedEntity.indexOf("-") + 1);
+    public static EmbedBuilder getIndexEmbedBuilder(Member requester) {
+        String type = IndexManager.getUserTypeSelection(requester.getId());
+        int entityId = IndexManager.getUserSelectedEntityId(requester.getId());
+        return getIndexEmbedBuilder(requester, type, entityId);
+    }
+
+    public static EmbedBuilder getIndexEmbedBuilder(Member requester, String entityType, int selectedEntityId) {
+        logger.info("getIndexEmbed - requester: {} | type: {} | entity: {}", requester.getId(), entityType, selectedEntityId);
         EntityManager<?> entityManager = AdventureEntities.getEntityManagerFromType(entityType.toLowerCase());
-        BaseEntity baseEntity = entityManager.getEntityById(Integer.parseInt(selectedIndex));
+
+        if (selectedEntityId == -1) {
+            BaseEntity firstEntity = entityManager.getPaginatedEntities(IndexManager.getUserPage(requester.getId()), Comparator.comparing(BaseEntity::getName)).findFirst().orElse(null);
+            if (firstEntity != null) {
+                selectedEntityId = firstEntity.getId();
+                IndexManager.setUserSelectedEntityId(requester.getId(), selectedEntityId);
+            }
+        }
+
+        BaseEntity baseEntity = entityManager.getEntityById(selectedEntityId);
         logger.info("getIndexEmbed - BaseEntity: {}", baseEntity);
 
         return new EmbedBuilder()

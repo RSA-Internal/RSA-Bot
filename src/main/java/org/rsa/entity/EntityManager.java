@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 public class EntityManager<T extends BaseEntity> {
 
@@ -65,13 +67,33 @@ public class EntityManager<T extends BaseEntity> {
     }
 
     public List<SelectOption> getOptionList(int defaultIndex) {
-        return entityList.stream()
-            .filter(entity -> entity.getId() > 0)
-            .map(entity ->
-                SelectOption
-                    .of(entity.getName(), "entity-" + entity.getId())
-                    .withDefault(entity.getId().equals(defaultIndex))
-            )
+        return getOptionList(defaultIndex, 1);
+    }
+
+    public List<SelectOption> getOptionList(int defaultIndex, int page) {
+        AtomicInteger index = new AtomicInteger();
+        Stream<T> paginatedEntities = getPaginatedEntities(page, Comparator.comparing(BaseEntity::getName));
+
+        return paginatedEntities.map(entity -> {
+                SelectOption generator = SelectOption
+                    .of(entity.getName(), "entity-" + entity.getId() + "-" + index)
+                    .withDefault(index.get() == defaultIndex);
+                index.getAndIncrement();
+                return generator;
+            })
             .toList();
+    }
+
+    public Stream<T> getPaginatedEntities(int page, Comparator<? super T> comparator) {
+        Stream<T> streamingEntities = entityList.stream()
+            .filter(entity -> entity.getId() > 0);
+
+        if (null != comparator) {
+            streamingEntities = streamingEntities.sorted(comparator);
+        }
+
+        return streamingEntities
+            .skip(page * 25L)
+            .limit(25);
     }
 }

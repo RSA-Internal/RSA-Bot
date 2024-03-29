@@ -4,10 +4,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.rsa.adventure.IndexManager;
-import org.rsa.adventure.model.Activity;
 import org.rsa.command.SubcommandObject;
 
-import static org.rsa.adventure.IndexManager.*;
+import static org.rsa.helper.AdventureIndexHelper.getActionRowsForResponse;
 import static org.rsa.util.EmbedBuilderUtil.getIndexEmbedBuilder;
 
 public class AdventureIndexSubcommand extends SubcommandObject {
@@ -25,12 +24,13 @@ public class AdventureIndexSubcommand extends SubcommandObject {
         }
 
         IndexManager.setUserTypeSelection(requester.getId(), "activity");
+        IndexManager.setUserPage(requester.getId(), 0);
+        IndexManager.setUserSelectedEntityIndex(requester.getId(), 0);
+        IndexManager.setUserSelectedEntityId(requester.getId(), -1);
 
-        // display embed with two select menus
         event
-            .replyEmbeds(getIndexEmbedBuilder(requester, "Activity", "activity-" + Activity.HUNT.getId()).build())
-            .addActionRow(getIndexSelectType(requester))
-            .addActionRow(getIndexSelectEntity(requester))
+            .replyEmbeds(getIndexEmbedBuilder(requester).build())
+            .setComponents(getActionRowsForResponse(requester))
             .setEphemeral(true)
             .queue();
     }
