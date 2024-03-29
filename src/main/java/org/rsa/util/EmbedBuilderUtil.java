@@ -106,7 +106,6 @@ public class EmbedBuilderUtil {
                 List<SkillEntity> requiredSkills = activity.getRequiredSkillSet();
                 List<ItemEntity> requiredItemsList = activity.getRequiredItems();
                 Integer experienceBound = activity.getExperienceGainBound();
-                List<ItemEntity> possibleItemsMap = activity.getPossibleItems();
 
                 String requiredLevels = requiredSkills.stream()
                     .filter(skill -> skill.getLevel() > 0)

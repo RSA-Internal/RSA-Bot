@@ -2,59 +2,82 @@ package org.rsa.model.adventure.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.rsa.model.adventure.loot.ItemDrop;
+import org.rsa.entity.adventure.ItemEntity;
+import org.rsa.entity.loot.LootTable;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.rsa.entity.loot.LootTable.LootTableBuilder;
+
 @Getter
 @AllArgsConstructor
 public enum Activity {
-    LEAVE(0, "Leave", 0, 0, Collections.emptyList(), Collections.emptyMap(), Collections.emptyMap()),
+    LEAVE(0, "Leave", 0, 0, Collections.emptyList(), Collections.emptyList(), Collections.emptyMap()),
     HUNT(1, "Hunt Animals",  5, 2,
         List.of(Item.BASIC_KNIFE),
-        Map.of(
-            Item.NOTHING, new ItemDrop(1, 40),
-            Item.BONE, new ItemDrop(2, 4),
-            Item.ANIMAL_PELT, new ItemDrop(1, 1),
-            Item.RAW_MEAT, new ItemDrop(1, 55)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.ANIMAL_PELT), 1, 1, 1)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.BONE), 4, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.RAW_MEAT), 8, 1, 4)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.NOTHING), 10, 1, 1)
+                .build()
+        ),
         Map.of(Skill.HUNTING, 0)),
     FORAGE(2, "Forage", 3, 3,
         List.of(),
-        Map.of(
-            Item.NOTHING, new ItemDrop(1, 40),
-            Item.BERRY, new ItemDrop(3, 13),
-            Item.STICK, new ItemDrop(2, 17),
-            Item.PLANT_FIBER, new ItemDrop(4, 20),
-            Item.ROCK, new ItemDrop(1, 10)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.ROCK), 2, 1, 1)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.STICK), 3, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.BERRY), 5, 1, 3)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.PLANT_FIBER), 6, 1, 4)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.NOTHING), 10, 1, 1)
+                .build()
+        ),
         Map.of(Skill.FORAGING, 0)),
     FISH(3, "Fish",  2, 1,
         List.of(Item.BASIC_FISHING_ROD),
-        Map.of(
-            Item.NOTHING, new ItemDrop(1, 40),
-            Item.STICK, new ItemDrop(1, 10),
-            Item.BONE, new ItemDrop(1, 1),
-            Item.KELP, new ItemDrop(2, 30),
-            Item.RAW_FISH, new ItemDrop(1, 19)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.BONE), 1, 1, 1)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.RAW_FISH), 3, 1, 1)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.KELP), 4, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.STICK), 5, 1, 1)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.NOTHING), 10, 1, 1)
+                .build()
+        ),
         Map.of(Skill.FISHING, 0)),
     MINE(5, "Mine", 5, 2,
         List.of(Item.BASIC_PICKAXE),
-        Map.of(Item.ROCK, new ItemDrop(4, 100)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.ROCK), 1, 1, 4)
+                .build()
+        ),
         Map.of(Skill.MINING, 0)),
     FARM(6, "Farm", 3, 3,
         List.of(Item.BASIC_HOE),
-        Map.of(
-            Item.NOTHING, new ItemDrop(1, 30),
-            Item.BERRY, new ItemDrop(2, 15),
-            Item.CARROT, new ItemDrop(4, 25),
-            Item.POTATO, new ItemDrop(3, 15),
-            Item.PLANT_FIBER, new ItemDrop(2, 6),
-            Item.ROCK, new ItemDrop(2, 9)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.PLANT_FIBER), 2, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.POTATO), 2, 1, 3)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.ROCK), 3, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.BERRY), 4, 1, 2)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.CARROT), 4, 1, 4)
+                .withLootTableEntry(ItemEntity.fromEnum(Item.NOTHING), 10, 1, 1)
+                .build()
+        ),
         Map.of(Skill.FORAGING, 2)),
     CHOP(7, "Chop Tree", 4, 1,
         List.of(Item.BASIC_AXE),
-        Map.of(Item.LOG, new ItemDrop(4, 100)),
+        List.of(
+            new LootTableBuilder()
+                .withLootTableEntry(ItemEntity.fromEnum(Item.LOG), 1, 1, 2)
+                .build()
+        ),
         Map.of(Skill.FORAGING, 1, Skill.LOGGING, 0)),
     ;
 
@@ -63,6 +86,6 @@ public enum Activity {
     private final Integer experienceGainBound;
     private final Integer rewardRolls;
     private final List<Item> requiredItems;
-    private final Map<Item, ItemDrop> possibleItems;
+    private final List<LootTable> lootTables;
     private final Map<Skill, Integer> requiredSkillSet;
 }

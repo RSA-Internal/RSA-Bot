@@ -1,21 +1,25 @@
 package org.rsa.entity.adventure;
 
 import lombok.Getter;
+import org.rsa.entity.BaseEntity;
+import org.rsa.entity.loot.LootTable;
+import org.rsa.logic.data.models.UserAdventureProfile;
+import org.rsa.manager.adventure.CooldownManager;
+import org.rsa.manager.adventure.TravelSummaryManager;
 import org.rsa.model.adventure.entity.Activity;
 import org.rsa.model.adventure.entity.Item;
-import org.rsa.model.adventure.loot.ItemDrop;
 import org.rsa.model.adventure.entity.Skill;
+import org.rsa.model.adventure.loot.LootTableEntry;
 import org.rsa.model.adventure.response.ActivityPerformResponse;
 import org.rsa.model.adventure.response.ActivityResponse;
 import org.rsa.register.adventure.EntityManagerRegister;
-import org.rsa.manager.adventure.CooldownManager;
-import org.rsa.manager.adventure.TravelSummaryManager;
-import org.rsa.adventure.model.*;
-import org.rsa.entity.BaseEntity;
-import org.rsa.logic.data.models.UserAdventureProfile;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
@@ -24,17 +28,10 @@ public class ActivityEntity extends BaseEntity {
     private final Integer experienceGainBound;
     private final Integer rewardRolls;
     private final List<ItemEntity> requiredItems;
-    private final List<ItemEntity> possibleItems;
+    private final List<LootTable> lootTables;
     private final List<SkillEntity> requiredSkillSet;
 
     public static ActivityEntity fromEnum(Activity activity) {
-        List<ItemEntity> possibleItems = new ArrayList<>();
-        for (Map.Entry<Item, ItemDrop> enumItems : activity.getPossibleItems().entrySet()) {
-            ItemEntity newEntity = ItemEntity.fromEnum(enumItems.getKey());
-            newEntity.setItemDrop(enumItems.getValue());
-            possibleItems.add(newEntity);
-        }
-
         List<SkillEntity> requiredSkills = new ArrayList<>();
         for (Map.Entry<Skill, Integer> enumSkills : activity.getRequiredSkillSet().entrySet()) {
             SkillEntity newEntity = SkillEntity.fromEnum(enumSkills.getKey());
@@ -48,7 +45,7 @@ public class ActivityEntity extends BaseEntity {
             activity.getExperienceGainBound(),
             activity.getRewardRolls(),
             activity.getRequiredItems().stream().map(ItemEntity::fromEnum).toList(),
-            possibleItems,
+            activity.getLootTables(),
             requiredSkills);
     }
 
@@ -57,13 +54,13 @@ public class ActivityEntity extends BaseEntity {
                           Integer experienceGainBound,
                           Integer rewardRolls,
                           List<ItemEntity> requiredItems,
-                          List<ItemEntity> possibleItems,
+                          List<LootTable> lootTables,
                           List<SkillEntity> requiredSkillSet) {
         super(id, name);
         this.experienceGainBound = experienceGainBound;
         this.rewardRolls = rewardRolls;
         this.requiredItems = requiredItems;
-        this.possibleItems = possibleItems;
+        this.lootTables = lootTables;
         this.requiredSkillSet = requiredSkillSet;
         EntityManagerRegister.activityManager.addEntity(this);
     }
@@ -72,9 +69,9 @@ public class ActivityEntity extends BaseEntity {
                           Integer experienceGainBound,
                           Integer rewardRolls,
                           List<ItemEntity> requiredItems,
-                          List<ItemEntity> possibleItems,
+                          List<LootTable> lootTables,
                           List<SkillEntity> requiredSkillSet) {
-        this(EntityManagerRegister.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, possibleItems, requiredSkillSet);
+        this(EntityManagerRegister.activityManager.getNextFreeId(), name, experienceGainBound, rewardRolls, requiredItems, lootTables, requiredSkillSet);
     }
 
     @Override
@@ -181,23 +178,29 @@ public class ActivityEntity extends BaseEntity {
         }
 
         // Item roll
-        ItemEntity[] items = generateItemArray(possibleItems);
-        int rolls = 1;
-        if (rewardRolls > 1) {
-            rolls = random.nextInt(1, rewardRolls);
-        }
+        //ItemEntity[] items = generateItemArray(possibleItems);
+        for (LootTable table : getLootTables()) {
+            int rolls = 1;
+            if (rewardRolls > 1) {
+                rolls = random.nextInt(1, rewardRolls);
+            }
 
-        for (int i=0;i<rolls;i++) {
-            ItemEntity randomReward = items[random.nextInt(items.length)];
-            int rewardCount = 1;
-            if (!Item.NOTHING.getId().equals(randomReward.getId())) {
-                ItemDrop itemDropForReward = randomReward.getItemDrop();
-                if (itemDropForReward.dropMax() > 1) {
-                    rewardCount = random.nextInt(1, itemDropForReward.dropMax());
+            for (int i=0;i<rolls;i++) {
+                LootTableEntry randomReward = table.getDrop();
+                ItemEntity item = randomReward.getItemToDrop();
+
+                if (!Item.NOTHING.getId().equals(item.getId())) {
+                    int rewardCount = randomReward.getMinDrop();
+                    int max = randomReward.getMaxDrop();
+
+                    if (max > rewardCount) {
+                        rewardCount = random.nextInt(rewardCount, max);
+                    }
+
+                    travelSummary.addItemReceived(item, rewardCount);
+                    response.addItemReceived(item, rewardCount);
+                    profile.updateBackpack(item.getId(), rewardCount);
                 }
-                travelSummary.addItemReceived(randomReward, rewardCount);
-                response.addItemReceived(randomReward, rewardCount);
-                profile.updateBackpack(randomReward.getId(), rewardCount);
             }
         }
 
@@ -210,51 +213,20 @@ public class ActivityEntity extends BaseEntity {
         return response;
     }
 
-    private ItemEntity[] generateItemArray(List<ItemEntity> possibleItems) {
-        List<ItemEntity> items = new ArrayList<>();
-
-        for (ItemEntity item : possibleItems) {
-            ItemDrop itemDrop = item.getItemDrop();
-            if (itemDrop == null) continue;
-            for (int i=0;i<itemDrop.dropChance();i++) {
-                items.add(item);
-            }
-        }
-
-        Collections.shuffle(items);
-        return items.toArray(ItemEntity[]::new);
-    }
-
     public static String getPossibleItemsAsString(ActivityEntity activity, boolean depth, boolean includeNothing) {
-        return activity.getPossibleItems().stream()
-            .filter(item -> {
-                if (Item.NOTHING.getId().equals(item.getId())) {
-                    return includeNothing;
-                }
-                return true;
-            })
-            .filter(item -> item.getItemDrop() != null)
-            .map(item -> {
-                ItemDrop itemDrop = item.getItemDrop();
-                StringBuilder range = new StringBuilder();
-                if (depth) {
-                    range.append(" ");
-                }
-                range.append("- ");
-                if (!Item.NOTHING.getId().equals(item.getId())) {
-                    range.append("1");
-                    if (itemDrop.dropMax() > 1) {
-                        range.append(" - ");
-                        range.append(itemDrop.dropMax());
-                    }
-                    range.append(" ");
-                }
-                range.append(item.getName());
-                range.append(" (");
-                range.append(itemDrop.dropChance());
-                range.append("%)");
+        List<LootTable> lootTables = activity.getLootTables();
+        AtomicInteger index = new AtomicInteger();
 
-                return range.toString();
+        return activity.lootTables.stream()
+            .map(table -> {
+                String tableRender = table.generateDisplay(depth, includeNothing);
+                if (lootTables.size() > 1) {
+                    String display = "Table " + (index.get() + 1) + "\n" + tableRender;
+                    index.getAndIncrement();
+                    return display;
+                } else {
+                    return tableRender;
+                }
             })
             .collect(Collectors.joining("\n"));
     }
