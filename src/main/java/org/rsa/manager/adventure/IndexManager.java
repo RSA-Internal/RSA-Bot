@@ -3,14 +3,15 @@ package org.rsa.manager.adventure;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
-import org.rsa.register.adventure.EntityManagerRegister;
-import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
+import org.rsa.register.adventure.EntityManagerRegister;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class IndexManager {
 
@@ -81,12 +82,7 @@ public class IndexManager {
     public static int getPageCountForUser(String userId) {
         String typeSelection = getUserTypeSelection(userId);
         EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(typeSelection);
-        int remaining = entityManager.getEntityList().size() % 25;
-        int pageCount = entityManager.getEntityList().size() / 25;
-        if (remaining > 0) {
-            pageCount += 1;
-        }
-        return pageCount;
+        return entityManager.getPageCount();
     }
 
     public static StringSelectMenu getIndexSelectType(Member requester) {
@@ -121,11 +117,6 @@ public class IndexManager {
     public static String getLetterRangeForPage(Member requester, int page) {
         String typeSelection = getUserTypeSelection(requester.getId());
         EntityManager<?> entityManager = EntityManagerRegister.getEntityManagerFromType(typeSelection);
-        Stream<? extends BaseEntity> entities = entityManager.getPaginatedEntities(page, Comparator.comparing(BaseEntity::getName));
-        List<String> names = entities.map(BaseEntity::getName).toList();
-        String firstName = names.get(0);
-        String lastName = names.get(names.size() - 1);
-
-        return firstName.charAt(0) + "-" + lastName.charAt(0);
+        return entityManager.getLetterRangeForPage(page);
     }
 }

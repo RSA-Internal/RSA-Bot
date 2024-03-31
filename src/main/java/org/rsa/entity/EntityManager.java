@@ -13,12 +13,7 @@ import java.util.stream.Stream;
 public class EntityManager<T extends BaseEntity> {
 
     private final Logger logger = LoggerFactory.getLogger(EntityManager.class);
-    private final Class<T> classInstance;
     private final List<T> entityList = new ArrayList<>();
-
-    public EntityManager(Class<T> clazz) {
-        classInstance = clazz;
-    }
 
     public int getNextFreeId() {
         return entityList.stream().map(BaseEntity::getId).max(Comparator.naturalOrder()).orElse(entityList.size()) + 1;
@@ -43,7 +38,15 @@ public class EntityManager<T extends BaseEntity> {
     }
 
     public List<T> getEntityList() {
-        return new ArrayList<>(entityList);
+        return getEntityList("");
+    }
+
+    public List<T> getEntityList(String filter) {
+        return new ArrayList<>(entityList).stream().filter(entity -> entity.getName().toLowerCase().contains(filter.toLowerCase())).toList();
+    }
+
+    public Stream<T> getEntityStream() {
+        return getEntityList().stream();
     }
 
     public T getEntityById(int id) {
@@ -54,8 +57,12 @@ public class EntityManager<T extends BaseEntity> {
     }
 
     public List<SelectOption> getOptionList(int defaultIndex, int page) {
+        return getOptionList(defaultIndex, page, "");
+    }
+
+    public List<SelectOption> getOptionList(int defaultIndex, int page, String filter) {
         AtomicInteger index = new AtomicInteger();
-        Stream<T> paginatedEntities = getPaginatedEntities(page, Comparator.comparing(BaseEntity::getName));
+        Stream<T> paginatedEntities = getPaginatedEntities(page, filter, Comparator.comparing(BaseEntity::getName));
 
         return paginatedEntities.map(entity -> {
                 SelectOption generator = SelectOption
@@ -67,9 +74,23 @@ public class EntityManager<T extends BaseEntity> {
             .toList();
     }
 
+    public Stream<T> getPaginatedEntities(int page, String filter) {
+        return getPaginatedEntities(page, filter, Comparator.comparing(BaseEntity::getName));
+    }
+
     public Stream<T> getPaginatedEntities(int page, Comparator<? super T> comparator) {
+        return getPaginatedEntities(page, "", comparator);
+    }
+
+    public Stream<T> getPaginatedEntities(int page, String filter, Comparator<? super T> comparator) {
         Stream<T> streamingEntities = entityList.stream()
             .filter(entity -> entity.getId() > 0);
+
+        if (filter != null && !filter.isEmpty()) {
+            streamingEntities = streamingEntities.filter(entity -> entity.getName().toLowerCase().contains(filter.toLowerCase()));
+            // TODO: Filter recipes inputs and outputs
+            // TODO: Filter loot tables
+        }
 
         if (null != comparator) {
             streamingEntities = streamingEntities.sorted(comparator);
@@ -78,5 +99,33 @@ public class EntityManager<T extends BaseEntity> {
         return streamingEntities
             .skip(page * 25L)
             .limit(25);
+    }
+
+    public String getLetterRangeForPage(int page) {
+        return getLetterRangeForPage(page, "");
+    }
+
+    public String getLetterRangeForPage(int page, String filter) {
+        Stream<T> paginatedEntities = getPaginatedEntities(page, filter, Comparator.comparing(BaseEntity::getName));
+        List<String> names = paginatedEntities.map(BaseEntity::getName).toList();
+        String firstName = names.get(0);
+        String lastName = names.get(names.size() - 1);
+
+        return firstName.charAt(0) + "-" + lastName.charAt(0);
+    }
+
+    public int getPageCount() {
+        return getPageCount("");
+    }
+
+    public int getPageCount(String filter) {
+        List<T> filteredEntities = getEntityList(filter);
+
+        int remaining = filteredEntities.size() % 25;
+        int pageCount = filteredEntities.size() / 25;
+        if (remaining > 0) {
+            pageCount += 1;
+        }
+        return pageCount;
     }
 }

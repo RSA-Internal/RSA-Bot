@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.entity.recipe.RecipeEntity;
 import org.rsa.register.adventure.EntityManagerRegister;
 import org.rsa.manager.adventure.UserZoneManager;
 import org.rsa.model.adventure.entity.Activity;
@@ -27,11 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static org.rsa.manager.adventure.RecipeBookManager.generateActionRows;
 import static org.rsa.manager.adventure.UserZoneManager.travelToTown;
 import static org.rsa.manager.adventure.UserZoneManager.travelToZone;
 import static org.rsa.translator.AdventureProfileTranslator.getAdventureProfileAsEmbed;
-import static org.rsa.util.EmbedBuilderUtil.getActivitySummaryEmbedBuilder;
-import static org.rsa.util.EmbedBuilderUtil.getEmbedBuilderTemplate;
+import static org.rsa.util.EmbedBuilderUtil.*;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -143,6 +144,23 @@ public class ButtonListener extends ListenerAdapter {
                 } else if (componentId.contains("zone")) {
                     ZoneEntity zone = EntityManagerRegister.zoneManager.getEntityById(idInComponent) ;
                     travelToZone(event, requester, adventureProfile, zone);
+                } else if (componentId.contains("craft")) {
+                    RecipeEntity recipe = EntityManagerRegister.recipeManager.getEntityById(idInComponent);
+                    if (recipe.performCraft(adventureProfile)) {
+                        event
+                            .reply("Successfully crafted " + recipe.getName() + ".")
+                            .setEmbeds(getRecipeBookEmbedBuilder(requester).build())
+                            .setComponents(generateActionRows(requester))
+                            .setEphemeral(true)
+                            .queue();
+                    } else {
+                        event
+                            .reply("Failed to craft " + recipe.getName() + ".")
+                            .setEmbeds(getRecipeBookEmbedBuilder(requester).build())
+                            .setComponents(generateActionRows(requester))
+                            .setEphemeral(true)
+                            .queue();
+                    }
                 }
             }
         }

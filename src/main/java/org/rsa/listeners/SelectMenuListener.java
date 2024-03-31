@@ -1,16 +1,23 @@
 package org.rsa.listeners;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.manager.adventure.IndexManager;
+import org.rsa.manager.adventure.RecipeBookManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.rsa.helper.AdventureIndexHelper.getActionRowsForResponse;
 import static org.rsa.util.EmbedBuilderUtil.getIndexEmbedBuilder;
+import static org.rsa.util.EmbedBuilderUtil.getRecipeBookEmbedBuilder;
 
 public class SelectMenuListener extends ListenerAdapter {
 
@@ -47,32 +54,63 @@ public class SelectMenuListener extends ListenerAdapter {
         }
 
         String newSelectedValue = event.getValues().get(0);
+        EmbedBuilder responseBuilder = null;
+        List<ActionRow> actionRows = new ArrayList<>();
 
         switch (componentId) {
             case "index-select-type" -> {
-                logger.info("New Selected Type: {}", newSelectedValue);
+                logger.info("New Selected Index Type: {}", newSelectedValue);
                 String typeName = newSelectedValue.substring(newSelectedValue.indexOf("-") + 1);
                 IndexManager.setUserTypeSelection(requester.getId(), typeName);
                 IndexManager.setUserPage(requester.getId(), 0);
                 IndexManager.setUserSelectedEntityIndex(requester.getId(), 0);
                 IndexManager.setUserSelectedEntityId(requester.getId(), -1);
+                responseBuilder = getIndexEmbedBuilder(requester);
+                actionRows = getActionRowsForResponse(requester);
             }
             case "index-select-entity" -> {
-                logger.info("New Selected Entity: {}", newSelectedValue);
+                logger.info("New Selected Index Entity: {}", newSelectedValue);
                 IndexManager.setUserSelectedEntityIndex(requester.getId(), extractEntityIndexFromLabel(newSelectedValue));
                 IndexManager.setUserSelectedEntityId(requester.getId(), extractEntityIdFromLabel(newSelectedValue));
+                responseBuilder = getIndexEmbedBuilder(requester);
+                actionRows = getActionRowsForResponse(requester);
             }
             case "index-select-page" -> {
-                logger.info("New Selected Page: {}", newSelectedValue);
+                logger.info("New Selected Index Page: {}", newSelectedValue);
                 IndexManager.setUserPage(requester.getId(), extractPageFromLabel(newSelectedValue));
                 IndexManager.setUserSelectedEntityIndex(requester.getId(), 0);
                 IndexManager.setUserSelectedEntityId(requester.getId(), -1);
+                responseBuilder = getIndexEmbedBuilder(requester);
+                actionRows = getActionRowsForResponse(requester);
+            }
+            case "recipe-select-recipe" -> {
+                logger.info("New Selected Recipe: {}", newSelectedValue);
+                RecipeBookManager.setUserRecipeIndex(requester.getId(), extractEntityIndexFromLabel(newSelectedValue));
+                RecipeBookManager.setUserRecipeId(requester.getId(), extractEntityIdFromLabel(newSelectedValue));
+                responseBuilder = getRecipeBookEmbedBuilder(requester);
+                actionRows = RecipeBookManager.generateActionRows(requester);
+            }
+            case "recipe-select-page" -> {
+                logger.info("New Selected Recipe Page: {}", newSelectedValue);
+                RecipeBookManager.setUserPage(requester.getId(), extractPageFromLabel(newSelectedValue));
+                RecipeBookManager.setUserRecipeIndex(requester.getId(), 0);
+                RecipeBookManager.setUserRecipeId(requester.getId(), -1);
+                responseBuilder = getRecipeBookEmbedBuilder(requester);
+                actionRows = RecipeBookManager.generateActionRows(requester);
             }
         }
 
+        if (null == responseBuilder) {
+            event
+                .reply("Something went wrong, please try again")
+                .setEphemeral(true)
+                .queue();
+            return;
+        }
+
         event
-            .editMessageEmbeds(getIndexEmbedBuilder(requester).build())
-            .setComponents(getActionRowsForResponse(requester))
+            .editMessageEmbeds(responseBuilder.build())
+            .setComponents(actionRows)
             .queue();
     }
 

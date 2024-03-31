@@ -3,7 +3,9 @@ package org.rsa.register.adventure;
 import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.entity.adventure.*;
+import org.rsa.entity.recipe.RecipeEntity;
 import org.rsa.model.adventure.entity.*;
+import org.rsa.model.adventure.recipe.Recipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +14,12 @@ import java.util.Arrays;
 public class EntityManagerRegister {
 
     private static final Logger logger = LoggerFactory.getLogger(EntityManagerRegister.class);
-    public static EntityManager<ActivityEntity> activityManager = new EntityManager<>(ActivityEntity.class);
-    public static EntityManager<ItemEntity> itemManager = new EntityManager<>(ItemEntity.class);
-    public static EntityManager<RarityEntity> rarityManager = new EntityManager<>(RarityEntity.class);
-    public static EntityManager<SkillEntity> skillManager = new EntityManager<>(SkillEntity.class);
-    public static EntityManager<ZoneEntity> zoneManager = new EntityManager<>(ZoneEntity.class);
+    public static EntityManager<ActivityEntity> activityManager = new EntityManager<>();
+    public static EntityManager<ItemEntity> itemManager = new EntityManager<>();
+    public static EntityManager<RarityEntity> rarityManager = new EntityManager<>();
+    public static EntityManager<SkillEntity> skillManager = new EntityManager<>();
+    public static EntityManager<ZoneEntity> zoneManager = new EntityManager<>();
+    public static EntityManager<RecipeEntity> recipeManager = new EntityManager<>();
 
     public static void registerEntities() {
         Arrays.stream(Activity.values()).iterator().forEachRemaining(ActivityEntity::fromEnum);
@@ -34,11 +37,15 @@ public class EntityManagerRegister {
         Arrays.stream(Zone.values()).iterator().forEachRemaining(ZoneEntity::fromEnum);
         logger.info("Registered zones: " + zoneManager.getEntityList().size());
 
+        Arrays.stream(Recipe.values()).iterator().forEachRemaining(RecipeEntity::fromEnum);
+        logger.info("Registered recipes: " + recipeManager.getEntityList().size());
+
         logger.info("Total activities: " + activityManager.getEntityList().size());
         logger.info("Total items: " + itemManager.getEntityList().size());
         logger.info("Total rarities: " + rarityManager.getEntityList().size());
         logger.info("Total skills: " + skillManager.getEntityList().size());
         logger.info("Total zones: " + zoneManager.getEntityList().size());
+        logger.info("Total recipes: " + recipeManager.getEntityList().size());
     }
 
     public static EntityManager<? extends BaseEntity> getEntityManagerFromType(String type) {

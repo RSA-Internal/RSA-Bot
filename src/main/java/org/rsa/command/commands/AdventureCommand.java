@@ -7,13 +7,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.AutoCompleteQuery;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.command.subcommands.adventure.*;
 import org.rsa.register.adventure.EntityManagerRegister;
 import org.rsa.command.CommandObject;
 import org.rsa.command.SubcommandObject;
-import org.rsa.command.subcommands.adventure.AdventureIndexSubcommand;
-import org.rsa.command.subcommands.adventure.AdventureProfileSubcommand;
-import org.rsa.command.subcommands.adventure.AdventureSettingsSubcommand;
-import org.rsa.command.subcommands.adventure.AdventureTravelSubcommand;
 import org.rsa.entity.adventure.ZoneEntity;
 import org.rsa.exception.ValidationException;
 import org.rsa.logic.data.managers.UserAdventureProfileManager;
@@ -28,7 +25,8 @@ public class AdventureCommand extends CommandObject {
         new AdventureProfileSubcommand(),
         new AdventureTravelSubcommand(),
         new AdventureIndexSubcommand(),
-        new AdventureSettingsSubcommand()
+        new AdventureSettingsSubcommand(),
+        new AdventureCraftingSubcommand()
     };
 
     public AdventureCommand() {

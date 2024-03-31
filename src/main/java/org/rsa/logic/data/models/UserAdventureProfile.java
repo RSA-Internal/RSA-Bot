@@ -186,6 +186,15 @@ public class UserAdventureProfile {
     }
 
     /**
+     * Get the quantity of the provided item id in a users backpack.
+     * @param itemId The item id.
+     * @return The quantity of the item in the backpack.
+     */
+    public int queryBackpack(Integer itemId) {
+        return backpack.getOrDefault(itemId, BigInteger.ZERO).intValue();
+    }
+
+    /**
      * Increment the times an activity has been performed by 1.
      * @param activity The activity performed.
      */

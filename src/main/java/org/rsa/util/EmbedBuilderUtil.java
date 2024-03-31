@@ -3,6 +3,8 @@ package org.rsa.util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import org.rsa.entity.recipe.RecipeEntity;
+import org.rsa.manager.adventure.RecipeBookManager;
 import org.rsa.register.adventure.EntityManagerRegister;
 import org.rsa.manager.adventure.IndexManager;
 import org.rsa.model.adventure.entity.Activity;
@@ -155,5 +157,31 @@ public class EmbedBuilderUtil {
             .setColor(HelperUtil.getRandomColor())
             .setThumbnail("https://cdn4.iconfinder.com/data/icons/learning-31/64/dictionary_book_lexicon_work_book_thesaurus-512.png")
             .addField("Viewing: " + capitalizeFirst(entityType) + " - " + baseEntity.getName(), baseEntity.getAsDetails(), true);
+    }
+
+    public static EmbedBuilder getRecipeBookEmbedBuilder(Member requester) {
+        int recipeId = RecipeBookManager.getUserRecipeId(requester.getId());
+        logger.info("getRecipeBookEmbed - requester: {} | type: recipe | entity: {}", requester.getId(), recipeId);
+
+        EntityManager<RecipeEntity> recipeManager = EntityManagerRegister.recipeManager;
+
+        if (recipeId == -1) {
+            RecipeEntity firstEntity = recipeManager.getPaginatedEntities(RecipeBookManager.getUserPage(requester.getId()), RecipeBookManager.getUserFilter(requester.getId())).findFirst().orElse(null);
+            if (firstEntity != null) {
+                recipeId = firstEntity.getId();
+                RecipeBookManager.setUserRecipeId(requester.getId(), recipeId);
+            }
+        }
+
+        RecipeEntity recipeEntity = recipeManager.getEntityById(recipeId);
+        logger.info("getRecipeBookEmbed - RecipeEntity: {}", recipeEntity);
+
+        return new EmbedBuilder()
+            .setTitle("Recipe Book")
+            .setAuthor(requester.getEffectiveName())
+            .setColor(HelperUtil.getRandomColor())
+            .setThumbnail("https://p7.hiclipart.com/preview/880/810/427/information-computer-icons-video-game-where-the-wild-things-are-recipe.jpg")
+            .addField("Viewing: " + recipeEntity.getName(), recipeEntity.getAsDetails(), true);
+
     }
 }
