@@ -4,6 +4,7 @@ import org.rsa.entity.BaseEntity;
 import org.rsa.entity.EntityManager;
 import org.rsa.entity.adventure.*;
 import org.rsa.entity.recipe.RecipeEntity;
+import org.rsa.model.adventure.Currency;
 import org.rsa.model.adventure.entity.*;
 import org.rsa.model.adventure.recipe.Recipe;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class EntityManagerRegister {
     public static EntityManager<SkillEntity> skillManager = new EntityManager<>();
     public static EntityManager<ZoneEntity> zoneManager = new EntityManager<>();
     public static EntityManager<RecipeEntity> recipeManager = new EntityManager<>();
+    public static EntityManager<CurrencyEntity> currencyManager = new EntityManager<>();
 
     public static void registerEntities() {
         Arrays.stream(Activity.values()).iterator().forEachRemaining(ActivityEntity::fromEnum);
@@ -40,12 +42,16 @@ public class EntityManagerRegister {
         Arrays.stream(Recipe.values()).iterator().forEachRemaining(RecipeEntity::fromEnum);
         logger.info("Registered recipes: " + recipeManager.getEntityList().size());
 
+        Arrays.stream(Currency.values()).iterator().forEachRemaining(CurrencyEntity::fromEnum);
+        logger.info("Registered currencies: " + currencyManager.getEntityList().size());
+
         logger.info("Total activities: " + activityManager.getEntityList().size());
         logger.info("Total items: " + itemManager.getEntityList().size());
         logger.info("Total rarities: " + rarityManager.getEntityList().size());
         logger.info("Total skills: " + skillManager.getEntityList().size());
         logger.info("Total zones: " + zoneManager.getEntityList().size());
         logger.info("Total recipes: " + recipeManager.getEntityList().size());
+        logger.info("Total currencies: " + currencyManager.getEntityList().size());
     }
 
     public static EntityManager<? extends BaseEntity> getEntityManagerFromType(String type) {
