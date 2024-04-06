@@ -1,21 +1,20 @@
 package org.rsa.task;
 
 import net.dv8tion.jda.api.JDA;
-import org.rsa.task.tasks.UpdateMessageScheduler;
-
+import org.rsa.task.tasks.DevforumUpdateTask;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-public class Tasks {
+public class TaskScheduler {
     private static final HashMap<String, TaskObject> tasks = new HashMap<>();
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public static void initTasks(JDA jda) {
         System.out.println("Starting tasks.");
 
-        addTaskObject(new UpdateMessageScheduler(jda, scheduler));
+        addTaskObject(new DevforumUpdateTask(jda, scheduler));
 
         tasks.forEach((s, taskObject) -> {
             try {
@@ -32,11 +31,24 @@ public class Tasks {
     }
 
     public static void stopTasks() {
-        tasks.forEach((s, taskObject) -> taskObject.stopTask());
+        tasks.forEach((s, taskObject) -> {
+            try {
+                taskObject.stopTask();
+            } catch (Exception e) {
+                System.err.println(MessageFormat.format("Failed to stop task: {0}. \n", taskObject.getName()) + e.getMessage());
+            }
+        });
     }
 
     public static void stopTask(String name) {
-        getTaskObject(name).stopTask();
+        TaskObject taskObject = getTaskObject(name);
+        if (taskObject != null) {
+            try {
+                taskObject.stopTask();
+            } catch (Exception e) {
+                System.err.println(MessageFormat.format("Failed to stop task: {0}. \n", name) + e.getMessage());
+            }
+        }
     }
 
     public static TaskObject getTaskObject(String name) {

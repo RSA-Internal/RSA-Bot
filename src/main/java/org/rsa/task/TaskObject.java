@@ -2,7 +2,6 @@ package org.rsa.task;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
-
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
