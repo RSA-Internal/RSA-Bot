@@ -1,5 +1,6 @@
 package org.rsa.discourse;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -27,20 +28,29 @@ public class DiscourseAPIHelper {
         }
     }
 
-    private final OkHttpClient client;
-    private final Gson gson;
-    private final String baseUrl;
+    private static Map<String, CategoryDetailsModel> latestCategoriesData;
+    private static final RateLimiter rateLimiter = RateLimiter.create(0.1);
+    private static final OkHttpClient client = new OkHttpClient();
+    private static final Gson gson = new Gson();
+    private static final String baseUrl = "https://devforum.roblox.com/";
 
-    public DiscourseAPIHelper(String baseUrl) {
-        this.baseUrl = baseUrl;
-        this.client = new OkHttpClient();
-        this.gson = new Gson();
+    public static Map<String, CategoryDetailsModel> getLatestCategoriesData() {
+        if (latestCategoriesData == null) {
+            try {
+                latestCategoriesData = fetchAllCategoryInformation();
+            } catch (IOException | ApiException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+
+        return latestCategoriesData;
     }
 
-    public Map<String, CategoryDetailsModel> getAllCategoryInformation() throws IOException, ApiException {
+    public static Map<String, CategoryDetailsModel> fetchAllCategoryInformation() throws IOException, ApiException {
         String url = baseUrl + "/site.json";
         Request request = new Request.Builder().url(url).build();
 
+        rateLimiter.acquire();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new ApiException("Unexpected code " + response.code(), response.code());
@@ -52,14 +62,16 @@ public class DiscourseAPIHelper {
             }
 
             CategoryDetailsModel.CategoriesResponse responseObj = gson.fromJson(responseBody.string(), CategoryDetailsModel.CategoriesResponse.class);
-            return  CategoryDetailsModel.fromCategoriesResponse(responseObj);
+            Map<String, CategoryDetailsModel> latestCategoriesData = CategoryDetailsModel.fromCategoriesResponse(responseObj);
+            return latestCategoriesData;
         }
     }
 
-    public String getLatestNonPinnedTopicId(String categoryId) throws IOException, ApiException {
+    public static String fetchLatestNonPinnedTopicId(String categoryId) throws IOException, ApiException {
         String url = baseUrl + "/c/" + categoryId + ".json";
         Request request = new Request.Builder().url(url).build();
 
+        rateLimiter.acquire();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new ApiException("Unexpected code " + response.code(), response.code());
@@ -81,12 +93,13 @@ public class DiscourseAPIHelper {
         return null;
     }
 
-    public TopicDetailsModel getLatestPostInCategory(String categoryId) throws IOException, ApiException {
-        String topicId = getLatestNonPinnedTopicId(categoryId);
+    public static TopicDetailsModel fetchLatestPostInCategory(String categoryId) throws IOException, ApiException {
+        String topicId = fetchLatestNonPinnedTopicId(categoryId);
 
         String url = baseUrl + "/t/" + topicId + ".json";
         Request request = new Request.Builder().url(url).build();
 
+        rateLimiter.acquire();
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new ApiException("Unexpected code " + response.code(), response.code());
