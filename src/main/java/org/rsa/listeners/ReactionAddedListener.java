@@ -8,11 +8,11 @@ import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.managers.ReputationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
-import org.rsa.logic.data.models.UserReputation;
+import org.rsa.util.GuildConfigurationConstant;
+import org.rsa.managers.GuildConfigurationManager;
+import org.rsa.managers.ReputationManager;
+import org.rsa.beans.GuildConfiguration;
+import org.rsa.beans.UserReputation;
 
 import java.util.List;
 import java.util.Objects;

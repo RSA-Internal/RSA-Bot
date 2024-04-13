@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.rsa.logic.data.models.UserReputation;
+import org.rsa.beans.UserReputation;
 import org.rsa.util.HelperUtil;
 
 public class ReputationTranslator {

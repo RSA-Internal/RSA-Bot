@@ -1,8 +1,8 @@
-package org.rsa.logic.data.managers;
+package org.rsa.managers;
 
 import net.dv8tion.jda.api.entities.Guild;
 import org.rsa.aws.RequestsManager;
-import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.beans.GuildConfiguration;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;

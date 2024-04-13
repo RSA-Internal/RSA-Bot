@@ -1,7 +1,7 @@
-package org.rsa.logic.data.managers;
+package org.rsa.managers;
 
 import org.rsa.aws.RequestsManager;
-import org.rsa.logic.data.models.UserReputation;
+import org.rsa.beans.UserReputation;
 import software.amazon.awssdk.enhanced.dynamodb.*;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
 

@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.util.GuildConfigurationConstant;
+import org.rsa.beans.GuildConfiguration;
 import org.rsa.util.HelperUtil;
 
 import java.util.List;
