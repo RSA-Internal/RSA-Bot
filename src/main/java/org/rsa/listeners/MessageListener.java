@@ -71,7 +71,19 @@ public class MessageListener extends ListenerAdapter {
                 String data = rawData.get("d").toString();
                 System.out.println(data);
 
-                if (data.contains("poll=") && !event.getMessage().getContentRaw().contains("poll=")) {
+                if (event.getMessage().getContentRaw().contains("poll")) {
+                    System.out.println("Message contains poll, ignoring.");
+                    return;
+                }
+
+                Message referenceMessage = event.getMessage().getReferencedMessage();
+
+                if (Objects.nonNull(referenceMessage) && referenceMessage.getContentRaw().contains("poll")) {
+                    System.out.println("Message contains poll, ignoring.");
+                    return;
+                }
+
+                if (data.contains("poll=")) {
                     System.out.println("Poll detected, deleting.");
                     event.getMessage().reply("Please do not send polls outside of the poll channel.").queue(m -> {
                         event.getMessage().delete().queue();
