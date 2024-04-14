@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.2.8r2";
+    private static final String VERSION = "v1.2.8r3";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
