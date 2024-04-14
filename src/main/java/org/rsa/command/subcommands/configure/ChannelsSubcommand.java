@@ -16,7 +16,8 @@ public class ChannelsSubcommand extends SubcommandPassthroughObject {
             event -> Objects.requireNonNull(event.getOption("value", OptionMapping::getAsChannel)).getId());
         addOptions(
             new OptionData(OptionType.STRING, "option", "Specify a channel type to configure.", true)
-                .addChoice(GuildConfigurationConstant.HELP_CHANNEL.getLocalization(), GuildConfigurationConstant.HELP_CHANNEL.getKey()),
+                .addChoice(GuildConfigurationConstant.HELP_CHANNEL.getLocalization(), GuildConfigurationConstant.HELP_CHANNEL.getKey())
+                .addChoice(GuildConfigurationConstant.POLL_CHANNEL.getLocalization(), GuildConfigurationConstant.POLL_CHANNEL.getKey()),
             new OptionData(OptionType.CHANNEL, "value", "Specify the channel", true)
         );
     }

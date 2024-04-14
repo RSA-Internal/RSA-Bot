@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.2.7";
+    private static final String VERSION = "v1.2.8";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -49,6 +49,7 @@ public class Bot {
                 setupGuild(event.getGuild());
             }
         });
+        builder.setEventPassthrough(true);
 
         JDA jda = builder.build();
         jda.awaitReady();

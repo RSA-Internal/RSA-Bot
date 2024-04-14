@@ -27,7 +27,8 @@ public enum GuildConfigurationConstant {
     ANSWER_ACCEPTED("answer_accepted", "Reputation to provide to an asker upon accepting an answer", "2"),
     ACCEPTED_ANSWER("accepted_answer", "Reputation to provide to a helper upon answer being accepted", "15"),
     QUESTION_MODERATED("question_moderated", "Reputation to provide when a question is moderated", "-5"),
-    FLAGGED_SPAM("flagged_spam", "Reputation to provide when a question is marked as spam", "-50");
+    FLAGGED_SPAM("flagged_spam", "Reputation to provide when a question is marked as spam", "-50"),
+    POLL_CHANNEL("poll_channel", "Channel for the designated poll channel", "");
 
 
     public static final List<GuildConfigurationConstant> EMOJI = new ArrayList<>() {{
@@ -44,6 +45,7 @@ public enum GuildConfigurationConstant {
 
     public static final List<GuildConfigurationConstant> CHANNEL = new ArrayList<>() {{
         add(HELP_CHANNEL);
+        add(POLL_CHANNEL);
     }};
 
     public static final List<GuildConfigurationConstant> OPTION = new ArrayList<>() {{

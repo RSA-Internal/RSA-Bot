@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 @Getter
 @Setter
 public class GuildConfiguration {
-    Integer schema_version = 5;
+    Integer schema_version = 6;
     String guildid; // Partition key
 
     // Emojis
@@ -34,6 +34,7 @@ public class GuildConfiguration {
 
     // Channel IDs
     String help_channel_id = "";
+    String poll_channel_id = "";
 
     // Options
     String req_chars_for_help_thread = "";
@@ -79,6 +80,7 @@ public class GuildConfiguration {
        put(GuildConfigurationConstant.ACCEPTED_ANSWER.getKey(), GuildConfiguration.this::setAccepted_answer);
        put(GuildConfigurationConstant.QUESTION_MODERATED.getKey(), GuildConfiguration.this::setQuestion_moderated);
        put(GuildConfigurationConstant.FLAGGED_SPAM.getKey(), GuildConfiguration.this::setFlagged_spam);
+        put(GuildConfigurationConstant.POLL_CHANNEL.getKey(), GuildConfiguration.this::setPoll_channel_id);
     }};
 
     private Map<String, Supplier<String>> getters = new HashMap<>() {{
@@ -101,6 +103,7 @@ public class GuildConfiguration {
         put(GuildConfigurationConstant.ACCEPTED_ANSWER.getKey(), GuildConfiguration.this::getAccepted_answer);
         put(GuildConfigurationConstant.QUESTION_MODERATED.getKey(), GuildConfiguration.this::getQuestion_moderated);
         put(GuildConfigurationConstant.FLAGGED_SPAM.getKey(), GuildConfiguration.this::getFlagged_spam);
+        put(GuildConfigurationConstant.POLL_CHANNEL.getKey(), GuildConfiguration.this::getPoll_channel_id);
     }};
 
     @DynamoDbIgnore
