@@ -1,5 +1,9 @@
 package org.rsa.listeners;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -13,6 +17,7 @@ import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -68,27 +73,22 @@ public class MessageListener extends ListenerAdapter {
         if (!isInPollChannel) {
             DataObject rawData = event.getRawData();
             if (Objects.nonNull(rawData)) {
-                String data = rawData.get("d").toString();
-                System.out.println(data);
-
-                if (event.getMessage().getContentRaw().contains("poll")) {
-                    System.out.println("Message contains poll, ignoring.");
-                    return;
-                }
-
-                Message referenceMessage = event.getMessage().getReferencedMessage();
-
-                if (Objects.nonNull(referenceMessage) && referenceMessage.getContentRaw().contains("poll")) {
-                    System.out.println("Message contains poll, ignoring.");
-                    return;
-                }
-
-                if (data.contains("poll=")) {
-                    System.out.println("Poll detected, deleting.");
-                    event.getMessage().reply("Please do not send polls outside of the poll channel.").queue(m -> {
-                        event.getMessage().delete().queue();
-                        m.delete().queueAfter(5, TimeUnit.SECONDS);
-                    });
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+                try {
+                    Map<String, Object> dataMap = mapper.readValue(rawData.toPrettyString(), new TypeReference<Map<String, Object>>() {});
+                    if (dataMap.containsKey("d")) {
+                        String dataJson = mapper.writeValueAsString(dataMap.get("d"));
+                        Map<String, Object> dataEntry = mapper.readValue(dataJson, new TypeReference<Map<String, Object>>() {});
+                        if (dataEntry.containsKey("poll")) {
+                            event.getMessage().reply(event.getAuthor().getAsMention() + ", please do not post polls outside of the poll channel.").queue(m -> {
+                                event.getMessage().delete().queue();
+                                m.delete().queueAfter(5, TimeUnit.SECONDS);
+                            });
+                        }
+                    }
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
                 }
             }
         }
