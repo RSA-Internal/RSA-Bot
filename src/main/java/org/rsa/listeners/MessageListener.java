@@ -13,6 +13,8 @@ import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.models.GuildConfiguration;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +70,12 @@ public class MessageListener extends ListenerAdapter {
         if (!isInPollChannel) {
             DataObject rawData = event.getRawData();
             if (Objects.nonNull(rawData)) {
-                if (rawData.toPrettyString().contains("poll")) {
+                String data = rawData.get("d").toString();
+                List<String> dataKeySet = Arrays.stream(data.split(" "))
+                    .map(s -> s.split("=")[0])
+                    .toList();
+
+                if (dataKeySet.contains("poll")) {
                     System.out.println("Poll detected, deleting.");
                     event.getMessage().reply("Please do not send polls outside of the poll channel.").queue(m -> {
                         event.getMessage().delete().queue();
