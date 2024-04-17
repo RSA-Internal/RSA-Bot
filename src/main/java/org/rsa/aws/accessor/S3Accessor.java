@@ -24,6 +24,7 @@ public class S3Accessor {
             System.out.println("Attempting to delete " + key + " in bucket: " + bucketName);
             DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(bucketName).key(key).build();
             s3Client.deleteObject(request);
+            System.out.println("Successfully deleted resource " + key + " in bucket: " + bucketName);
         } catch (S3Exception e) {
             System.out.println("Failed to delete " + key + " in bucket: " + bucketName);
             System.out.println(e.awsErrorDetails().errorMessage());
@@ -35,6 +36,7 @@ public class S3Accessor {
             System.out.println("Attempting to delete bucket: " + bucketName);
             DeleteBucketRequest request = DeleteBucketRequest.builder().bucket(bucketName).build();
             s3Client.deleteBucket(request);
+            System.out.println("Successfully deleted bucket: " + bucketName);
         } catch (S3Exception e) {
             System.out.println("Failed to delete bucket: " + bucketName);
             System.out.println(e.awsErrorDetails().errorMessage());
@@ -43,6 +45,7 @@ public class S3Accessor {
 
     public static void createResource(S3Client s3Client, String bucketName, String key, String path) {
         try {
+            System.out.println("Attempting to create resource: " + key + " in bucket: " + bucketName);
             if (!doesBucketExist(s3Client, bucketName)) {
                 createBucket(s3Client, bucketName);
             }
@@ -55,6 +58,7 @@ public class S3Accessor {
                 .key(key)
                 .build();
             s3Client.putObject(request, RequestBody.fromFile(new File(path)));
+            System.out.println("Successfully created resource: " + key + " in bucket: " + bucketName);
         } catch (S3Exception e) {
             System.out.println("Failed to create resource with key: " + key + " in bucket: " + bucketName);
             System.out.println(e.awsErrorDetails().errorMessage());
