@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.SecretsManager;
 import org.rsa.command.*;
 import org.rsa.listeners.*;
-import org.rsa.listeners.ReactionAddedListener;
+import org.rsa.util.BackupUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.2.8r5";
+    private static final String VERSION = "v1.3.0";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -59,6 +59,9 @@ public class Bot {
                 System.err.println("Failed to fetch guild");
             } else {
                 setupGuild(guild);
+                if (guild.getId().equals("165202235226062848")) {
+                    BackupUtil.backupGuild(guild);
+                }
             }
         });
     }
