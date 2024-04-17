@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.3.0";
+    private static final String VERSION = "v1.3.1";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -84,7 +84,7 @@ public class Bot {
                 // Disable All CacheFlags.
                 .disableCache(Arrays.asList(CacheFlag.values()))
                 // Enable specific CacheFlags
-                .enableCache(CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS)
+                .enableCache(CacheFlag.EMOJI, CacheFlag.CLIENT_STATUS, CacheFlag.STICKER)
                 // Only cache members who are online or owner of the guild.
                 .setMemberCachePolicy(MemberCachePolicy.ONLINE.or(MemberCachePolicy.OWNER))
                 // Disable member chunking on startup.
