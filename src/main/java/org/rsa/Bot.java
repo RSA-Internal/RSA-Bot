@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.3.1";
+    private static final String VERSION = "v1.3.2";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -35,12 +35,15 @@ public class Bot {
 
         configureMemoryUsage(builder);
         builder.addEventListeners(
-                new AutoCompleteListener(),
-                new SlashCommandListener(),
-                new ReactionAddedListener(),
-                new ReactionRemovedListener(),
-                new MessageListener(),
-                new ContextInteractionListeners()
+            new AutoCompleteListener(),
+            new SlashCommandListener(),
+            new ReactionAddedListener(),
+            new ReactionRemovedListener(),
+            new MessageListener(),
+            new ContextInteractionListeners(),
+            new EmojiUploadedListener(),
+            new StickUploadedListener(),
+            new GuildIconListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override

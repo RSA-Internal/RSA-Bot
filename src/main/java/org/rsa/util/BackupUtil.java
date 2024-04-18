@@ -25,33 +25,40 @@ public class BackupUtil {
         backupServerIcon(guild);
     }
 
-    public static void backupEmojis(Guild guild) {
-        for (RichCustomEmoji emoji : guild.getEmojis()) {
-            try {
-                String fileName = emoji.getName() + ".png";
-                File f = emoji.getImage().downloadToFile(new File(fileName)).get();
-                S3Accessor.createResource(s3Client, guild.getId() + "-emojis", fileName, f.getPath());
-                cleanupResource(f.getPath());
-            } catch (ExecutionException | InterruptedException e) {
-                System.out.println("Failed to download emoji: " + emoji.getName());
-            }
+    private static void backupEmojis(Guild guild) {
+        guild.getEmojis().forEach(e -> backupEmoji(guild, e));
+    }
+
+    public static void backupEmoji(Guild guild, RichCustomEmoji emoji) {
+        if (Objects.isNull(guild) || Objects.isNull(emoji)) return;
+        try {
+            String fileName = emoji.getName() + "_" + emoji.getId() + ".png";
+            File f = emoji.getImage().downloadToFile(new File(fileName)).get();
+            S3Accessor.createResource(s3Client, guild.getId() + "-emojis", fileName, f.getPath());
+            cleanupResource(f.getPath());
+        } catch (ExecutionException | InterruptedException e) {
+            System.out.println("Failed to download emoji: " + emoji.getName());
         }
     }
 
-    public static void backupStickers(Guild guild) {
-        for (Sticker sticker : guild.getStickers()) {
-            try {
-                String fileName = sticker.getName() + ".png";
-                File f = sticker.getIcon().downloadToFile(new File(fileName)).get();
-                S3Accessor.createResource(s3Client, guild.getId() + "-stickers", fileName, f.getPath());
-                cleanupResource(fileName);
-            } catch (ExecutionException | InterruptedException e) {
-                System.out.println("Failed to download emoji: " + sticker.getName());
-            }
+    private static void backupStickers(Guild guild) {
+        guild.getStickers().forEach(s -> backupSticker(guild, s));
+    }
+
+    public static void backupSticker(Guild guild, Sticker sticker) {
+        if (Objects.isNull(guild) || Objects.isNull(sticker)) return;
+        try {
+            String fileName = sticker.getName() + "_" + sticker.getId() + ".png";
+            File f = sticker.getIcon().downloadToFile(new File(fileName)).get();
+            S3Accessor.createResource(s3Client, guild.getId() + "-stickers", fileName, f.getPath());
+            cleanupResource(fileName);
+        } catch (ExecutionException | InterruptedException e) {
+            System.out.println("Failed to download emoji: " + sticker.getName());
         }
     }
 
     public static void backupServerIcon(Guild guild) {
+        if (Objects.isNull(guild)) return;
         try {
             Calendar cal = Calendar.getInstance();
             SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_NOW);
