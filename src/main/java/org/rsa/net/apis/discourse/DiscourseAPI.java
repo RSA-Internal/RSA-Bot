@@ -57,6 +57,7 @@ public class DiscourseAPI {
 
         rateLimiter.acquire();
         CategoryTopicsModel responseObj = HttpClient.get(url, CategoryTopicsModel.class);
+        // Grabs the first non-pinned item in the list, if it exists
         return responseObj.topic_list().topics().stream()
                 .filter(topic -> !topic.pinned())
                 .findFirst()

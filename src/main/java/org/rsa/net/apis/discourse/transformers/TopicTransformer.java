@@ -15,14 +15,15 @@ public class TopicTransformer {
         String content = response.post_stream().posts().get(0).cooked();
         String parsed = parseHtml(content);
         Temporal timestamp = Instant.parse(response.created_at());
+        String imageUrl = "https:" + response.image_url(); // JDA pattern matches require we have https: or attachment
 
         return new Topic(
                 timestamp,
                 response.id(),
                 response.title(),
                 response.details().created_by().username(),
-                response.details().created_by().avatar_template(),
-                parsed
+                parsed,
+                imageUrl
         );
     }
 

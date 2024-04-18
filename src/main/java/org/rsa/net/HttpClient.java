@@ -6,11 +6,8 @@ import okhttp3.*;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class HttpClient {
     private static final OkHttpClient client = new OkHttpClient();
@@ -39,6 +36,7 @@ public class HttpClient {
             String jsonString = responseBody.string();
 
             if (jsonString.equals("{}")) {
+                // POST normally shouldn't return a body, but sometimes it will anyway... thanks roblox!
                 return null;
             }
 
@@ -47,8 +45,9 @@ public class HttpClient {
     }
 
     public static String buildUrlWithParams(String url, Map<String, Object> params) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(url).newBuilder();
+        HttpUrl.Builder urlBuilder = HttpUrl.get(url).newBuilder(); // HttpUrl.get(String URL) should throw IllegalArgumentException ??
         for (Map.Entry<String, Object> entry : params.entrySet()) {
+            // loop through objects (and lists) to append to URL as query
             if (entry.getValue() instanceof List) {
                 for (Object val : (List<?>) entry.getValue()) {
                     urlBuilder.addQueryParameter(entry.getKey(), val.toString());
