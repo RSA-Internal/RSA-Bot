@@ -30,6 +30,10 @@ public class TaskScheduler {
         tasks.put(taskObject.getName(), taskObject);
     }
 
+    public static TaskObject getTaskObject(String name) {
+        return tasks.get(name);
+    }
+
     public static void stopTasks() {
         tasks.forEach((s, taskObject) -> {
             try {
@@ -49,9 +53,5 @@ public class TaskScheduler {
                 System.err.println(MessageFormat.format("Failed to stop task: {0}. \n", name) + e.getMessage());
             }
         }
-    }
-
-    public static TaskObject getTaskObject(String name) {
-        return tasks.get(name);
     }
 }
