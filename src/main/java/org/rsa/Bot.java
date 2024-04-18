@@ -16,8 +16,8 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.SecretsManager;
 import org.rsa.command.*;
+import org.rsa.command.v2.CommandObjectV2;
 import org.rsa.listeners.*;
-import org.rsa.util.BackupUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.3.2";
+    private static final String VERSION = "v1.3.3";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -62,9 +62,6 @@ public class Bot {
                 System.err.println("Failed to fetch guild");
             } else {
                 setupGuild(guild);
-                if (guild.getId().equals("165202235226062848")) {
-                    BackupUtil.backupGuild(guild);
-                }
             }
         });
     }
@@ -116,6 +113,12 @@ public class Bot {
         List<SlashCommandData> slashCommandData = commandObjectList.stream()
                 .map(CommandObject::slashCommandImplementation)
                 .collect(Collectors.toList());
+
+        List<CommandObjectV2> commandObjectV2s = Commands.getCommandsV2();
+        List<SlashCommandData> slashCommandDataV2 = commandObjectV2s.stream()
+            .map(CommandObjectV2::getSlashCommandImplementation)
+            .toList();
+
         List<CommandData> messageContextCommandData = ContextItems.getLoadedMessageItems()
                         .values().stream().map(MessageContextObject::getCommandData)
                         .toList();
@@ -124,6 +127,7 @@ public class Bot {
                         .toList();
 
         commands.addCommands(slashCommandData).queue();
+        commands.addCommands(slashCommandDataV2).queue();
         commands.addCommands(messageContextCommandData).queue();
         commands.addCommands(userContextCommandData).queue();
     }

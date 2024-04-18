@@ -3,8 +3,11 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.command.CommandObject;
 import org.rsa.command.Commands;
-import org.rsa.exception.ValidationException;
+import org.rsa.command.v2.CommandObjectV2;
+
+import java.util.Objects;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -15,10 +18,15 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        try {
-            Commands.getCommand(event.getName()).handleSlashCommand(event);
-        } catch (ValidationException e) {
-            event.reply(e.toEventResponse()).setEphemeral(true).queue();
+        CommandObject command = Commands.getCommand(event.getName());
+        if (Objects.nonNull(command) && command.isAutocomplete()) {
+            command.onSlashCommandInteraction(event);
+            return;
+        }
+
+        CommandObjectV2 commandObjectV2 = Commands.getCommandV2(event.getName());
+        if (Objects.nonNull(commandObjectV2) && commandObjectV2.isAutocomplete()) {
+            commandObjectV2.onSlashCommandInteraction(event);
         }
     }
 }
