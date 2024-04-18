@@ -57,7 +57,7 @@ public class DiscourseAPI {
 
         rateLimiter.acquire();
         CategoryTopicsModel responseObj = HttpClient.get(url, CategoryTopicsModel.class);
-        return responseObj.topicList().topics().stream()
+        return responseObj.topic_list().topics().stream()
                 .filter(topic -> !topic.pinned())
                 .findFirst()
                 .map(CategoryTopicsModel.TopicList.Topic::id);
