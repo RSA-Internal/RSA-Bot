@@ -26,6 +26,7 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
     private final boolean isGuildOnly;
     private Consumer<EventEntities<SlashCommandInteractionEvent>> eventCallback;
     private boolean isAutocomplete = false;
+    private Map<String, SubcommandObjectV2> loadedSubcommands;
 
     public CommandObjectV2(String name, String description) {
         this(name, description, Collections.emptyList(), Collections.emptyMap(), Collections.emptyList(), false);
@@ -71,6 +72,14 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
     }
 
     public SlashCommandData getSlashCommandImplementation() {
+        loadedSubcommands = new HashMap<>(subcommandMap);
+
+        subcommandGroups.forEach(group ->
+            group.getSubcommands().forEach(data ->
+                loadedSubcommands.put(
+                    group.getName().toLowerCase() + "_" + data.getName().toLowerCase(),
+                    (SubcommandObjectV2) data)));
+
         return Commands.slash(name, description)
             .addOptions(optionDataList)
             .addSubcommands(subcommandMap.values())
@@ -89,21 +98,15 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
         }
 
         String subcommandName = event.getSubcommandName();
+        String subCommandGroup = event.getSubcommandGroup();
+
         if (Objects.nonNull(subcommandName)) {
-
-            String subCommandGroup = event.getSubcommandGroup();
-            SubcommandObjectV2 subcommandObjectV2 = subcommandMap.get(subcommandName);
-
+            String subcommandKey = subcommandName.toLowerCase();
             if (Objects.nonNull(subCommandGroup)) {
-                Optional<SubcommandGroupData> subcommandGroupData = subcommandGroups.stream().filter(g -> g.getName().equals(subCommandGroup)).findFirst();
-                if (subcommandGroupData.isPresent()) {
-                    List<SubcommandData> subcommandDataList = subcommandGroupData.get().getSubcommands();
-                    Optional<SubcommandData> subcommandData = subcommandDataList.stream().filter(c -> c.getName().equals(subcommandName)).findFirst();
-                    if (subcommandData.isPresent()) {
-                        subcommandObjectV2 = (SubcommandObjectV2) subcommandData.get();
-                    }
-                }
+                subcommandKey = subCommandGroup.toLowerCase() + "_" + subcommandKey;
             }
+
+            SubcommandObjectV2 subcommandObjectV2 = loadedSubcommands.get(subcommandKey);
 
             if (Objects.nonNull(subcommandObjectV2)) {
                 subcommandObjectV2.processSlashCommandInteraction(entities);

@@ -30,6 +30,6 @@ public class ConfigureChannels extends SubcommandObjectV2 {
         String option = event.getOption("option", OptionMapping::getAsString);
         // TODO: Evaluate if requireNonNull can throw NPE here. Discord prevents events passing null if `isRequired`.
         String value = Objects.requireNonNull(event.getOption("value", OptionMapping::getAsChannel)).getId();
-        GuildConfigurationManager.processUpdate(entities.getGuild(), option, value);
+        event.reply(GuildConfigurationManager.processUpdate(entities.getGuild(), option, value)).setEphemeral(true).queue();
     }
 }

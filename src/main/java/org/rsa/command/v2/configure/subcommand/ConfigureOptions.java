@@ -35,6 +35,6 @@ public class ConfigureOptions extends SubcommandObjectV2 {
         SlashCommandInteractionEvent event = entities.getEvent();
         String option = event.getOption("option", OptionMapping::getAsString);
         String value = event.getOption("value", OptionMapping::getAsString);
-        GuildConfigurationManager.processUpdate(entities.getGuild(), option, value);
+        event.reply(GuildConfigurationManager.processUpdate(entities.getGuild(), option, value)).setEphemeral(true).queue();
     }
 }
