@@ -1,7 +1,6 @@
 package org.rsa.command.v2.backup;
 
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -23,10 +22,5 @@ public class ViewBackupSubcommand extends SubcommandObjectV2 {
     @Override
     public void processAutoCompleteInteraction(EventEntities<CommandAutoCompleteInteractionEvent> entities) {
         entities.getEvent().replyChoices(SUPPORTED_CATEGORIES.stream().map(category -> new Command.Choice(category, category)).toList()).queue();
-    }
-
-    @Override
-    public void processSlashCommandInteraction(EventEntities<SlashCommandInteractionEvent> entities) {
-        entities.getEvent().reply("Not yet implemented.").setEphemeral(true).queue();
     }
 }
