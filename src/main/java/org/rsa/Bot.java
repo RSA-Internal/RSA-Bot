@@ -27,7 +27,7 @@ import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.3.3";
+    private static final String VERSION = "v1.3.4";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -107,6 +107,7 @@ public class Bot {
 
     private static void setupGuild(Guild guild) {
         System.out.println("Setting up commands for: " + guild.getId());
+        // TODO: Determine how to properly update commands rather than resubmitting the entire payload each time.
         CommandListUpdateAction commands = guild.updateCommands();
 
         List<CommandObject> commandObjectList = Commands.getCommands();

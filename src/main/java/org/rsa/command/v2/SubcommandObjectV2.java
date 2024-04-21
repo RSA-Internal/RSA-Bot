@@ -10,7 +10,7 @@ public abstract class SubcommandObjectV2 extends SubcommandData {
         super(name, description);
     }
 
-    public abstract void processAutoCompleteInteraction(EventEntities<CommandAutoCompleteInteractionEvent> entities);
+    public void processAutoCompleteInteraction(EventEntities<CommandAutoCompleteInteractionEvent> entities) {}
 
-    public abstract void processSlashCommandInteraction(EventEntities<SlashCommandInteractionEvent> entities);
+    public void processSlashCommandInteraction(EventEntities<SlashCommandInteractionEvent> entities) {}
 }

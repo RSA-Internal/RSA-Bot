@@ -1,22 +1,22 @@
 package org.rsa.command.v2;
 
 import lombok.Getter;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import net.dv8tion.jda.api.interactions.commands.build.*;
 import org.jetbrains.annotations.NotNull;
+import org.rsa.exception.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 @Getter
 public abstract class CommandObjectV2 extends ListenerAdapter {
+
+    public static final Logger commandLogger = LoggerFactory.getLogger(CommandObjectV2.class);
 
     private final String name;
     private final String description;
@@ -80,25 +80,37 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
-        Member requester = event.getMember();
-        if (Objects.isNull(guild) || Objects.isNull(requester)) {
+        EventEntities<SlashCommandInteractionEvent> entities = null;
+        try {
+            entities = new EventEntities<>(event);
+        } catch (ValidationException e) {
+            commandLogger.warn(e.toEventResponse());
             event.reply("Something went wrong processing your event.").setEphemeral(true).queue();
-            return;
         }
-
-        EventEntities<SlashCommandInteractionEvent> entities = new EventEntities<>(event, guild, requester);
 
         String subcommandName = event.getSubcommandName();
         if (Objects.nonNull(subcommandName)) {
+
+            String subCommandGroup = event.getSubcommandGroup();
             SubcommandObjectV2 subcommandObjectV2 = subcommandMap.get(subcommandName);
+
+            if (Objects.nonNull(subCommandGroup)) {
+                Optional<SubcommandGroupData> subcommandGroupData = subcommandGroups.stream().filter(g -> g.getName().equals(subCommandGroup)).findFirst();
+                if (subcommandGroupData.isPresent()) {
+                    List<SubcommandData> subcommandDataList = subcommandGroupData.get().getSubcommands();
+                    Optional<SubcommandData> subcommandData = subcommandDataList.stream().filter(c -> c.getName().equals(subcommandName)).findFirst();
+                    if (subcommandData.isPresent()) {
+                        subcommandObjectV2 = (SubcommandObjectV2) subcommandData.get();
+                    }
+                }
+            }
+
             if (Objects.nonNull(subcommandObjectV2)) {
                 subcommandObjectV2.processSlashCommandInteraction(entities);
-                return;
             } else {
                 event.reply("No implementation for " + event.getName() + " -> " + subcommandName).setEphemeral(true).queue();
-                return;
             }
+            return;
         }
 
         if (Objects.nonNull(eventCallback)) {
@@ -111,14 +123,13 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        Guild guild = event.getGuild();
-        Member requester = event.getMember();
-        if (Objects.isNull(guild) || Objects.isNull(requester)) {
+        EventEntities<CommandAutoCompleteInteractionEvent> entities = null;
+        try {
+            entities = new EventEntities<>(event);
+        } catch (ValidationException e) {
+            commandLogger.warn(e.toEventResponse());
             event.replyChoices(Collections.emptyList()).queue();
-            return;
         }
-
-        EventEntities<CommandAutoCompleteInteractionEvent> entities = new EventEntities<>(event, guild, requester);
 
         String subcommandName = event.getSubcommandName();
         if (Objects.nonNull(subcommandName)) {

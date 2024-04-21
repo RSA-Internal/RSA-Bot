@@ -7,6 +7,7 @@ import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class GuildConfigurationManager {
@@ -32,7 +33,10 @@ public class GuildConfigurationManager {
 
     public static String processUpdate(Guild guild, String option, String value) {
         GuildConfiguration guildConfig = GuildConfigurationManager.fetch(guild.getId());
-        boolean result = guildConfig.updateField(option, value);
+        boolean result = false;
+        if (Objects.nonNull(option) && Objects.nonNull(value)) {
+            result = guildConfig.updateField(option, value);
+        }
 
         String response = "✅ **" + option + "** option changed to " + value + ".";
 

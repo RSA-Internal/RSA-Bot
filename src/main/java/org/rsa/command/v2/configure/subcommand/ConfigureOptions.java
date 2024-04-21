@@ -1,17 +1,18 @@
-package org.rsa.command.subcommands.configure;
+package org.rsa.command.v2.configure.subcommand;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.rsa.command.SubcommandPassthroughObject;
+import org.rsa.command.v2.EventEntities;
+import org.rsa.command.v2.SubcommandObjectV2;
 import org.rsa.logic.constants.GuildConfigurationConstant;
+import org.rsa.logic.data.managers.GuildConfigurationManager;
 
-public class OptionsSubcommand extends SubcommandPassthroughObject {
-
-    public OptionsSubcommand() {
-        super("options", "Various options for a server.",
-            event -> event.getOption("option", OptionMapping::getAsString),
-            event -> event.getOption("value", OptionMapping::getAsString));
+public class ConfigureOptions extends SubcommandObjectV2 {
+    public ConfigureOptions() {
+        super("options", "Various options for the server.");
+        // TODO: Introduce helper method for mapping `GuildConfigurationConstant` to a choice list.
         addOptions(
             new OptionData(OptionType.STRING, "option", "Specify the setting to change.", true)
                 .addChoice(GuildConfigurationConstant.REQUIRED_CHARACTERS.getLocalization(), GuildConfigurationConstant.REQUIRED_CHARACTERS.getKey())
@@ -27,5 +28,13 @@ public class OptionsSubcommand extends SubcommandPassthroughObject {
                 .addChoice(GuildConfigurationConstant.FLAGGED_SPAM.getLocalization(), GuildConfigurationConstant.FLAGGED_SPAM.getKey()),
             new OptionData(OptionType.STRING, "value", "The value for the option.", true)
         );
+    }
+
+    @Override
+    public void processSlashCommandInteraction(EventEntities<SlashCommandInteractionEvent> entities) {
+        SlashCommandInteractionEvent event = entities.getEvent();
+        String option = event.getOption("option", OptionMapping::getAsString);
+        String value = event.getOption("value", OptionMapping::getAsString);
+        GuildConfigurationManager.processUpdate(entities.getGuild(), option, value);
     }
 }
