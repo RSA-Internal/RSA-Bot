@@ -1,4 +1,4 @@
-package org.rsa.command;
+package org.rsa.context;
 
 import lombok.Getter;
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;

@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.SecretsManager;
 import org.rsa.command.Commands;
-import org.rsa.command.ContextItems;
-import org.rsa.command.MessageContextObject;
-import org.rsa.command.UserContextObject;
+import org.rsa.context.ContextItems;
+import org.rsa.context.MessageContextObject;
+import org.rsa.context.UserContextObject;
 import org.rsa.command.v2.CommandObjectV2;
 import org.rsa.listeners.*;
 
