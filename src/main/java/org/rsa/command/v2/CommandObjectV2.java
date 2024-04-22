@@ -32,6 +32,10 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
         this(name, description, Collections.emptyList(), Collections.emptyMap(), Collections.emptyList(), false);
     }
 
+    public CommandObjectV2(String name, String description, boolean isGuildOnly) {
+        this(name, description, Collections.emptyList(), Collections.emptyMap(), Collections.emptyList(), isGuildOnly);
+    }
+
     public CommandObjectV2(String name, String description, List<OptionData> optionDataList, Map<String, SubcommandObjectV2> subcommandMap, List<SubcommandGroupData> subcommandGroups, boolean isGuildOnly) {
         this.name = name;
         this.description = description;

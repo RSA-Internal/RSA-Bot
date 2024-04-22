@@ -4,6 +4,7 @@ import org.rsa.command.commands.*;
 import org.rsa.command.v2.CommandObjectV2;
 import org.rsa.command.v2.backup.BackupCommand;
 import org.rsa.command.v2.configure.ConfigureCommandV2;
+import org.rsa.command.v2.reputation.ReputationCommandV2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,11 +20,11 @@ public class Commands {
         addCommandObject(new CheckInCommand());
         addCommandObject(new CheckOutCommand());
         addCommandObject(new CompileCommand());
-        addCommandObject(new ReputationCommand());
         addCommandObject(new ResolveCommand());
 
         addCommandObjectV2(new BackupCommand());
         addCommandObjectV2(new ConfigureCommandV2());
+        addCommandObjectV2(new ReputationCommandV2());
     }
 
     private static void addCommandObject(CommandObject commandObject) {
