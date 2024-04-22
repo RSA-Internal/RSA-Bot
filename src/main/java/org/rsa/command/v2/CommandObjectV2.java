@@ -121,13 +121,14 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
             return;
         }
 
-        if (Objects.nonNull(eventCallback)) {
-            eventCallback.accept(entities);
-            return;
-        }
+        processSlashCommand(entities);
 
-        event.reply("No implementation for " + event.getName()).setEphemeral(true).queue();
+        if (!event.isAcknowledged()) {
+            event.reply("No implementation for " + event.getName()).setEphemeral(true).queue();
+        }
     }
+
+    public void processSlashCommand(@NotNull EventEntities<SlashCommandInteractionEvent> entities) { }
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
@@ -149,6 +150,12 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
             }
         }
 
-        event.replyChoices(Collections.emptyList()).queue();
+        processAutoComplete(entities);
+
+        if (!event.isAcknowledged()) {
+            event.replyChoices(Collections.emptyList()).queue();
+        }
     }
+
+    public void processAutoComplete(@NotNull EventEntities<CommandAutoCompleteInteractionEvent> entities) { }
 }

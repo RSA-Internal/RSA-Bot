@@ -1,4 +1,4 @@
-package org.rsa.command.commands;
+package org.rsa.command.v2.compile;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -9,42 +9,47 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.command.CommandObject;
+import org.rsa.command.v2.CommandObjectV2;
+import org.rsa.command.v2.EventEntities;
 import org.rsa.wandbox.WandboxAPI;
 import org.rsa.wandbox.entities.CompileParameter;
 import org.rsa.wandbox.entities.CompileResult;
 import org.rsa.wandbox.entities.CompilerInfo;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CompileCommand extends CommandObject {
+public class CompileCommandV2 extends CommandObjectV2 {
 
     List<CompilerInfo> compilers = WandboxAPI.getList();
     Set<String> languageList = compilers.stream().map(CompilerInfo::getLanguage).collect(Collectors.toSet());
     Map<String, Set<String>> languageVersions = compilers.stream()
-            .collect(Collectors.groupingBy(
-                    CompilerInfo::getLanguage,
-                    Collectors.mapping(
-                            CompilerInfo::getVersion, Collectors.toSet()
-                    )
-            ));
+        .collect(Collectors.groupingBy(
+            CompilerInfo::getLanguage,
+            Collectors.mapping(
+                CompilerInfo::getVersion, Collectors.toSet()
+            )
+        ));
 
-    public CompileCommand() {
+    public CompileCommandV2() {
         super("compile", "Compiles code.");
         addOptionData(new OptionData(OptionType.STRING, "language",
-                "The language to compile your code in.", true, true));
+            "The language to compile your code in.", true, true));
         addOptionData(new OptionData(OptionType.STRING, "version",
-                "The version of the language to use.", true, true));
+            "The version of the language to use.", true, true));
         addOptionData(new OptionData(OptionType.STRING, "code",
-                "The code to compile.", true));
+            "The code to compile.", true));
         addOptionData(new OptionData(OptionType.BOOLEAN, "display",
-                "Display the result to the channel.", false));
-        setIsAutocomplete();
+            "Display the result to the channel.", false));
+        setAutocomplete(true);
     }
 
     @Override
-    public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
+    public void processAutoComplete(@NotNull EventEntities<CommandAutoCompleteInteractionEvent> entities) {
+        CommandAutoCompleteInteractionEvent event = entities.getEvent();
         AutoCompleteQuery focusedOption = event.getFocusedOption();
         Set<String> setToFilter = Collections.emptySet();
 
@@ -65,14 +70,16 @@ public class CompileCommand extends CommandObject {
     private @NotNull List<Command.Choice> getFilteredOptions(String query,
                                                              Set<String> setToFilter) {
         return setToFilter.stream()
-                .filter(e -> e.startsWith(query))
-                .map(e -> new Command.Choice(e, e))
-                .limit(25)
-                .toList();
+            .filter(e -> e.startsWith(query))
+            .map(e -> new Command.Choice(e, e))
+            .limit(25)
+            .toList();
     }
 
     @Override
-    public void handleSlashCommand(@NotNull SlashCommandInteractionEvent event) {
+    public void processSlashCommand(@NotNull EventEntities<SlashCommandInteractionEvent> entities) {
+        SlashCommandInteractionEvent event = entities.getEvent();
+
         String language = event.getOption("language", "Lua", OptionMapping::getAsString);
         String version = event.getOption("version", "5.4.3", OptionMapping::getAsString);
         String code = event.getOption("code", OptionMapping::getAsString);
@@ -83,9 +90,9 @@ public class CompileCommand extends CommandObject {
         }
 
         List<CompilerInfo> matchingCompilers = compilers.stream()
-                .filter(compiler -> compiler.getLanguage().equals(language))
-                .filter(compiler -> compiler.getVersion().equals(version))
-                .toList();
+            .filter(compiler -> compiler.getLanguage().equals(language))
+            .filter(compiler -> compiler.getVersion().equals(version))
+            .toList();
         if (matchingCompilers.isEmpty()) {
             event
                 .reply("No valid compilers matching Language: `" + language + "` and Version: `" + version + "`.")
