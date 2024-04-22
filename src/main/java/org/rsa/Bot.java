@@ -15,13 +15,15 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
 import org.rsa.aws.SecretsManager;
-import org.rsa.command.*;
+import org.rsa.command.Commands;
+import org.rsa.command.ContextItems;
+import org.rsa.command.MessageContextObject;
+import org.rsa.command.UserContextObject;
 import org.rsa.command.v2.CommandObjectV2;
 import org.rsa.listeners.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.rsa.aws.SecretsManager.getValue;
 
@@ -110,11 +112,6 @@ public class Bot {
         // TODO: Determine how to properly update commands rather than resubmitting the entire payload each time.
         CommandListUpdateAction commands = guild.updateCommands();
 
-        List<CommandObject> commandObjectList = Commands.getCommands();
-        List<SlashCommandData> slashCommandData = commandObjectList.stream()
-                .map(CommandObject::slashCommandImplementation)
-                .collect(Collectors.toList());
-
         List<CommandObjectV2> commandObjectV2s = Commands.getCommandsV2();
         List<SlashCommandData> slashCommandDataV2 = commandObjectV2s.stream()
             .map(CommandObjectV2::getSlashCommandImplementation)
@@ -127,7 +124,6 @@ public class Bot {
                         .values().stream().map(UserContextObject::getCommandData)
                         .toList();
 
-        commands.addCommands(slashCommandData).queue();
         commands.addCommands(slashCommandDataV2).queue();
         commands.addCommands(messageContextCommandData).queue();
         commands.addCommands(userContextCommandData).queue();

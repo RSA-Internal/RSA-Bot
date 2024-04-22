@@ -3,7 +3,6 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.command.CommandObject;
 import org.rsa.command.Commands;
 import org.rsa.command.v2.CommandObjectV2;
 
@@ -14,12 +13,6 @@ public class AutoCompleteListener extends ListenerAdapter {
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
         super.onCommandAutoCompleteInteraction(event);
         if (event.getGuild() == null) {
-            return;
-        }
-
-        CommandObject command = Commands.getCommand(event.getName());
-        if (Objects.nonNull(command) && command.isAutocomplete()) {
-            command.onCommandAutoCompleteInteraction(event);
             return;
         }
 
