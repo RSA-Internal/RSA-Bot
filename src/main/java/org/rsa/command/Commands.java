@@ -1,6 +1,5 @@
 package org.rsa.command;
 
-import org.rsa.command.commands.*;
 import org.rsa.command.v2.CommandObjectV2;
 import org.rsa.command.v2.backup.BackupCommand;
 import org.rsa.command.v2.compile.CompileCommandV2;
@@ -17,9 +16,6 @@ public class Commands {
 
     static {
         System.out.println("Loading commands.");
-
-        addCommandObject(new CheckInCommand());
-        addCommandObject(new CheckOutCommand());
 
         addCommandObjectV2(new BackupCommand());
         addCommandObjectV2(new ConfigureCommandV2());
