@@ -89,12 +89,13 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        EventEntities<SlashCommandInteractionEvent> entities = null;
+        EventEntities<SlashCommandInteractionEvent> entities;
         try {
             entities = new EventEntities<>(event);
         } catch (ValidationException e) {
             commandLogger.warn(e.toEventResponse());
             event.reply("Something went wrong processing your event.").setEphemeral(true).queue();
+            return;
         }
 
         String subcommandName = event.getSubcommandName();
@@ -126,12 +127,13 @@ public abstract class CommandObjectV2 extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(@NotNull CommandAutoCompleteInteractionEvent event) {
-        EventEntities<CommandAutoCompleteInteractionEvent> entities = null;
+        EventEntities<CommandAutoCompleteInteractionEvent> entities;
         try {
             entities = new EventEntities<>(event);
         } catch (ValidationException e) {
             commandLogger.warn(e.toEventResponse());
             event.replyChoices(Collections.emptyList()).queue();
+            return;
         }
 
         String subcommandName = event.getSubcommandName();

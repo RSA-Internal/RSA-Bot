@@ -33,5 +33,9 @@ public class SlashCommandListener extends ListenerAdapter {
         if (Objects.nonNull(commandObjectV2)) {
             commandObjectV2.onSlashCommandInteraction(event);
         }
+
+        if (!event.isAcknowledged()) {
+            event.reply("Failed to acknowledge event, please let the bot author know.").setEphemeral(true).queue();
+        }
     }
 }
