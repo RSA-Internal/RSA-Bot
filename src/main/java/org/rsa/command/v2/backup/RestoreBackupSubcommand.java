@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.rsa.command.v2.EventEntities;
-import org.rsa.command.v2.SubcommandObjectV2;
+import org.panda.jda.command.EventEntities;
+import org.panda.jda.command.SubcommandObjectV2;
 
 import static org.rsa.command.v2.backup.BackupConstants.SUPPORTED_CATEGORIES;
 

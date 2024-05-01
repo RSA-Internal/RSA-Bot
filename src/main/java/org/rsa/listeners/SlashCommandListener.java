@@ -3,8 +3,8 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.panda.jda.command.CommandObjectV2;
 import org.rsa.command.Commands;
-import org.rsa.command.v2.CommandObjectV2;
 
 import java.util.Objects;
 

@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.rsa.command.v2.EventEntities;
-import org.rsa.command.v2.SubcommandObjectV2;
+import org.panda.jda.command.EventEntities;
+import org.panda.jda.command.SubcommandObjectV2;
 import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.models.GuildConfiguration;

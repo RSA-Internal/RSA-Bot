@@ -1,6 +1,6 @@
 package org.rsa.command;
 
-import org.rsa.command.v2.CommandObjectV2;
+import org.panda.jda.command.CommandObjectV2;
 import org.rsa.command.v2.backup.BackupCommand;
 import org.rsa.command.v2.compile.CompileCommandV2;
 import org.rsa.command.v2.configure.ConfigureCommandV2;
