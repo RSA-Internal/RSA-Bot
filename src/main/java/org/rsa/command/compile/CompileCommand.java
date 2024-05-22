@@ -1,4 +1,4 @@
-package org.rsa.command.v2.compile;
+package org.rsa.command.compile;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -22,7 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CompileCommandV2 extends CommandObjectV2 {
+import static net.dv8tion.jda.api.interactions.commands.build.CommandData.MAX_OPTIONS;
+
+public class CompileCommand extends CommandObjectV2 {
 
     List<CompilerInfo> compilers = WandboxAPI.getList();
     Set<String> languageList = compilers.stream().map(CompilerInfo::getLanguage).collect(Collectors.toSet());
@@ -34,7 +36,7 @@ public class CompileCommandV2 extends CommandObjectV2 {
             )
         ));
 
-    public CompileCommandV2() {
+    public CompileCommand() {
         super("compile", "Compiles code.");
         addOptionData(new OptionData(OptionType.STRING, "language",
             "The language to compile your code in.", true, true));
@@ -72,7 +74,7 @@ public class CompileCommandV2 extends CommandObjectV2 {
         return setToFilter.stream()
             .filter(e -> e.startsWith(query))
             .map(e -> new Command.Choice(e, e))
-            .limit(25)
+            .limit(MAX_OPTIONS)
             .toList();
     }
 

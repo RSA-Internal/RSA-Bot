@@ -1,37 +1,37 @@
 package org.rsa.command;
 
 import org.panda.jda.command.CommandObjectV2;
-import org.rsa.command.v2.backup.BackupCommand;
-import org.rsa.command.v2.compile.CompileCommandV2;
-import org.rsa.command.v2.configure.ConfigureCommandV2;
-import org.rsa.command.v2.reputation.ReputationCommandV2;
+import org.rsa.command.backup.BackupCommand;
+import org.rsa.command.compile.CompileCommand;
+import org.rsa.command.configure.ConfigureCommand;
+import org.rsa.command.reputation.ReputationCommand;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class Commands {
-    private static final HashMap<String, CommandObjectV2> v2Commands = new HashMap<>();
+    private static final HashMap<String, CommandObjectV2> commands = new HashMap<>();
 
     static {
         System.out.println("Loading commands.");
 
-        addCommandObjectV2(new BackupCommand());
-        addCommandObjectV2(new ConfigureCommandV2());
-        addCommandObjectV2(new ReputationCommandV2());
-        addCommandObjectV2(new CompileCommandV2());
+        addCommandObject(new BackupCommand());
+        addCommandObject(new ConfigureCommand());
+        addCommandObject(new ReputationCommand());
+        addCommandObject(new CompileCommand());
     }
 
-    private static void addCommandObjectV2(CommandObjectV2 commandObjectV2) {
+    private static void addCommandObject(CommandObjectV2 commandObjectV2) {
         System.out.println("Loading " + commandObjectV2.getName());
-        v2Commands.put(commandObjectV2.getName(), commandObjectV2);
+        commands.put(commandObjectV2.getName(), commandObjectV2);
     }
 
-    public static List<CommandObjectV2> getCommandsV2() {
-        return new ArrayList<>(v2Commands.values());
+    public static List<CommandObjectV2> getCommands() {
+        return new ArrayList<>(commands.values());
     }
 
-    public static CommandObjectV2 getCommandV2(String name) {
-        return v2Commands.get(name);
+    public static CommandObjectV2 getCommand(String name) {
+        return commands.get(name);
     }
 }

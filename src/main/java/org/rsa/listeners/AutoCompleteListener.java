@@ -16,7 +16,7 @@ public class AutoCompleteListener extends ListenerAdapter {
             return;
         }
 
-        CommandObjectV2 commandObjectV2 = Commands.getCommandV2(event.getName());
+        CommandObjectV2 commandObjectV2 = Commands.getCommand(event.getName());
         if (Objects.nonNull(commandObjectV2) && commandObjectV2.isAutocomplete()) {
             commandObjectV2.onCommandAutoCompleteInteraction(event);
         }

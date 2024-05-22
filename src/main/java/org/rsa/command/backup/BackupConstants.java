@@ -1,4 +1,4 @@
-package org.rsa.command.v2.backup;
+package org.rsa.command.backup;
 
 import java.util.ArrayList;
 import java.util.List;

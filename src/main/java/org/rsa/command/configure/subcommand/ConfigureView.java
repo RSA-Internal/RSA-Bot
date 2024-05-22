@@ -1,4 +1,4 @@
-package org.rsa.command.v2.configure.subcommand;
+package org.rsa.command.configure.subcommand;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

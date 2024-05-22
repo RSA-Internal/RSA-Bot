@@ -112,7 +112,7 @@ public class Bot {
         // TODO: Determine how to properly update commands rather than resubmitting the entire payload each time.
         CommandListUpdateAction commands = guild.updateCommands();
 
-        List<CommandObjectV2> commandObjectV2s = Commands.getCommandsV2();
+        List<CommandObjectV2> commandObjectV2s = Commands.getCommands();
         List<SlashCommandData> slashCommandDataV2 = commandObjectV2s.stream()
             .map(CommandObjectV2::getSlashCommandImplementation)
             .toList();

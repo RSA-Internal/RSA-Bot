@@ -1,4 +1,4 @@
-package org.rsa.command.v2.backup;
+package org.rsa.command.backup.subcommand;
 
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.panda.jda.command.EventEntities;
 import org.panda.jda.command.SubcommandObjectV2;
 
-import static org.rsa.command.v2.backup.BackupConstants.SUPPORTED_CATEGORIES;
+import static org.rsa.command.backup.BackupConstants.SUPPORTED_CATEGORIES;
 
 public class RestoreBackupSubcommand extends SubcommandObjectV2 {
 
@@ -21,6 +21,12 @@ public class RestoreBackupSubcommand extends SubcommandObjectV2 {
 
     @Override
     public void processAutoCompleteInteraction(EventEntities<CommandAutoCompleteInteractionEvent> entities) {
-        entities.getEvent().replyChoices(SUPPORTED_CATEGORIES.stream().map(category -> new Command.Choice(category, category)).toList()).queue();
+        entities
+            .getEvent()
+            .replyChoices(
+                SUPPORTED_CATEGORIES.stream()
+                    .map(category -> new Command.Choice(category, category))
+                    .toList())
+            .queue();
     }
 }
