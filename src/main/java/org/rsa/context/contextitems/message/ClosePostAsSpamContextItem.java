@@ -1,4 +1,4 @@
-package org.rsa.command.contextitems.message;
+package org.rsa.context.contextitems.message;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
-import org.rsa.command.MessageContextObject;
+import org.rsa.context.MessageContextObject;
 import org.rsa.logic.constants.GuildConfigurationConstant;
 import org.rsa.logic.data.managers.GuildConfigurationManager;
 import org.rsa.logic.data.managers.ReputationManager;

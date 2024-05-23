@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionE
 import net.dv8tion.jda.api.events.interaction.command.UserContextInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.command.ContextItems;
+import org.rsa.context.ContextItems;
 import org.rsa.exception.ValidationException;
 
 public class ContextInteractionListeners extends ListenerAdapter {

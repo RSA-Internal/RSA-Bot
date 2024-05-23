@@ -1,8 +1,8 @@
-package org.rsa.command;
+package org.rsa.context;
 
 import lombok.Getter;
-import org.rsa.command.contextitems.message.AcceptAnswerContextItem;
-import org.rsa.command.contextitems.message.ClosePostAsSpamContextItem;
+import org.rsa.context.contextitems.message.AcceptAnswerContextItem;
+import org.rsa.context.contextitems.message.ClosePostAsSpamContextItem;
 
 import java.util.HashMap;
 

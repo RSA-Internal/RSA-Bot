@@ -3,8 +3,10 @@ package org.rsa.listeners;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.panda.jda.command.CommandObjectV2;
 import org.rsa.command.Commands;
-import org.rsa.exception.ValidationException;
+
+import java.util.Objects;
 
 public class SlashCommandListener extends ListenerAdapter {
 
@@ -15,10 +17,13 @@ public class SlashCommandListener extends ListenerAdapter {
             return;
         }
 
-        try {
-            Commands.getCommand(event.getName()).handleSlashCommand(event);
-        } catch (ValidationException e) {
-            event.reply(e.toEventResponse()).setEphemeral(true).queue();
+        CommandObjectV2 commandObjectV2 = Commands.getCommand(event.getName());
+        if (Objects.nonNull(commandObjectV2)) {
+            commandObjectV2.onSlashCommandInteraction(event);
+        }
+
+        if (!event.isAcknowledged()) {
+            event.reply("Failed to acknowledge event, please let the bot author know.").setEphemeral(true).queue();
         }
     }
 }

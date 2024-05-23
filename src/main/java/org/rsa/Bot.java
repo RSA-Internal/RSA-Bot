@@ -14,20 +14,22 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.NotNull;
+import org.panda.jda.command.CommandObjectV2;
 import org.rsa.aws.SecretsManager;
-import org.rsa.command.*;
+import org.rsa.command.Commands;
+import org.rsa.context.ContextItems;
+import org.rsa.context.MessageContextObject;
+import org.rsa.context.UserContextObject;
 import org.rsa.listeners.*;
-import org.rsa.util.BackupUtil;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
-    private static final String VERSION = "v1.3.1";
+    private static final String VERSION = "v1.3.4";
     private static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
@@ -35,12 +37,15 @@ public class Bot {
 
         configureMemoryUsage(builder);
         builder.addEventListeners(
-                new AutoCompleteListener(),
-                new SlashCommandListener(),
-                new ReactionAddedListener(),
-                new ReactionRemovedListener(),
-                new MessageListener(),
-                new ContextInteractionListeners()
+            new AutoCompleteListener(),
+            new SlashCommandListener(),
+            new ReactionAddedListener(),
+            new ReactionRemovedListener(),
+            new MessageListener(),
+            new ContextInteractionListeners(),
+            new EmojiUploadedListener(),
+            new StickUploadedListener(),
+            new GuildIconListener()
         );
         builder.addEventListeners(new ListenerAdapter() {
             @Override
@@ -59,9 +64,6 @@ public class Bot {
                 System.err.println("Failed to fetch guild");
             } else {
                 setupGuild(guild);
-                if (guild.getId().equals("165202235226062848")) {
-                    BackupUtil.backupGuild(guild);
-                }
             }
         });
     }
@@ -107,12 +109,14 @@ public class Bot {
 
     private static void setupGuild(Guild guild) {
         System.out.println("Setting up commands for: " + guild.getId());
+        // TODO: Determine how to properly update commands rather than resubmitting the entire payload each time.
         CommandListUpdateAction commands = guild.updateCommands();
 
-        List<CommandObject> commandObjectList = Commands.getCommands();
-        List<SlashCommandData> slashCommandData = commandObjectList.stream()
-                .map(CommandObject::slashCommandImplementation)
-                .collect(Collectors.toList());
+        List<CommandObjectV2> commandObjectV2s = Commands.getCommands();
+        List<SlashCommandData> slashCommandDataV2 = commandObjectV2s.stream()
+            .map(CommandObjectV2::getSlashCommandImplementation)
+            .toList();
+
         List<CommandData> messageContextCommandData = ContextItems.getLoadedMessageItems()
                         .values().stream().map(MessageContextObject::getCommandData)
                         .toList();
@@ -120,7 +124,7 @@ public class Bot {
                         .values().stream().map(UserContextObject::getCommandData)
                         .toList();
 
-        commands.addCommands(slashCommandData).queue();
+        commands.addCommands(slashCommandDataV2).queue();
         commands.addCommands(messageContextCommandData).queue();
         commands.addCommands(userContextCommandData).queue();
     }
