@@ -1,5 +1,6 @@
 package org.rsa.util;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.entities.sticker.Sticker;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
+@Slf4j
 public class BackupUtil {
 
     public static final String DATE_FORMAT_NOW = "yyyy-MM-dd-HH_mm_ss";
@@ -37,7 +39,7 @@ public class BackupUtil {
             S3Accessor.createResource(s3Client, guild.getId() + "-emojis", fileName, f.getPath());
             cleanupResource(f.getPath());
         } catch (ExecutionException | InterruptedException e) {
-            System.out.println("Failed to download emoji: " + emoji.getName());
+            log.warn("Failed to download emoji: " + emoji.getName());
         }
     }
 
@@ -53,7 +55,7 @@ public class BackupUtil {
             S3Accessor.createResource(s3Client, guild.getId() + "-stickers", fileName, f.getPath());
             cleanupResource(fileName);
         } catch (ExecutionException | InterruptedException e) {
-            System.out.println("Failed to download emoji: " + sticker.getName());
+            log.warn("Failed to download emoji: " + sticker.getName());
         }
     }
 
@@ -71,7 +73,7 @@ public class BackupUtil {
                 cleanupResource(fileName);
             }
         } catch (ExecutionException | InterruptedException e) {
-            System.out.println("Failed to download guild icon");
+            log.warn("Failed to download guild icon");
         }
     }
 
@@ -80,12 +82,12 @@ public class BackupUtil {
         if (f.exists()) {
             boolean deleted = f.delete();
             if (deleted) {
-                System.out.println("Successfully deleted: " + filePath);
+                log.info("Successfully deleted: " + filePath);
             } else {
-                System.out.println("Failed to delete: " + filePath);
+                log.warn("Failed to delete: " + filePath);
             }
         } else {
-            System.out.println("No resource to delete: " + filePath);
+            log.info("No resource to delete: " + filePath);
         }
     }
 }

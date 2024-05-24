@@ -3,6 +3,7 @@ package org.rsa.wandbox;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.rsa.wandbox.entities.CompileParameter;
 import org.rsa.wandbox.entities.CompileResult;
 import org.rsa.wandbox.entities.CompilerInfo;
@@ -17,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
+@Slf4j
 public class WandboxAPI {
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -34,7 +36,7 @@ public class WandboxAPI {
             if ("POST".equals(method)) {
                 con.setDoOutput(true);
                 if (null == body) {
-                    System.out.println("Method was POST but no body was provided.");
+                    log.warn("Method was POST but no body was provided.");
                 } else {
                     try(OutputStream os = con.getOutputStream()) {
                         byte[] input = body.getBytes(StandardCharsets.UTF_8);
@@ -56,7 +58,7 @@ public class WandboxAPI {
 
             return response.toString();
         } catch (IOException e) {
-            System.err.println("Failed to process httpRequest: {URL: " + targetURL + ", Method: " + method + "}.\n" + e.getMessage());
+            log.error("Failed to process httpRequest: {URL: " + targetURL + ", Method: " + method + "}.\n" + e.getMessage());
             return "";
         }
     }
@@ -66,7 +68,7 @@ public class WandboxAPI {
             String jsonResult = httpRequest("/api/list.json", "GET", null);
             return mapper.readValue(jsonResult, COMPILER_INFO_LIST_TYPE);
         } catch (JsonProcessingException e) {
-            System.err.println("Failed to get compiler list. " + e.getMessage());
+            log.error("Failed to get compiler list. " + e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -76,7 +78,7 @@ public class WandboxAPI {
             String jsonResult = httpRequest("/api/compile.json", "POST", compileParameter.toJson());
             return mapper.readValue(jsonResult, CompileResult.class);
         } catch (JsonProcessingException e) {
-            System.err.println("Failed to compile code. " + e.getMessage());
+            log.error("Failed to compile code. " + e.getMessage());
             CompileResult result = new CompileResult();
             result.setStatus("0");
             result.setCompiler_error(e.getMessage());

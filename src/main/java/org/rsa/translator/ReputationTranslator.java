@@ -1,5 +1,6 @@
 package org.rsa.translator;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -7,10 +8,11 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.rsa.beans.UserReputation;
 import org.rsa.util.HelperUtil;
 
+@Slf4j
 public class ReputationTranslator {
 
     public static MessageEmbed getReputationAsEmbed(Guild guild, UserReputation reputation, Member requester, Member reputationHolder) {
-        System.out.println("User avatar url: " + reputationHolder.getEffectiveAvatarUrl());
+        log.info("User avatar url: " + reputationHolder.getEffectiveAvatarUrl());
 
         return new EmbedBuilder()
             .setAuthor(requester.getEffectiveName())

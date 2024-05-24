@@ -1,5 +1,6 @@
 package org.rsa;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -24,25 +25,18 @@ import org.rsa.listeners.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static org.rsa.aws.SecretsManager.getValue;
 
+@Slf4j
 public class Bot {
 
     private static final String VERSION = "v1.3.4";
-    public static boolean isDev = false;
+    public static boolean isDev = true;
 
     public static void main(String[] args) throws InterruptedException {
-        String isProdFlag = System.getenv("isProd");
-        if (Objects.nonNull(isProdFlag)) {
-            isDev = Boolean.parseBoolean(isProdFlag);
-        }
+        JDABuilder builder = initJDA();
 
-
-        JDABuilder builder = JDABuilder.createDefault(getBotToken());
-
-        configureMemoryUsage(builder);
         builder.addEventListeners(
             new AutoCompleteListener(),
             new SlashCommandListener(),
@@ -68,11 +62,18 @@ public class Bot {
 
         jda.getGuilds().forEach(guild -> {
             if (guild == null) {
-                System.err.println("Failed to fetch guild");
+                log.warn("Failed to fetch guild");
             } else {
                 setupGuild(guild);
             }
         });
+    }
+
+    private static JDABuilder initJDA() {
+        JDABuilder builder = JDABuilder.createDefault(getBotToken());
+        configureMemoryUsage(builder);
+        log.info("isProd environment: {}", !isDev);
+        return builder;
     }
 
     private static String getBotToken() {
@@ -115,7 +116,7 @@ public class Bot {
     }
 
     private static void setupGuild(Guild guild) {
-        System.out.println("Setting up commands for: " + guild.getId());
+        log.info("Setting up commands for: " + guild.getId());
         // TODO: Determine how to properly update commands rather than resubmitting the entire payload each time.
         CommandListUpdateAction commands = guild.updateCommands();
 

@@ -1,5 +1,6 @@
 package org.rsa.command.configure.subcommand;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,6 +15,7 @@ import org.rsa.managers.GuildConfigurationManager;
 import org.rsa.translator.ConfigurationTranslator;
 import org.rsa.util.GuildConfigurationConstant;
 
+@Slf4j
 public class ConfigureView extends SubcommandObjectV2 {
     public ConfigureView() {
         super("view", "View configure for the current guild.");
@@ -38,7 +40,7 @@ public class ConfigureView extends SubcommandObjectV2 {
         MessageEmbed response = ConfigurationTranslator.getConfigurationAsEmbed(guild, configuration, requester);
         if (list != null) {
             list = list.replaceAll("_", " ");
-            System.out.println("Rendering configuration for list: " + list);
+            log.info("Rendering configuration for list: " + list);
             response = ConfigurationTranslator.getConfigurationListAsEmbed(guild, configuration, requester, list);
         }
 
