@@ -9,10 +9,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.panda.jda.command.EventEntities;
 import org.panda.jda.command.SubcommandObjectV2;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.beans.GuildConfiguration;
+import org.rsa.managers.GuildConfigurationManager;
 import org.rsa.translator.ConfigurationTranslator;
+import org.rsa.util.GuildConfigurationConstant;
 
 public class ConfigureView extends SubcommandObjectV2 {
     public ConfigureView() {

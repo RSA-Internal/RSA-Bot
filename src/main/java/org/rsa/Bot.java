@@ -24,15 +24,22 @@ import org.rsa.listeners.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.rsa.aws.SecretsManager.getValue;
 
 public class Bot {
 
     private static final String VERSION = "v1.3.4";
-    private static boolean isDev = false;
+    public static boolean isDev = false;
 
     public static void main(String[] args) throws InterruptedException {
+        String isProdFlag = System.getenv("isProd");
+        if (Objects.nonNull(isProdFlag)) {
+            isDev = Boolean.parseBoolean(isProdFlag);
+        }
+
+
         JDABuilder builder = JDABuilder.createDefault(getBotToken());
 
         configureMemoryUsage(builder);
