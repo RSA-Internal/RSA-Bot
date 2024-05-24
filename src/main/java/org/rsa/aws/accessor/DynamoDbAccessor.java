@@ -2,7 +2,6 @@ package org.rsa.aws.accessor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rsa.Bot;
-import org.rsa.aws.client.DynamoClient;
 import software.amazon.awssdk.core.internal.waiters.ResponseOrException;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -11,10 +10,11 @@ import software.amazon.awssdk.services.dynamodb.model.ResourceInUseException;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 
+import static org.rsa.aws.factory.DependencyFactory.dynamoDbEnhancedClient;
+import static org.rsa.aws.factory.DependencyFactory.dynamoDbWaiter;
+
 @Slf4j
 public class DynamoDbAccessor {
-
-    private static final DynamoClient dynamoClient = DynamoClient.getInstance();
 
     private static String validateTableName(String tableName) {
         log.info("Validating table name: " + tableName);
@@ -32,7 +32,7 @@ public class DynamoDbAccessor {
     public static <T> void createTable(String tableName, TableSchema<T> schema) {
         tableName = validateTableName(tableName);
         log.info("Creating table: " + tableName);
-        DynamoDbTable<T> tableInstance = dynamoClient.getDynamoDbEnhancedClient().table(tableName, schema);
+        DynamoDbTable<T> tableInstance = dynamoDbEnhancedClient().table(tableName, schema);
         try {
             tableInstance.createTable(builder -> builder
                 .provisionedThroughput(b -> b
@@ -49,14 +49,14 @@ public class DynamoDbAccessor {
     public static <T> DynamoDbTable<T> getTable(String tableName, TableSchema<T> schema) {
         tableName = validateTableName(tableName);
         log.info("Retrieving table: " + tableName);
-        DynamoDbTable<T> tableInstance = dynamoClient.getDynamoDbEnhancedClient().table(tableName, schema);
+        DynamoDbTable<T> tableInstance = dynamoDbEnhancedClient().table(tableName, schema);
         try {
             tableInstance.describeTable();
             return tableInstance;
         } catch (ResourceNotFoundException r) {
             // table does not exist.
             createTable(tableName, schema);
-            try (DynamoDbWaiter waiter = DynamoDbWaiter.builder().client(dynamoClient.getDynamoDbClient()).build()) {
+            try (DynamoDbWaiter waiter = dynamoDbWaiter()) {
                 ResponseOrException<DescribeTableResponse> response = waiter
                     .waitUntilTableExists(builder -> builder.tableName("Customer").build())
                     .matched();
@@ -65,7 +65,7 @@ public class DynamoDbAccessor {
                 // The actual error can be inspected in response.exception()
                 //logger.info("Customer table was created.");
                 log.info("GetTable created new table: " + tableName);
-                return dynamoClient.getDynamoDbEnhancedClient().table(tableName, schema);
+                return dynamoDbEnhancedClient().table(tableName, schema);
             } catch (Exception e) {
                 log.info("GetTable could not find or create a table: " + tableName);
             }
