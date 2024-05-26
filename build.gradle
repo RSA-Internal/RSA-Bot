@@ -26,7 +26,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.jsoup:jsoup:1.17.1'
-    implementation 'com.google.guava:guava:33.0.0-jre'
+    implementation 'com.google.guava:guava:33.2.0-jre'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
 
     implementation platform('software.amazon.awssdk:bom:2.20.135')
@@ -36,7 +36,7 @@ dependencies {
     implementation 'software.amazon.awssdk:dynamodb-enhanced'
     implementation 'software.amazon.awssdk:secretsmanager'
 
-    implementation 'net.dv8tion:JDA:5.0.0-beta.22'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.23'
     implementation 'ch.qos.logback:logback-classic:1.4.14'
 
     implementation 'com.github.TinyPandas:PandaWrapperJDA:e966220963'
