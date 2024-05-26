@@ -11,12 +11,12 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
-public class WandboxAPI {
+public class WandboxApi {
     private static final Type COMPILER_INFO_LIST_TYPE = new TypeToken<List<CompilerInfoModel>>() {}.getType();
     private final String BASE_URL;
     private final HttpClient httpClient;
 
-    public WandboxAPI(HttpClient httpClient, String baseUrl) {
+    public WandboxApi(HttpClient httpClient, String baseUrl) {
         this.httpClient = httpClient;
         this.BASE_URL = baseUrl;
     }

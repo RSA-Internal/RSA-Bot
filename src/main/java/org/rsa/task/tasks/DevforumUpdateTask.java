@@ -4,11 +4,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.net.apis.APIFactory;
-import org.rsa.net.apis.discourse.DiscourseAPI;
+import org.rsa.net.apis.ApiFactory;
+import org.rsa.net.apis.discourse.DiscourseApi;
 import org.rsa.net.apis.discourse.domain.Category;
 import org.rsa.net.apis.discourse.domain.Topic;
-import org.rsa.net.apis.roblox.RobloxAPI;
+import org.rsa.net.apis.roblox.RobloxApi;
 import org.rsa.net.apis.roblox.models.users.MultiGetUserByNameModel;
 import org.rsa.task.TaskObject;
 
@@ -27,16 +27,16 @@ public class DevforumUpdateTask extends TaskObject {
     private static final String TRUNCATE_FORMAT_STRING = "\n\n[(Read more...)](%s)";
     private static String THUMBNAIL_URL = "https://devforum-uploads.s3.dualstack.us-east-2.amazonaws.com/uploads/original/5X/c/3/2/5/c325b8f46fd0b3c5b418b005b66c7af661539d44.png";
     private static final int MAX_DESCRIPTION_LENGTH_CHAR = 500;
-    private final DiscourseAPI discourseAPI;
-    private final RobloxAPI robloxAPI;
+    private final DiscourseApi discourseApi;
+    private final RobloxApi robloxApi;
 
     public DevforumUpdateTask(JDA jda, ScheduledExecutorService scheduler) {
         super(TASK_NAME, jda, scheduler);
-        discourseAPI = APIFactory.getDiscourseAPI();
-        robloxAPI = APIFactory.getRobloxAPI();
+        discourseApi = ApiFactory.getDiscourseApi();
+        robloxApi = ApiFactory.getRobloxApi();
 
         try {
-            THUMBNAIL_URL = discourseAPI.fetchSiteBasicInfo().logo_url(); // Try and grab the latest thumbnail from forum
+            THUMBNAIL_URL = discourseApi.fetchSiteBasicInfo().logo_url(); // Try and grab the latest thumbnail from forum
         } catch(IOException e) {
             System.err.println(e.getMessage());
         }
@@ -44,10 +44,10 @@ public class DevforumUpdateTask extends TaskObject {
 
     protected void execute() {
         try {
-            Map<String, Category> categories = discourseAPI.fetchAllCategoryInformation();
+            Map<String, Category> categories = discourseApi.fetchAllCategoryInformation();
             categories.forEach((categoryId, categoryDetails) -> {
                 try {
-                    Topic topicResponse = discourseAPI.fetchLatestPostInCategory(categoryId);
+                    Topic topicResponse = discourseApi.fetchLatestPostInCategory(categoryId);
                     MessageEmbed messageEmbed = createEmbed(topicResponse, categoryDetails);
                     jda.getTextChannelById("1187145914343764129").sendMessageEmbeds(messageEmbed).queue();
                 } catch(IOException e) {
@@ -64,7 +64,7 @@ public class DevforumUpdateTask extends TaskObject {
     }
 
     private MessageEmbed createEmbed(Topic topicDetails, Category postCategoryDetails) {
-        String baseUrl = discourseAPI.getBaseUrl();
+        String baseUrl = discourseApi.getBaseUrl();
         String topicUrl = baseUrl + "/t/" + topicDetails.id();
         String categoryUrl = baseUrl + "/c/" + postCategoryDetails.id();
         String description = trimDescription(topicDetails, topicUrl);
@@ -80,8 +80,8 @@ public class DevforumUpdateTask extends TaskObject {
 
         try {
             // Grab profile image URL from thumbnails endpoint by getting ID from username
-            MultiGetUserByNameModel.User user = robloxAPI.multiGetUserByName(List.of(topicDetails.author()), true).data().get(0);
-            String imgUrl = robloxAPI.getAvatarHeadshot(List.of(user.id()), "50x50", "Png", false).data().get(0).imageUrl();
+            MultiGetUserByNameModel.User user = robloxApi.multiGetUserByName(List.of(topicDetails.author()), true).data().get(0);
+            String imgUrl = robloxApi.getAvatarHeadshot(List.of(user.id()), "50x50", "Png", false).data().get(0).imageUrl();
             embedBuilder.setFooter(String.format(FOOTER_FORMAT, topicDetails.author()), imgUrl);
         } catch(IOException | IndexOutOfBoundsException e) {
             System.err.println(e.getMessage());

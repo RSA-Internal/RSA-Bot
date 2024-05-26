@@ -1,7 +1,6 @@
 package org.rsa.net.apis.discourse;
 
 import com.google.common.util.concurrent.RateLimiter;
-import lombok.Getter;
 import org.rsa.net.apis.discourse.domain.Category;
 import org.rsa.net.apis.discourse.domain.Topic;
 import org.rsa.net.apis.discourse.models.CategoryModel;
@@ -16,7 +15,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-public class DiscourseAPI {
+public class DiscourseApi {
     private final RateLimiter rateLimiter;
     private final HttpClient httpClient;
     private Map<String, Category> latestCategoryInformation;
@@ -28,7 +27,7 @@ public class DiscourseAPI {
     private final String TOPICS_URL_FORMAT;
     private final String SITE_BASIC_INFO_URL;
 
-    public DiscourseAPI(RateLimiter rateLimiter, HttpClient httpClient, TopicTransformer topicTransformer, CategoryTransformer categoryTransformer, String baseUrl) {
+    public DiscourseApi(RateLimiter rateLimiter, HttpClient httpClient, TopicTransformer topicTransformer, CategoryTransformer categoryTransformer, String baseUrl) {
         this.rateLimiter = rateLimiter;
         this.httpClient = httpClient;
         this.topicTransformer = topicTransformer;

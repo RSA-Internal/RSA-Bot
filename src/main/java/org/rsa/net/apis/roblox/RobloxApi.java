@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RobloxAPI {
+public class RobloxApi {
     private final RateLimiter rateLimiter;
     private final HttpClient httpClient;
     private static final String USERS_BASE_URL = "https://users.roblox.com";
     private static final String THUMBNAILS_BASE_URL = "https://thumbnails.roblox.com";
 
-    public RobloxAPI(RateLimiter rateLimiter, HttpClient httpClient) {
+    public RobloxApi(RateLimiter rateLimiter, HttpClient httpClient) {
         this.rateLimiter = rateLimiter;
         this.httpClient = httpClient;
     }

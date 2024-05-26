@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.panda.jda.command.CommandObjectV2;
 import org.panda.jda.command.EventEntities;
-import org.rsa.net.apis.APIFactory;
-import org.rsa.net.apis.wandbox.WandboxAPI;
+import org.rsa.net.apis.ApiFactory;
+import org.rsa.net.apis.wandbox.WandboxApi;
 import org.rsa.net.apis.wandbox.models.CompileParameterModel;
 import org.rsa.net.apis.wandbox.models.CompileResultModel;
 import org.rsa.net.apis.wandbox.models.CompilerInfoModel;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import static net.dv8tion.jda.api.interactions.commands.build.CommandData.MAX_OPTIONS;
 
 public class CompileCommand extends CommandObjectV2 {
-    private final WandboxAPI wandboxAPI;
+    private final WandboxApi wandboxApi;
     private final List<CompilerInfoModel> compilers;
     private final Set<String> languageList;
     private final Map<String, Set<String>> languageVersions;
@@ -43,8 +43,8 @@ public class CompileCommand extends CommandObjectV2 {
             "Display the result to the channel.", false));
         setAutocomplete(true);
 
-        wandboxAPI = APIFactory.getWandboxAPI();
-        compilers = wandboxAPI.getList();
+        wandboxApi = ApiFactory.getWandboxApi();
+        compilers = wandboxApi.getList();
         languageList = compilers.stream().map(CompilerInfoModel::language).collect(Collectors.toSet());
         languageVersions = compilers.stream()
                 .collect(Collectors.groupingBy(
@@ -113,7 +113,7 @@ public class CompileCommand extends CommandObjectV2 {
         CompilerInfoModel firstMatchingCompiler = matchingCompilers.get(0);
         CompileParameterModel compileParameter = new CompileParameterModel(code, null, firstMatchingCompiler.name(), null);
 
-        CompileResultModel result = wandboxAPI.compileJson(compileParameter);
+        CompileResultModel result = wandboxApi.compileJson(compileParameter);
         EmbedBuilder resultDisplay = new EmbedBuilder();
         resultDisplay.setTitle("Code Result");
         resultDisplay.setAuthor(event.getUser().getName());
