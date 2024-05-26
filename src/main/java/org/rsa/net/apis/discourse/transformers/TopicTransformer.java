@@ -11,7 +11,8 @@ import java.time.Instant;
 import java.time.temporal.Temporal;
 
 public class TopicTransformer {
-    public static Topic fromResponse(TopicModel response) {
+
+    public Topic fromResponse(TopicModel response) {
         String content = response.post_stream().posts().get(0).cooked();
         String parsed = parseHtml(content);
         Temporal timestamp = Instant.parse(response.created_at());
@@ -27,7 +28,7 @@ public class TopicTransformer {
         );
     }
 
-    private static String parseHtml(String html) {
+    private String parseHtml(String html) {
         Document document = Jsoup.parse(html);
         Elements paragraphs = document.select("p");
         StringBuilder sb = new StringBuilder();

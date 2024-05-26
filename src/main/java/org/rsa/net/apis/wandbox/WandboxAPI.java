@@ -13,21 +13,26 @@ import java.util.List;
 
 public class WandboxAPI {
     private static final Type COMPILER_INFO_LIST_TYPE = new TypeToken<List<CompilerInfoModel>>() {}.getType();
+    private final String BASE_URL;
+    private final HttpClient httpClient;
 
-    private static final String BASE_URL = "https://wandbox.org";
+    public WandboxAPI(HttpClient httpClient, String baseUrl) {
+        this.httpClient = httpClient;
+        this.BASE_URL = baseUrl;
+    }
 
-    public static List<CompilerInfoModel> getList() {
+    public List<CompilerInfoModel> getList() {
         try {
-            return HttpClient.get(BASE_URL + "/api/list.json", COMPILER_INFO_LIST_TYPE);
+            return httpClient.get(BASE_URL + "/api/list.json", COMPILER_INFO_LIST_TYPE);
         } catch (IOException e) {
             System.err.println("Failed to get compiler list. " + e.getMessage());
             return Collections.emptyList();
         }
     }
 
-    public static CompileResultModel compileJson(CompileParameterModel compileParameterModel) {
+    public CompileResultModel compileJson(CompileParameterModel compileParameterModel) {
         try {
-            return HttpClient.post(BASE_URL + "/api/compile.json", compileParameterModel, CompileResultModel.class);
+            return httpClient.post(BASE_URL + "/api/compile.json", compileParameterModel, CompileResultModel.class);
         } catch (IOException e) {
             System.err.println("Failed to compile code. " + e.getMessage());
             return new CompileResultModel("1", "", e.getMessage(), "", "", "", "");

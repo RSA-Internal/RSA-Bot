@@ -17,31 +17,47 @@ import java.util.Map;
 import java.util.Optional;
 
 public class DiscourseAPI {
-    private static final RateLimiter rateLimiter = RateLimiter.create(0.4); // 1 API hit every 3 seconds
-    private static final @Getter String BASE_URL = "https://devforum.roblox.com";
-    private static final String CATEGORIES_URL = BASE_URL + "/site.json";
-    private static final String CATEGORY_URL_FORMAT = BASE_URL + "/c/%s.json";
-    private static final String TOPICS_URL_FORMAT = BASE_URL + "/t/%s.json";
-    private static final String SITE_BASIC_INFO_URL = BASE_URL + "/site/basic-info.json";
-    private static Map<String, Category> latestCategoryInformation;
+    private final RateLimiter rateLimiter;
+    private final HttpClient httpClient;
+    private Map<String, Category> latestCategoryInformation;
+    private final TopicTransformer topicTransformer;
+    private final CategoryTransformer categoryTransformer;
+    private final String BASE_URL;
+    private final String CATEGORIES_URL;
+    private final String CATEGORY_URL_FORMAT;
+    private final String TOPICS_URL_FORMAT;
+    private final String SITE_BASIC_INFO_URL;
 
-    public static SiteBasicInfoModel fetchSiteBasicInfo() throws IOException {
-        rateLimiter.acquire();
-        return HttpClient.get(SITE_BASIC_INFO_URL, SiteBasicInfoModel.class);
+    public DiscourseAPI(RateLimiter rateLimiter, HttpClient httpClient, TopicTransformer topicTransformer, CategoryTransformer categoryTransformer, String baseUrl) {
+        this.rateLimiter = rateLimiter;
+        this.httpClient = httpClient;
+        this.topicTransformer = topicTransformer;
+        this.categoryTransformer = categoryTransformer;
+        this.BASE_URL = baseUrl;
+        this.CATEGORIES_URL = baseUrl + "/site.json";
+        this.CATEGORY_URL_FORMAT = baseUrl + "/c/%s.json";
+        this.TOPICS_URL_FORMAT = baseUrl + "/t/%s.json";
+        this.SITE_BASIC_INFO_URL = baseUrl + "/site/basic-info.json";
     }
 
-    public static Map<String, Category> fetchAllCategoryInformation() throws IOException {
+    public SiteBasicInfoModel fetchSiteBasicInfo() throws IOException {
         rateLimiter.acquire();
-        CategoryModel responseObj = HttpClient.get(CATEGORIES_URL, CategoryModel.class);
-        Map<String, Category> categoryDetails = CategoryTransformer.fromResponse(responseObj);
+        return httpClient.get(SITE_BASIC_INFO_URL, SiteBasicInfoModel.class);
+    }
+
+    public Map<String, Category> fetchAllCategoryInformation() throws IOException {
+        rateLimiter.acquire();
+        CategoryModel responseObj = httpClient.get(CATEGORIES_URL, CategoryModel.class);
+        Map<String, Category> categoryDetails = categoryTransformer.fromResponse(responseObj);
+        latestCategoryInformation = categoryDetails;
         return categoryDetails;
     }
 
-    public static Optional<String> fetchLatestNonPinnedTopicId(String categoryId) throws IOException {
+    public Optional<String> fetchLatestNonPinnedTopicId(String categoryId) throws IOException {
         String url = String.format(CATEGORY_URL_FORMAT, categoryId);
 
         rateLimiter.acquire();
-        CategoryTopicsModel responseObj = HttpClient.get(url, CategoryTopicsModel.class);
+        CategoryTopicsModel responseObj = httpClient.get(url, CategoryTopicsModel.class);
         // Grabs the first non-pinned item in the list, if it exists
         return responseObj.topic_list().topics().stream()
                 .filter(topic -> !topic.pinned())
@@ -49,21 +65,25 @@ public class DiscourseAPI {
                 .map(CategoryTopicsModel.TopicList.Topic::id);
     }
 
-    public static Topic fetchLatestPostInCategory(String categoryId) throws IOException, IllegalArgumentException {
+    public Topic fetchLatestPostInCategory(String categoryId) throws IOException, IllegalArgumentException {
         Optional<String> topicIdOptional = fetchLatestNonPinnedTopicId(categoryId);
         String topicId = topicIdOptional.orElseThrow(() -> new IllegalArgumentException("No non-pinned topic found for category ID: " + categoryId));
         String url = String.format(TOPICS_URL_FORMAT, topicId);
 
         rateLimiter.acquire();
-        TopicModel topicModel = HttpClient.get(url, TopicModel.class);
-        return TopicTransformer.fromResponse(topicModel);
+        TopicModel topicModel = httpClient.get(url, TopicModel.class);
+        return topicTransformer.fromResponse(topicModel);
     }
 
-    public static Map<String, Category> getLatestCategoryInformation() throws IOException {
+    public Map<String, Category> getLatestCategoryInformation() throws IOException {
         if (latestCategoryInformation != null) {
             return latestCategoryInformation;
         } else {
             return fetchAllCategoryInformation();
         }
+    }
+
+    public String getBaseUrl() {
+        return BASE_URL;
     }
 }

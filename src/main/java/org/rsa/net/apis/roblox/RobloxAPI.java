@@ -11,37 +11,35 @@ import java.util.List;
 import java.util.Map;
 
 public class RobloxAPI {
-    private static final RateLimiter rateLimiter = RateLimiter.create(1);
+    private final RateLimiter rateLimiter;
+    private final HttpClient httpClient;
+    private static final String USERS_BASE_URL = "https://users.roblox.com";
+    private static final String THUMBNAILS_BASE_URL = "https://thumbnails.roblox.com";
 
-    public static class Users {
-        private static final String USERS_BASE_URL = "https://users.roblox.com";
-        private static final String GET_USERS_ENDPOINT = USERS_BASE_URL + "/v1/usernames/users";
-
-        public static MultiGetUserByNameModel multiGetUserByName(List<String> usernames, boolean excludeBannedUsers) throws IOException {
-            Map<String, Object> requestBodyMap = new HashMap<>();
-            requestBodyMap.put("usernames", usernames);
-            requestBodyMap.put("excludeBannedUsers", excludeBannedUsers);
-
-            rateLimiter.acquire();
-            return HttpClient.post(GET_USERS_ENDPOINT, requestBodyMap, MultiGetUserByNameModel.class);
-        }
+    public RobloxAPI(RateLimiter rateLimiter, HttpClient httpClient) {
+        this.rateLimiter = rateLimiter;
+        this.httpClient = httpClient;
     }
 
-    public static class Thumbnails {
-        private static final String THUMBNAILS_BASE_URL = "https://thumbnails.roblox.com";
-        private static final String GET_AVATAR_HEADSHOT_ENDPOINT = THUMBNAILS_BASE_URL + "/v1/users/avatar-headshot";
+    public MultiGetUserByNameModel multiGetUserByName(List<String> usernames, boolean excludeBannedUsers) throws IOException {
+        String GET_USERS_ENDPOINT = USERS_BASE_URL + "/v1/usernames/users";
+        Map<String, Object> requestBodyMap = new HashMap<>();
+        requestBodyMap.put("usernames", usernames);
+        requestBodyMap.put("excludeBannedUsers", excludeBannedUsers);
 
-        public static ThumbnailModel getAvatarHeadshot(List<Long> userIds, String thumbnailSize, String format, Boolean isCircular) throws IOException {
-            Map<String, Object> queryParams = new HashMap<>();
-            queryParams.put("userIds", userIds);
-            queryParams.put("size", thumbnailSize);
-            queryParams.put("format", format);
-            queryParams.put("isCircular", isCircular.toString());
+        rateLimiter.acquire();
+        return httpClient.post(GET_USERS_ENDPOINT, requestBodyMap, MultiGetUserByNameModel.class);
+    }
 
-            rateLimiter.acquire();
-            return HttpClient.get(HttpClient.buildUrlWithParams(GET_AVATAR_HEADSHOT_ENDPOINT, queryParams), ThumbnailModel.class);
-        }
+    public ThumbnailModel getAvatarHeadshot(List<Long> userIds, String thumbnailSize, String format, Boolean isCircular) throws IOException {
+        String GET_AVATAR_HEADSHOT_ENDPOINT = THUMBNAILS_BASE_URL + "/v1/users/avatar-headshot";
+        Map<String, Object> queryParams = new HashMap<>();
+        queryParams.put("userIds", userIds);
+        queryParams.put("size", thumbnailSize);
+        queryParams.put("format", format);
+        queryParams.put("isCircular", isCircular.toString());
+
+        rateLimiter.acquire();
+        return httpClient.get(httpClient.buildUrlWithParams(GET_AVATAR_HEADSHOT_ENDPOINT, queryParams), ThumbnailModel.class);
     }
 }
-
-

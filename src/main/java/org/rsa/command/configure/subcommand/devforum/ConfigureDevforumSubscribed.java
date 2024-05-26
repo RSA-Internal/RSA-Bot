@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.panda.jda.command.EventEntities;
 import org.panda.jda.command.SubcommandObjectV2;
+import org.rsa.net.apis.APIFactory;
 import org.rsa.net.apis.discourse.DiscourseAPI;
 
 import java.io.IOException;
@@ -17,11 +18,13 @@ import java.util.stream.Collectors;
 import static net.dv8tion.jda.api.interactions.commands.build.CommandData.MAX_OPTIONS;
 
 public class ConfigureDevforumSubscribed extends SubcommandObjectV2 {
+    private final DiscourseAPI discourseAPI;
 
     public ConfigureDevforumSubscribed() {
         super("subscribed", "Configure subscribed categories.");
 
         addOptions(new OptionData(OptionType.STRING, "categories", "Subscribed categories", true, true));
+        discourseAPI = APIFactory.getDiscourseAPI();
     }
 
     @Override
@@ -31,9 +34,9 @@ public class ConfigureDevforumSubscribed extends SubcommandObjectV2 {
 
         List<Command.Choice> options = Collections.emptyList();
         try {
-            options = DiscourseAPI.getLatestCategoryInformation().keySet().stream()
-                    .filter(category -> category.toLowerCase().startsWith(focusedOption.getValue().toLowerCase()))
-                    .map(category -> new Command.Choice(category, category))
+            options = discourseAPI.getLatestCategoryInformation().values().stream()
+                    .filter(category -> category.name().startsWith(focusedOption.getValue().toLowerCase()))
+                    .map(category -> new Command.Choice(category.name(), category.id()))
                     .limit(MAX_OPTIONS)
                     .collect(Collectors.toList());
         } catch (IOException e) {

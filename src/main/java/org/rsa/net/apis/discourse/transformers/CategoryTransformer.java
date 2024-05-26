@@ -8,7 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CategoryTransformer {
-    public static Map<String, Category> fromResponse(CategoryModel response) {
+
+    public Map<String, Category> fromResponse(CategoryModel response) {
         Map<String, Category> categoryDetailsList = new HashMap<>();
         for (CategoryModel.Category category : response.categories()) {
             categoryDetailsList.put(category.id(), new Category(category.id(), category.name(), Color.decode("#" + category.color())));

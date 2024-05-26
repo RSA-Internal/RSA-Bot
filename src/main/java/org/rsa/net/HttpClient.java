@@ -10,10 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpClient {
-    private static final OkHttpClient client = new OkHttpClient();
-    private static final Gson gson = new GsonBuilder().create();
+    private final OkHttpClient client;
+    private final Gson gson;
 
-    public static <T> T get(String url, Type typeOfT) throws IOException {
+    public HttpClient(OkHttpClient client, Gson gson) {
+        this.client = client;
+        this.gson = gson;
+    }
+
+    public <T> T get(String url, Type typeOfT) throws IOException {
         Request request = new Request.Builder().url(url).build();
 
         try (Response response = client.newCall(request).execute()) {
@@ -24,7 +29,7 @@ public class HttpClient {
         }
     }
 
-    public static <T> T post(String url, Object payload, Type typeOfT) throws IOException {
+    public <T> T post(String url, Object payload, Type typeOfT) throws IOException {
         RequestBody body = RequestBody.create(
                 gson.toJson(payload),
                 MediaType.get("application/json; charset=utf-8"));
@@ -44,8 +49,8 @@ public class HttpClient {
         }
     }
 
-    public static String buildUrlWithParams(String url, Map<String, Object> params) {
-        HttpUrl.Builder urlBuilder = HttpUrl.get(url).newBuilder(); // HttpUrl.get(String URL) should throw IllegalArgumentException ??
+    public String buildUrlWithParams(String url, Map<String, Object> params) {
+        HttpUrl.Builder urlBuilder = HttpUrl.get(url).newBuilder();
         for (Map.Entry<String, Object> entry : params.entrySet()) {
             // loop through objects (and lists) to append to URL as query
             if (entry.getValue() instanceof List) {
