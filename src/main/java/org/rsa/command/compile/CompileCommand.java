@@ -11,10 +11,11 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import org.panda.jda.command.CommandObjectV2;
 import org.panda.jda.command.EventEntities;
-import org.rsa.wandbox.WandboxAPI;
-import org.rsa.wandbox.entities.CompileParameter;
-import org.rsa.wandbox.entities.CompileResult;
-import org.rsa.wandbox.entities.CompilerInfo;
+import org.rsa.net.apis.ApiFactory;
+import org.rsa.net.apis.wandbox.WandboxApi;
+import org.rsa.net.apis.wandbox.models.CompileParameterModel;
+import org.rsa.net.apis.wandbox.models.CompileResultModel;
+import org.rsa.net.apis.wandbox.models.CompilerInfoModel;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,16 +26,10 @@ import java.util.stream.Collectors;
 import static net.dv8tion.jda.api.interactions.commands.build.CommandData.MAX_OPTIONS;
 
 public class CompileCommand extends CommandObjectV2 {
-
-    List<CompilerInfo> compilers = WandboxAPI.getList();
-    Set<String> languageList = compilers.stream().map(CompilerInfo::getLanguage).collect(Collectors.toSet());
-    Map<String, Set<String>> languageVersions = compilers.stream()
-        .collect(Collectors.groupingBy(
-            CompilerInfo::getLanguage,
-            Collectors.mapping(
-                CompilerInfo::getVersion, Collectors.toSet()
-            )
-        ));
+    private final WandboxApi wandboxApi;
+    private final List<CompilerInfoModel> compilers;
+    private final Set<String> languageList;
+    private final Map<String, Set<String>> languageVersions;
 
     public CompileCommand() {
         super("compile", "Compiles code.");
@@ -47,6 +42,18 @@ public class CompileCommand extends CommandObjectV2 {
         addOptionData(new OptionData(OptionType.BOOLEAN, "display",
             "Display the result to the channel.", false));
         setAutocomplete(true);
+
+        wandboxApi = ApiFactory.getWandboxApi();
+        compilers = wandboxApi.getList();
+        languageList = compilers.stream().map(CompilerInfoModel::language).collect(Collectors.toSet());
+        languageVersions = compilers.stream()
+                .collect(Collectors.groupingBy(
+                        CompilerInfoModel::language,
+                        Collectors.mapping(
+                                CompilerInfoModel::version,
+                                Collectors.toSet()
+                        )
+                ));
     }
 
     @Override
@@ -91,9 +98,9 @@ public class CompileCommand extends CommandObjectV2 {
             return;
         }
 
-        List<CompilerInfo> matchingCompilers = compilers.stream()
-            .filter(compiler -> compiler.getLanguage().equals(language))
-            .filter(compiler -> compiler.getVersion().equals(version))
+        List<CompilerInfoModel> matchingCompilers = compilers.stream()
+            .filter(compiler -> compiler.language().equals(language))
+            .filter(compiler -> compiler.version().equals(version))
             .toList();
         if (matchingCompilers.isEmpty()) {
             event
@@ -103,23 +110,21 @@ public class CompileCommand extends CommandObjectV2 {
             return;
         }
 
-        CompilerInfo firstMatchingCompiler = matchingCompilers.get(0);
-        CompileParameter compileParameter = new CompileParameter();
-        compileParameter.setCompiler(firstMatchingCompiler.getName());
-        compileParameter.setCode(code);
+        CompilerInfoModel firstMatchingCompiler = matchingCompilers.get(0);
+        CompileParameterModel compileParameter = new CompileParameterModel(code, null, firstMatchingCompiler.name(), null);
 
-        CompileResult result = WandboxAPI.compileJson(compileParameter);
+        CompileResultModel result = wandboxApi.compileJson(compileParameter);
         EmbedBuilder resultDisplay = new EmbedBuilder();
         resultDisplay.setTitle("Code Result");
         resultDisplay.setAuthor(event.getUser().getName());
         resultDisplay.addField("Language", language, true);
         resultDisplay.addField("Version", version, true);
         resultDisplay.addField("Compile Status", result.getStatus(), true);
-        if (!result.getCompiler_message().isEmpty()) {
-            resultDisplay.addField("Compiler message", "```\n" + result.getCompiler_message().substring(0, Math.min(result.getCompiler_message().length(), 250)) + "\n```", false);
+        if (!result.compiler_message().isEmpty()) {
+            resultDisplay.addField("Compiler message", "```\n" + result.compiler_message().substring(0, Math.min(result.compiler_message().length(), 250)) + "\n```", false);
         }
-        if (!result.getProgram_message().isEmpty()) {
-            resultDisplay.addField("Program message", "```\n" + result.getProgram_message().substring(0, Math.min(result.getProgram_message().length(), 250)) + "\n```", false);
+        if (!result.program_message().isEmpty()) {
+            resultDisplay.addField("Program message", "```\n" + result.program_message().substring(0, Math.min(result.program_message().length(), 250)) + "\n```", false);
         }
 
         boolean isEphemeral = true;
