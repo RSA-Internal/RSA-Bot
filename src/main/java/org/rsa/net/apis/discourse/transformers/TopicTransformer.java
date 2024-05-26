@@ -20,7 +20,7 @@ public class TopicTransformer {
 
         return new Topic(
                 timestamp,
-                response.id(),
+                Integer.parseInt(response.id()),
                 response.title(),
                 response.details().created_by().username(),
                 parsed,

@@ -12,7 +12,7 @@ public class CategoryTransformer {
     public Map<String, Category> fromResponse(CategoryModel response) {
         Map<String, Category> categoryDetailsList = new HashMap<>();
         for (CategoryModel.Category category : response.categories()) {
-            categoryDetailsList.put(category.id(), new Category(category.id(), category.name(), Color.decode("#" + category.color())));
+            categoryDetailsList.put(category.id(), new Category(Integer.parseInt(category.id()), category.name(), Color.decode("#" + category.color())));
         }
         return categoryDetailsList;
     }
