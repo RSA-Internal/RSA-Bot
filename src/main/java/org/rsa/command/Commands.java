@@ -2,6 +2,7 @@ package org.rsa.command;
 
 import lombok.extern.slf4j.Slf4j;
 import org.panda.jda.command.CommandObjectV2;
+import org.rsa.command.ai.AssistCommand;
 import org.rsa.command.backup.BackupCommand;
 import org.rsa.command.compile.CompileCommand;
 import org.rsa.command.configure.ConfigureCommand;
@@ -22,6 +23,7 @@ public class Commands {
         addCommandObject(new ConfigureCommand());
         addCommandObject(new ReputationCommand());
         addCommandObject(new CompileCommand());
+        addCommandObject(new AssistCommand());
     }
 
     private static void addCommandObject(CommandObjectV2 commandObjectV2) {

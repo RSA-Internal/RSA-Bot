@@ -2,6 +2,7 @@ package org.rsa.aws.factory;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.waiters.DynamoDbWaiter;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -36,5 +37,9 @@ public class DependencyFactory {
      */
     public static DynamoDbWaiter dynamoDbWaiter() {
         return DynamoDbWaiter.builder().client(dynamoDbClient()).build();
+    }
+
+    public static BedrockRuntimeClient bedrockRuntimeClient() {
+        return BedrockRuntimeClient.builder().region(Region.US_WEST_2).build();
     }
 }
