@@ -1,11 +1,12 @@
 package org.rsa.translator;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.util.GuildConfigurationConstant;
+import org.rsa.beans.GuildConfiguration;
 import org.rsa.util.HelperUtil;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Slf4j
 public class ConfigurationTranslator {
 
     private static void addSectionToEmbed(Guild guild, GuildConfiguration configuration, EmbedBuilder embedBuilder, String sectionTitle, List<GuildConfigurationConstant> sectionList) {
@@ -36,7 +38,7 @@ public class ConfigurationTranslator {
 
         int remaining = 3 - (index % 3);
         if (remaining < 3) {
-            System.out.println("Section: " + sectionTitle + " | Remaining: " + remaining);
+            log.info("Section: " + sectionTitle + " | Remaining: " + remaining);
             for (int i = 0; i < remaining; i++) {
                 embedBuilder.addBlankField(true);
             }

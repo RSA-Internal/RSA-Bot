@@ -1,4 +1,4 @@
-package org.rsa.logic.data.models;
+package org.rsa.beans;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -7,12 +7,12 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
+import org.rsa.beans.GuildConfiguration;
+import org.rsa.beans.UserReputation;
 import org.rsa.context.MessageContextObject;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.managers.ReputationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
-import org.rsa.logic.data.models.UserReputation;
+import org.rsa.managers.GuildConfigurationManager;
+import org.rsa.managers.ReputationManager;
+import org.rsa.util.GuildConfigurationConstant;
 
 import java.util.List;
 import java.util.Objects;

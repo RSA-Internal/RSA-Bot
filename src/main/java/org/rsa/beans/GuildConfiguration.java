@@ -1,10 +1,10 @@
-package org.rsa.logic.data.models;
+package org.rsa.beans;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.Guild;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
+import org.rsa.util.GuildConfigurationConstant;
+import org.rsa.managers.GuildConfigurationManager;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbIgnore;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;

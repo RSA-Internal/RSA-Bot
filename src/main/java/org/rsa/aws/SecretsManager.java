@@ -2,6 +2,7 @@ package org.rsa.aws;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.GetSecretValueRequest;
@@ -11,6 +12,7 @@ import software.amazon.awssdk.services.secretsmanager.model.SecretsManagerExcept
 import java.io.IOException;
 import java.util.HashMap;
 
+@Slf4j
 public class SecretsManager {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final TypeReference<HashMap<String, String>> SECRET_TYPE_REFERENCE = new TypeReference<>() {};
@@ -38,10 +40,10 @@ public class SecretsManager {
             secretsClient.close();
             return secretValue;
         } catch (SecretsManagerException e) {
-            System.err.println(e.awsErrorDetails().errorMessage());
+            log.error(e.awsErrorDetails().errorMessage());
             return null;
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }

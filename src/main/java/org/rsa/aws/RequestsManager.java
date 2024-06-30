@@ -1,5 +1,6 @@
 package org.rsa.aws;
 
+import org.rsa.aws.accessor.DynamoDbAccessor;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.model.*;
@@ -17,7 +18,7 @@ public class RequestsManager<T> {
 
     public RequestsManager(String tableName, Class<T> type)
     {
-        this.table = DynamoDB.GetDynamoTable(tableName, TableSchema.fromBean(type));
+        this.table = DynamoDbAccessor.getTable(tableName, TableSchema.fromBean(type));
         this.classType = type;
     }
 

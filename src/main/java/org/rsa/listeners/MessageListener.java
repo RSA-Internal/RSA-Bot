@@ -13,9 +13,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.data.DataObject;
 import org.jetbrains.annotations.NotNull;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
-import org.rsa.logic.data.models.GuildConfiguration;
+import org.rsa.util.GuildConfigurationConstant;
+import org.rsa.managers.GuildConfigurationManager;
+import org.rsa.beans.GuildConfiguration;
 
 import java.util.Map;
 import java.util.Objects;

@@ -1,4 +1,4 @@
-package org.rsa.logic.constants;
+package org.rsa.util;
 
 import lombok.Getter;
 

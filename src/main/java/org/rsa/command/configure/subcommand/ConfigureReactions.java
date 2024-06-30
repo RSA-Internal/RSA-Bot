@@ -6,8 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.panda.jda.command.EventEntities;
 import org.panda.jda.command.SubcommandObjectV2;
-import org.rsa.logic.constants.GuildConfigurationConstant;
-import org.rsa.logic.data.managers.GuildConfigurationManager;
+import org.rsa.managers.GuildConfigurationManager;
+import org.rsa.util.GuildConfigurationConstant;
 
 public class ConfigureReactions extends SubcommandObjectV2 {
     public ConfigureReactions() {

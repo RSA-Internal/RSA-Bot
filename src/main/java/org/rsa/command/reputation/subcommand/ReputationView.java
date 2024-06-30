@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.panda.jda.command.EventEntities;
 import org.panda.jda.command.SubcommandObjectV2;
-import org.rsa.logic.data.managers.ReputationManager;
-import org.rsa.logic.data.models.UserReputation;
+import org.rsa.beans.UserReputation;
+import org.rsa.managers.ReputationManager;
 import org.rsa.translator.ReputationTranslator;
 
 public class ReputationView extends SubcommandObjectV2 {
