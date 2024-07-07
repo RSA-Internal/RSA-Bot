@@ -1,7 +1,9 @@
-package org.rsa.aws.bedrock.claude;
+package org.rsa.aws.bedrock;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.rsa.aws.factory.DependencyFactory;
+import org.rsa.constants.ModelDefinition;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.bedrockruntime.BedrockRuntimeClient;
 import software.amazon.awssdk.services.bedrockruntime.model.*;
@@ -13,12 +15,10 @@ import java.util.Map;
 public class Converse {
 
     private static final BedrockRuntimeClient bedrockClient = DependencyFactory.bedrockRuntimeClient();
-    private static final String SONNET_MODEL_ID = "anthropic.claude-3-sonnet-20240229-v1:0";
-
     private static final Map<String, ConverseContext> contextMap = new HashMap<>();
     private static final long TTL = 1000 * 60 * 5;
 
-    public static ConverseDetailedResponse converse(String requesterId, String input, boolean reset, String personality) {
+    public static ConverseDetailedResponse converse(String requesterId, String input, @NonNull final ModelDefinition modelDefinition, boolean reset, String personality) {
         ConverseContext converseContext;
         if (contextMap.containsKey(requesterId) && !reset) {
             converseContext = contextMap.get(requesterId);
@@ -47,7 +47,7 @@ public class Converse {
         try {
             ConverseContext finalConverseContext = converseContext;
             ConverseResponse response = bedrockClient.converse(request -> request
-                .modelId(SONNET_MODEL_ID)
+                .modelId(modelDefinition.modelId())
                 .messages(finalConverseContext.messages)
                 .system(SystemContentBlock.fromText(finalConverseContext.personality != null ? "Respond to this message with a " + finalConverseContext.personality + " personality" : "Respond to this message how you normally would"),
                         SystemContentBlock.fromText("Your name is PandaBot and you are designed to help users with Roblox related questions."),
@@ -79,12 +79,13 @@ public class Converse {
 
             converseContext.addMessage(response.output().message());
             contextMap.put(requesterId, converseContext);
-            ConverseDetailedResponse detailedResponse = new ConverseDetailedResponse(response);
+            ConverseDetailedResponse detailedResponse = new ConverseDetailedResponse(response, modelDefinition);
+
             log.info("Generated response with tokens: [{} | {}] @ cost of ${}", detailedResponse.inputTokens, detailedResponse.outputTokens, detailedResponse.cost);
 
             return detailedResponse;
         } catch (SdkClientException e) {
-            log.error("ERROR: Can't invoke '{}'. Reason: {}", SONNET_MODEL_ID, e.getMessage());
+            log.error("ERROR: Can't invoke '{}'. Reason: {}", modelDefinition.modelId(), e.getMessage());
             return null;
         }
     }

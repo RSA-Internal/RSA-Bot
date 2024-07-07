@@ -1,4 +1,4 @@
-package org.rsa.aws.bedrock.claude;
+package org.rsa.aws.bedrock;
 
 import software.amazon.awssdk.services.bedrockruntime.model.Message;
 
